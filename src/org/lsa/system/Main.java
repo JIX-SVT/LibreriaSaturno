@@ -18,8 +18,7 @@ public class Main extends Application {
             miConexion.conectar();
             System.out.println("Bienvenido a Librería Saturno");
 
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/CambioContrasenaView.fxml"));
             
             Parent root = loader.load();
             Scene scene = new Scene(root);
@@ -34,8 +33,12 @@ public class Main extends Application {
         }
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
-}   
-
+}
