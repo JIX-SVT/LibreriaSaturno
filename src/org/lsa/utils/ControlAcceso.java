@@ -16,11 +16,11 @@ public class ControlAcceso {
         String rol = usuario.getRol().toLowerCase();
 
         switch (vistaDestino) {
-            case "DashboardAdmin.fxml":
+            case "DashboardAdminController.fxml":
                 return rol.equals("admin");
-            case "DashboardBodega.fxml":
+            case "DashboardBodegaController.fxml":
                 return rol.equals("admin") || rol.equals("bodega");
-            case "DashboardCajero.fxml":
+            case "DashboardCajeroController.fxml":
                 return rol.equals("admin") || rol.equals("cajero");
             default:
                 return false;
