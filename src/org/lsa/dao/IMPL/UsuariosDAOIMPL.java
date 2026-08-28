@@ -1,8 +1,6 @@
 
 package org.lsa.dao.IMPL;
 
-import com.mysql.cj.jdbc.CallableStatement;
-import com.sun.jdi.connect.spi.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import org.lsa.dao.UsuariosDAO;
@@ -21,20 +19,20 @@ public class UsuariosDAOIMPL implements UsuariosDAO{
     @Override
     public List<Usuarios> listar() {
        
-        List<Usuarios> editoriales = new ArrayList<>();
+        List<Usuarios> usuarios = new ArrayList<>();
         
         String consulta = "{call sp_listarusuarios()}";
         
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             CallableStatement consultaCall = conexion.prepareCall(consulta);
+        try (java.sql.Connection conexion = Conexion.getInstancia().conectar();
+             java.sql.CallableStatement consultaCall = conexion.prepareCall(consulta);
               ResultSet tablaResultado = consultaCall.executeQuery();) {
                 
                 
               while (tablaResultado.next()) {
-                  Usuarios.add(new Usuarios(
+                  usuarios.add(new Usuarios(
                           tablaResultado.getString("_username"),
                           tablaResultado.getString("_passwordhash"),
-                          tablaResultado.getString("_confirmarPassword")
+                          tablaResultado.getString("_confirmarPassword")                       
                   ));
             }
          
@@ -43,7 +41,7 @@ public class UsuariosDAOIMPL implements UsuariosDAO{
             System.err.print("Error al Listar Editoriales " + e.getMessage());
         }
       
-         return editoriales;
+         return usuarios;
     }
 
     @Override
@@ -51,8 +49,8 @@ public class UsuariosDAOIMPL implements UsuariosDAO{
              Usuarios usuarios = new Usuarios();
 
         String consultaSQL = "{call sp_buscareditorial(?)}";
-        try (Connection conexion = Conexion.getInstancia().conectar(); 
-                CallableStatement consultaCall = conexion.prepareCall(consultaSQL);) {
+        try (java.sql.Connection conexion = Conexion.getInstancia().conectar(); 
+                java.sql.CallableStatement consultaCall = conexion.prepareCall(consultaSQL);) {
             consultaCall.setString(1, username);
             ResultSet tablaResultado = consultaCall.executeQuery();
             if (tablaResultado.next()) {
@@ -70,8 +68,8 @@ public class UsuariosDAOIMPL implements UsuariosDAO{
     @Override
     public boolean actualizar(Usuarios usuarios) {
         String sql = "{call sp_actualizarusuarios(?, ?)}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
+        try (java.sql.Connection con = Conexion.getInstancia().conectar();
+             java.sql.CallableStatement cs = con.prepareCall(sql)) {
             cs.setString(1, usuarios.getUsername());
             cs.setString(2, usuarios.getPasswordHash());
             return cs.executeUpdate() > 0;
@@ -84,8 +82,8 @@ public class UsuariosDAOIMPL implements UsuariosDAO{
     @Override
     public boolean eliminar(String username) {
    String sql = "{call sp_eliminarusuarios(?)}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
+        try (java.sql.Connection con = Conexion.getInstancia().conectar();
+             java.sql.CallableStatement cs = con.prepareCall(sql)) {
             cs.setString(1, username);
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {

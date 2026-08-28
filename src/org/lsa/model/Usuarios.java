@@ -5,7 +5,6 @@ public class Usuarios  {
     private String username;
     private String passwordHash;
     private String confirmarPassword;
-    
     public Usuarios(){
         
     }
@@ -38,5 +37,4 @@ public class Usuarios  {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
-    
 }

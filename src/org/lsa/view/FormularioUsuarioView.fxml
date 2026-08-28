@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.lsa.controller.FormularioUsuarioController">
+    <stylesheets>
+        <URL value="@/org/lsa/view/style/formulariousuarioview.css" />
+    </stylesheets>
+   <children>
+      <TextField fx:id="txtUsuario" layoutX="226.0" layoutY="143.0" />
+      <PasswordField fx:id="txtContraseña" layoutX="226.0" layoutY="188.0" />
+      <PasswordField fx:id="txtconfirmarContraseña" layoutX="226.0" layoutY="231.0" />
+      <Text layoutX="165.0" layoutY="160.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Usuario" wrappingWidth="45.341796875" />
+      <Text layoutX="148.0" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña" wrappingWidth="79.341796875" />
+      <Text layoutX="105.0" layoutY="248.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Confirmar Contraseña" wrappingWidth="120.341796875" />
+      <Text layoutX="156.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Registrar Usuario" wrappingWidth="288.0">
+         <font>
+            <Font size="37.0" />
+         </font>
+      </Text>
+      <Button layoutX="225.0" layoutY="307.0" mnemonicParsing="false" text="Guardar" />
+      <Button layoutX="300.0" layoutY="307.0" mnemonicParsing="false" text="Regresar" />
+   </children>
+</AnchorPane>
