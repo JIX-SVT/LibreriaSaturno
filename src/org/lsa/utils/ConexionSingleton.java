@@ -24,4 +24,8 @@ public class ConexionSingleton {
     public Connection conectar() throws SQLException {
         return Conexion.getInstancia().conectar();
     }
+
+    public Connection getConexion() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
