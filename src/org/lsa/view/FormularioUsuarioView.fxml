@@ -8,23 +8,50 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.lsa.controller.FormularioUsuarioController">
+<AnchorPane id="AnchorPane" prefHeight="449.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.FormularioUsuarioController">
     <stylesheets>
         <URL value="@/org/lsa/view/style/formulariousuarioview.css" />
     </stylesheets>
    <children>
-      <TextField fx:id="txtUsuario" layoutX="226.0" layoutY="143.0" />
-      <PasswordField fx:id="txtContraseña" layoutX="226.0" layoutY="188.0" />
-      <PasswordField fx:id="txtconfirmarContraseña" layoutX="226.0" layoutY="231.0" />
-      <Text layoutX="165.0" layoutY="160.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Usuario" wrappingWidth="45.341796875" />
-      <Text layoutX="148.0" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña" wrappingWidth="79.341796875" />
-      <Text layoutX="105.0" layoutY="248.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Confirmar Contraseña" wrappingWidth="120.341796875" />
-      <Text layoutX="156.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Registrar Usuario" wrappingWidth="288.0">
+      <TextField fx:id="txtUsuario" layoutX="180.0" layoutY="94.0" prefHeight="25.0" prefWidth="227.0" />
+      <PasswordField fx:id="txtContraseña" layoutX="180.0" layoutY="281.0" prefHeight="25.0" prefWidth="227.0" />
+      <PasswordField fx:id="txtconfirmarContraseña" layoutX="180.0" layoutY="336.0" prefHeight="25.0" prefWidth="227.0" />
+      <Text layoutX="51.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Usuario" wrappingWidth="59.0">
+         <font>
+            <Font size="14.0" />
+         </font></Text>
+      <Text layoutX="51.0" layoutY="299.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contraseña" wrappingWidth="79.341796875">
+         <font>
+            <Font size="14.0" />
+         </font></Text>
+      <Text layoutX="51.0" layoutY="345.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Confirmar Contraseña" wrappingWidth="114.341796875">
+         <font>
+            <Font size="14.0" />
+         </font></Text>
+      <Text layoutX="122.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Formulario Usuario" wrappingWidth="343.0">
          <font>
             <Font size="37.0" />
          </font>
       </Text>
-      <Button layoutX="225.0" layoutY="307.0" mnemonicParsing="false" text="Guardar" />
-      <Button layoutX="300.0" layoutY="307.0" mnemonicParsing="false" text="Regresar" />
+      <Button layoutX="180.0" layoutY="394.0" mnemonicParsing="false" onAction="#handleGuardar" prefHeight="25.0" prefWidth="90.0" text="Guardar" />
+      <Button layoutX="306.0" layoutY="394.0" mnemonicParsing="false" onAction="#handleRegresar" prefHeight="25.0" prefWidth="90.0" text="Regresar" />
+      <Text layoutX="51.0" layoutY="156.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nombre" wrappingWidth="59.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <TextField fx:id="txtNombre" layoutX="180.0" layoutY="138.0" prefHeight="25.0" prefWidth="227.0" />
+      <Text layoutX="51.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Correo" wrappingWidth="50.341796875">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <TextField fx:id="txtCorreo" layoutX="180.0" layoutY="233.0" prefHeight="25.0" prefWidth="227.0" />
+      <Text layoutX="51.0" layoutY="201.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Apellido" wrappingWidth="59.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <TextField fx:id="txtApellido" layoutX="180.0" layoutY="183.0" prefHeight="25.0" prefWidth="227.0" />
    </children>
 </AnchorPane>

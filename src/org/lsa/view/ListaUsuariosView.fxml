@@ -22,16 +22,16 @@
             </padding>
             <Label prefHeight="27.0" prefWidth="173.0" style="-fx-font-size: 18; -fx-font-weight: bold;" text="Usuarios" />
             <TextField fx:id="txtNombre" promptText="Usuario" />
-            <TextField fx:id="txtDireccion" promptText="Nombre" />
-         <TextField fx:id="txtDireccion1" promptText="Apellido" />
-         <TextField fx:id="txtDireccion2" promptText="Correo" />
-         <TextField fx:id="txtDireccion3" promptText="Fecha de creación" />
+            <TextField fx:id="txtNombre" promptText="Nombre" />
+         <TextField fx:id="txtApellido" promptText="Apellido" />
+         <TextField fx:id="txtCorreo" promptText="Correo" />
+         <TextField fx:id="txtFC" promptText="Fecha de creación" />
             <HBox spacing="10">
-                <Button onAction="#handleGuardarEditorial" prefWidth="120" text="Guardar" />
-            <Button onAction="#handleGuardarEditorial" prefWidth="120" text="Editar" />
-            <Button onAction="#handleGuardarEditorial" prefWidth="120.0" text="Desactivar" />
+                <Button onAction="#handleGuardar" prefWidth="120" text="Guardar" />
+            <Button onAction="#handleEditar" prefWidth="120" text="Editar" />
+            <Button onAction="#handleDesactivar" prefWidth="120.0" text="Desactivar" />
             </HBox>
-             <Button onAction="#handleLimpiarEditorial" prefWidth="120" text="Limpiar" />
+             <Button onAction="#handleLimpiar" prefWidth="120" text="Limpiar" />
             <Label fx:id="lblMensaje" />
         </VBox>
     </left>
