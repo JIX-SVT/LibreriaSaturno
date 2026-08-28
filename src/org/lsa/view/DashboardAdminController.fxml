@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.lsa.controller.DashboardAdminController" 
+      alignment="CENTER" spacing="20" prefWidth="600" prefHeight="400">
+    <Label text="Panel de Administración" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Button text="Cerrar Sesión" onAction="#handleCerrarSesion"/>
+</VBox>

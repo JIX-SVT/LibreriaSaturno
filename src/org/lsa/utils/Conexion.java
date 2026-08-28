@@ -28,7 +28,7 @@ public class Conexion {
 
     private void cargarPropiedades() {
         Properties properties = new Properties();
-        try (InputStream input = Conexion.class.getResourceAsStream("/sql.properties")) {
+        try (InputStream input = Conexion.class.getResourceAsStream("/sql.example.properties")) {
 
             if (input == null) {
                 System.err.println("Error: No se encontró el archivo sql.properties en src/");
