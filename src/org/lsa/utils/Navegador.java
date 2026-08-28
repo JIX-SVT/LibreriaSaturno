@@ -21,13 +21,13 @@ public class Navegador {
         String rol = usuario.getRol() != null ? usuario.getRol().toLowerCase() : "";
         switch (rol) {
             case "admin":
-                cargarVista(stage, "/org/lsa/view/DashboardAdmin.fxml", "Panel Administración");
+                cargarVista(stage, "/org/lsa/view/DashboardAdminController.fxml", "Panel Administración");
                 break;
             case "bodega":
-                cargarVista(stage, "/org/lsa/view/DashboardBodega.fxml", "Panel Bodega");
+                cargarVista(stage, "/org/lsa/view/DashboardBodegaController.fxml", "Panel Bodega");
                 break;
             case "cajero":
-                cargarVista(stage, "/org/lsa/view/DashboardCajero.fxml", "Panel Caja");
+                cargarVista(stage, "/org/lsa/view/DashboardCajeroController.fxml", "Panel Caja");
                 break;
             default:
                 mostrarAlertaAccesoDenegado();
