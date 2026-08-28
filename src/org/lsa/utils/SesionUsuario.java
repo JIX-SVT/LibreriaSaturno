@@ -1,5 +1,5 @@
 package org.lsa.utils;
-
+// Inicio sesión
 import org.lsa.model.Usuario;
 
 public class SesionUsuario {
