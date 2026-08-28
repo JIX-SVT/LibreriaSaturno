@@ -6,11 +6,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400" prefWidth="600" spacing="20" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardAdminController">
+<VBox alignment="CENTER" prefHeight="400" prefWidth="600" spacing="20" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
    <children>
       <Pane prefHeight="444.0" prefWidth="600.0">
          <children>
-            <Label layoutX="155.0" layoutY="64.0" prefHeight="57.0" prefWidth="290.0" text="Bienvenido Administrador" textFill="#3679e3">
+            <Label layoutX="155.0" layoutY="64.0" prefHeight="57.0" prefWidth="290.0" text="Bienvenido Cajero" textFill="#3679e3">
                <font>
                   <Font name="Corbel Light" size="27.0" />
                </font>
