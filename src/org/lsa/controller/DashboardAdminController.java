@@ -25,9 +25,9 @@ public class DashboardAdminController implements Initializable {
     @FXML
     public void handleIngresar(ActionEvent event) {
         Alert alerta = new Alert(AlertType.WARNING);
-        alerta.setTitle("Sección No Disponible");
+        alerta.setTitle("Vista No Disponible");
         alerta.setHeaderText(null);
-        alerta.setContentText("Esta sección no está disponible.");
+        alerta.setContentText("No se encuentra disponible.");
         alerta.showAndWait();
     }
 

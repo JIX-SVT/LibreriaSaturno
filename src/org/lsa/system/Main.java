@@ -19,7 +19,7 @@ public class Main extends Application {
             System.out.println("Bienvenido a Librería Saturno");
 
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/Login.fxml"));
             
             Parent root = loader.load();
             Scene scene = new Scene(root);
