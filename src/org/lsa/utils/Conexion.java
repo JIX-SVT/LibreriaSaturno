@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * @author Gregory Jerónimo
+ * @author Gregory Jerónimo 2026116
  */
 public class Conexion {
 
