@@ -10,6 +10,6 @@ public interface UsuariosDAO {
     List<Usuarios> listar();
     Usuarios buscar(String username);
     boolean actualizar(Usuarios Usuarios);
-    boolean eliminar(String username);
+    boolean eliminar(String username);  
 }
 
