@@ -7,29 +7,20 @@ import org.lsa.utils.ConexionSingleton;
 
 public class InventarioDAO {
 
-    public boolean registrarMovimiento(int libroId, String tipo, int cantidad) {
-        String sqlMov = "INSERT INTO inventario (libro_id, tipo_movimiento, cantidad) VALUES (?, ?, ?)";
-        String sqlStock = tipo.equalsIgnoreCase("INGRESO") 
-                ? "UPDATE libros SET stock_actual = stock_actual + ? WHERE id = ?"
-                : "UPDATE libros SET stock_actual = stock_actual - ? WHERE id = ? AND stock_actual >= ?";
+    public boolean registrarMovimiento(String isbn, String tipo, int cantidad) {
+        String sqlMov = "INSERT INTO inventario (isbn_libro, tipo_movimiento, cantidad) VALUES (?, ?, ?)";
 
         try (Connection conn = ConexionSingleton.getInstancia().getConexion()) {
             conn.setAutoCommit(false);
-            try (PreparedStatement stmtMov = conn.prepareStatement(sqlMov);
-                 PreparedStatement stmtStock = conn.prepareStatement(sqlStock)) {
+            
+            try (PreparedStatement stmtMov = conn.prepareStatement(sqlMov)) {
 
-                stmtMov.setInt(1, libroId);
+                stmtMov.setString(1, isbn);
                 stmtMov.setString(2, tipo);
                 stmtMov.setInt(3, cantidad);
-                stmtMov.executeUpdate();
 
-                stmtStock.setInt(1, cantidad);
-                stmtStock.setInt(2, libroId);
-                if (tipo.equalsIgnoreCase("SALIDA")) {
-                    stmtStock.setInt(3, cantidad);
-                }
-
-                int filas = stmtStock.executeUpdate();
+                int filas = stmtMov.executeUpdate();
+                
                 if (filas > 0) {
                     conn.commit();
                     return true;

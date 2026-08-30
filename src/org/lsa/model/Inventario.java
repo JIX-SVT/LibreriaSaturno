@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class Inventario {
     private int id;
     private int libroId;
-    private String tipoMovimiento; // "INGRESO" o "SALIDA"
+    private String tipoMovimiento;
     private int cantidad;
     private Timestamp fecha;
 

@@ -1,6 +1,8 @@
 package org.lsa.controller;
 
 import java.net.URL;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,12 +22,13 @@ import org.lsa.utils.SesionUsuario;
 public class DashboardBodegaController implements Initializable {
 
     @FXML private TableView<Libro> tblLibros;
-    @FXML private TableColumn<Libro, Integer> colId;
-    @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colAutor;
+    @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colNitEditorial;
+    @FXML private TableColumn<Libro, Date> colFechaPublicacion;
     @FXML private TableColumn<Libro, Double> colPrecio;
-    @FXML private TableColumn<Libro, Integer> colStockActual, colStockMinimo;
+    @FXML private TableColumn<Libro, Integer> colIdCategoria;
 
-    @FXML private TextField txtIsbn, txtTitulo, txtAutor, txtPrecio, txtStockActual, txtStockMinimo, txtCantidadMovimiento;
+    @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtIdCategoria, txtNitEditorial, txtCantidadMovimiento;
+    @FXML private DatePicker dpFechaPublicacion;
     @FXML private Label lblAlertaBajoStock;
 
     private final LibroDAO libroDAO = new LibroDAO();
@@ -47,28 +50,17 @@ public class DashboardBodegaController implements Initializable {
     }
 
     private void configurarColumnas() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colAutor.setCellValueFactory(new PropertyValueFactory<>("autor"));
+        colFechaPublicacion.setCellValueFactory(new PropertyValueFactory<>("fechaPublicacion"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-        colStockActual.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
-        colStockMinimo.setCellValueFactory(new PropertyValueFactory<>("stockMinimo"));
+        colIdCategoria.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
+        colNitEditorial.setCellValueFactory(new PropertyValueFactory<>("nitEditorial"));
     }
 
     private void cargarDatos() {
         listaLibros.setAll(libroDAO.listarLibros());
         tblLibros.setItems(listaLibros);
-        verificarBajoStock();
-    }
-
-    private void verificarBajoStock() {
-        long bajoStock = listaLibros.stream().filter(l -> l.getStockActual() < l.getStockMinimo()).count();
-        if (bajoStock > 0) {
-            lblAlertaBajoStock.setText("️ Hay " + bajoStock + " producto(s) por debajo del stock mínimo.");
-        } else {
-            lblAlertaBajoStock.setText("Todos los productos tienen stock adecuado.");
-        }
     }
 
     @FXML
@@ -77,10 +69,22 @@ public class DashboardBodegaController implements Initializable {
             Libro libro = (libroSeleccionado == null) ? new Libro() : libroSeleccionado;
             libro.setIsbn(txtIsbn.getText());
             libro.setTitulo(txtTitulo.getText());
-            libro.setAutor(txtAutor.getText());
+            
+            if (dpFechaPublicacion.getValue() != null) {
+                libro.setFechaPublicacion(Date.valueOf(dpFechaPublicacion.getValue()));
+            } else {
+                libro.setFechaPublicacion(null);
+            }
+
             libro.setPrecio(Double.parseDouble(txtPrecio.getText()));
-            libro.setStockActual(Integer.parseInt(txtStockActual.getText()));
-            libro.setStockMinimo(Integer.parseInt(txtStockMinimo.getText()));
+            
+            if (!txtIdCategoria.getText().isEmpty()) {
+                libro.setIdCategoria(Integer.parseInt(txtIdCategoria.getText()));
+            } else {
+                libro.setIdCategoria(0);
+            }
+
+            libro.setNitEditorial(txtNitEditorial.getText());
 
             if (libroDAO.guardarOActualizar(libro)) {
                 mostrarAlerta("Éxito", "Libro guardado/modificado correctamente.", Alert.AlertType.INFORMATION);
@@ -90,7 +94,7 @@ public class DashboardBodegaController implements Initializable {
                 mostrarAlerta("Error", "No se pudo guardar el libro.", Alert.AlertType.ERROR);
             }
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error de formato", "Verifique que Precio y Stocks sean numéricos.", Alert.AlertType.WARNING);
+            mostrarAlerta("Error de formato", "Verifique que Precio e Id Categoría sean valores numéricos válidos.", Alert.AlertType.WARNING);
         }
     }
 
@@ -113,12 +117,12 @@ public class DashboardBodegaController implements Initializable {
             int cantidad = Integer.parseInt(txtCantidadMovimiento.getText());
             if (cantidad <= 0) throw new NumberFormatException();
 
-            if (inventarioDAO.registrarMovimiento(libroSeleccionado.getId(), tipo, cantidad)) {
+            if (inventarioDAO.registrarMovimiento(libroSeleccionado.getIsbn(), tipo, cantidad)) {
                 mostrarAlerta("Éxito", tipo + " registrado correctamente.", Alert.AlertType.INFORMATION);
                 txtCantidadMovimiento.clear();
                 cargarDatos();
             } else {
-                mostrarAlerta("Error", "No se pudo registrar la " + tipo + " (verifique stock suficiente).", Alert.AlertType.ERROR);
+                mostrarAlerta("Error", "No se pudo registrar la " + tipo + " (verifique los datos ingresados).", Alert.AlertType.ERROR);
             }
         } catch (NumberFormatException e) {
             mostrarAlerta("Error", "Ingrese una cantidad entera válida mayor a 0.", Alert.AlertType.WARNING);
@@ -140,20 +144,26 @@ public class DashboardBodegaController implements Initializable {
     private void completarCampos(Libro l) {
         txtIsbn.setText(l.getIsbn());
         txtTitulo.setText(l.getTitulo());
-        txtAutor.setText(l.getAutor());
+        
+        if (l.getFechaPublicacion() != null) {
+            dpFechaPublicacion.setValue(new java.sql.Date(l.getFechaPublicacion().getTime()).toLocalDate());
+        } else {
+            dpFechaPublicacion.setValue(null);
+        }
+        
         txtPrecio.setText(String.valueOf(l.getPrecio()));
-        txtStockActual.setText(String.valueOf(l.getStockActual()));
-        txtStockMinimo.setText(String.valueOf(l.getStockMinimo()));
+        txtIdCategoria.setText(String.valueOf(l.getIdCategoria()));
+        txtNitEditorial.setText(l.getNitEditorial());
     }
 
     private void limpiarCampos() {
         libroSeleccionado = null;
         txtIsbn.clear();
         txtTitulo.clear();
-        txtAutor.clear();
+        dpFechaPublicacion.setValue(null);
         txtPrecio.clear();
-        txtStockActual.clear();
-        txtStockMinimo.clear();
+        txtIdCategoria.clear();
+        txtNitEditorial.clear();
         txtCantidadMovimiento.clear();
         tblLibros.getSelectionModel().clearSelection();
     }
