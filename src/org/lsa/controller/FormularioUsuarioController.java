@@ -68,7 +68,7 @@ public class FormularioUsuarioController implements Initializable {
             lblFechaActualizacion.setText(usuario.getFechaActualizacion() != null ? usuario.getFechaActualizacion() : "N/A");
         }
     }
-
+// Handle Guardar
     @FXML
     private void handleGuardar() {
         if (!validarCampos()) {
