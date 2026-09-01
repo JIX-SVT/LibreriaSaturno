@@ -18,7 +18,7 @@ public class Main extends Application {
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
-
+// Catch
         } catch (Exception e) {
             System.err.println("Error al iniciar la aplicación: " + e.getMessage());
             e.printStackTrace();
