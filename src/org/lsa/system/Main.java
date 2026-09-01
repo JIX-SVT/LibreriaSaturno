@@ -1,35 +1,26 @@
 package org.lsa.system;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.lsa.utils.ConexionSingleton;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage stage) throws SQLException {
+    public void start(Stage primaryStage) {
         try {
-            ConexionSingleton miConexion = ConexionSingleton.getInstancia();
-            miConexion.conectar();
-            System.out.println("Bienvenido a Librería Saturno");
-
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/Login.fxml"));
-            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/ListaUsuariosView.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
+            primaryStage.setTitle("Librería Saturno - Gestión de Usuarios");
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
 
-            stage.setTitle("Librería Saturno");
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            System.err.println("Error al cargar la vista FXML: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error al iniciar la aplicación: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -37,5 +28,4 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}   
-
+}
