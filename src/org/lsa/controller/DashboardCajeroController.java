@@ -1,13 +1,16 @@
-
 package org.lsa.controller;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.lsa.dao.LibroDAO;
 import org.lsa.model.Libro;
@@ -28,22 +31,43 @@ public class DashboardCajeroController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configurarTabla();
-        lblVentasHoy.setText("Q0.00");
+        cargarTabla(); 
+        actualizarVentasHoy();
     }
 
     private void configurarTabla() {
-        colIsbn.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("isbn"));
-        colTitulo.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("titulo"));
-        colAutor.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("autor"));
-        colPrecio.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("precio"));
-        colStock.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("stockActual"));
+        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colAutor.setCellValueFactory(new PropertyValueFactory<>("autor"));
+        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stockActual"));
+    }
+
+    private void cargarTabla() {
+        List<Libro> libros = libroDAO.listarLibros();
+        if (libros != null) {
+            ObservableList<Libro> datos = FXCollections.observableArrayList(libros);
+            tblResultados.setItems(datos);
+        }
+    }
+
+    private void actualizarVentasHoy() {
+    
+        lblVentasHoy.setText("Q0.00");
     }
 
     @FXML
     public void handleBuscar(ActionEvent event) {
         String criterio = txtBusqueda.getText();
-        if (criterio != null && !criterio.trim().isEmpty()) {
-            tblResultados.getItems().setAll(libroDAO.listarLibros());
+        
+        if (criterio == null || criterio.trim().isEmpty()) {
+            cargarTabla(); 
+        } else {
+          
+            List<Libro> resultados = libroDAO.buscarLibros(criterio.trim()); 
+            if (resultados != null) {
+                tblResultados.getItems().setAll(resultados);
+            }
         }
     }
 
@@ -55,7 +79,14 @@ public class DashboardCajeroController implements Initializable {
         alerta.setContentText("Módulo de caja listo para procesar una nueva venta.");
         alerta.showAndWait();
     }
-
+    
+@FXML
+    public void handleVolverMenu(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Navegador.cargarVista(stage, "/org/lsa/view/DashboardMenuView.fxml", "Menú Principal - Librería Saturno");
+    }
+    
+    
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
         SesionUsuario.getInstancia().cerrarSesion();

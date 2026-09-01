@@ -3,6 +3,7 @@ package org.lsa.controller;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,8 +40,11 @@ public class DashboardBodegaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configurarColumnas();
-        cargarDatos();
         
+        tblLibros.setItems(listaLibros);
+        
+        cargarDatos();
+
         tblLibros.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 libroSeleccionado = newSelection;
@@ -59,8 +63,20 @@ public class DashboardBodegaController implements Initializable {
     }
 
     private void cargarDatos() {
-        listaLibros.setAll(libroDAO.listarLibros());
-        tblLibros.setItems(listaLibros);
+        try {
+            List<Libro> consulta = libroDAO.listarLibros();
+            
+            System.out.println("Registros obtenidos de la BD: " + (consulta != null ? consulta.size() : 0));
+
+            if (consulta != null) {
+                listaLibros.setAll(consulta);
+            } else {
+                listaLibros.clear();
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar datos en la tabla: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -69,7 +85,7 @@ public class DashboardBodegaController implements Initializable {
             Libro libro = (libroSeleccionado == null) ? new Libro() : libroSeleccionado;
             libro.setIsbn(txtIsbn.getText());
             libro.setTitulo(txtTitulo.getText());
-            
+
             if (dpFechaPublicacion.getValue() != null) {
                 libro.setFechaPublicacion(Date.valueOf(dpFechaPublicacion.getValue()));
             } else {
@@ -77,7 +93,7 @@ public class DashboardBodegaController implements Initializable {
             }
 
             libro.setPrecio(Double.parseDouble(txtPrecio.getText()));
-            
+
             if (!txtIdCategoria.getText().isEmpty()) {
                 libro.setIdCategoria(Integer.parseInt(txtIdCategoria.getText()));
             } else {
@@ -135,6 +151,12 @@ public class DashboardBodegaController implements Initializable {
     }
 
     @FXML
+    public void handleVolverMenu(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Navegador.cargarVista(stage, "/org/lsa/view/DashboardMenuView.fxml", "Menú Principal - Librería Saturno");
+    }
+
+    @FXML
     public void handleCerrarSesion(ActionEvent event) {
         SesionUsuario.getInstancia().cerrarSesion();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -144,13 +166,13 @@ public class DashboardBodegaController implements Initializable {
     private void completarCampos(Libro l) {
         txtIsbn.setText(l.getIsbn());
         txtTitulo.setText(l.getTitulo());
-        
+
         if (l.getFechaPublicacion() != null) {
             dpFechaPublicacion.setValue(new java.sql.Date(l.getFechaPublicacion().getTime()).toLocalDate());
         } else {
             dpFechaPublicacion.setValue(null);
         }
-        
+
         txtPrecio.setText(String.valueOf(l.getPrecio()));
         txtIdCategoria.setText(String.valueOf(l.getIdCategoria()));
         txtNitEditorial.setText(l.getNitEditorial());
