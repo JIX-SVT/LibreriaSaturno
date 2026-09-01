@@ -12,35 +12,43 @@ import org.lsa.utils.Conexion;
 
 public class UsuarioDAOImpl extends UsuarioDAO {
 
-    public boolean autenticar(String correo, String contrasena) {
-        String consulta = "{call sp_autenticarusuario(?, ?)}"; 
+    @Override
+    public Usuario autenticar(String correo, String contrasena) {
+        Usuario usuario = null;
+        String consulta = "{call sp_autenticarusuario(?, ?)}";
         
-        try (Connection conexion = Conexion.getInstancia().conectar();
+        try (Connection conexion = new Conexion().conectar();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-
+             
             consultaCall.setString(1, correo);
             consultaCall.setString(2, contrasena);
             
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
-                    return true;
+                    usuario = new Usuario();
+                    // Asegúrate de que los nombres de los campos coincidan con los que devuelve tu procedimiento almacenado
+                    usuario.setIdUsuario(tablaResultado.getInt("id_usuario"));
+                    usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
+                    usuario.setCorreo(tablaResultado.getString("correo"));
+                    usuario.setRol(tablaResultado.getString("rol"));
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error al autenticar Usuario: " + e.getMessage());
         }
-        return false;
+        
+        return usuario;
     }
 
     @Override
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
         String consulta = "{call sp_listarusuarios()}";
-
-        try (Connection conexion = Conexion.getInstancia().conectar();
+        
+        try (Connection conexion = new Conexion().conectar();
              CallableStatement consultaCall = conexion.prepareCall(consulta);
              ResultSet tablaResultado = consultaCall.executeQuery()) {
-
+             
             while (tablaResultado.next()) {
                 usuarios.add(new Usuario(
                         tablaResultado.getInt("id_usuario"),
@@ -50,19 +58,18 @@ public class UsuarioDAOImpl extends UsuarioDAO {
                 ));
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar Usuarios: " + e.getMessage());
+            System.err.println("Error al listar usuarios: " + e.getMessage());
         }
         return usuarios;
     }
 
-    @Override
-    public Usuario buscarPorId(int idUsuario) {
+    public Usuario buscarUsuario(int idUsuario) {
         Usuario usuario = new Usuario();
         String consultaSQL = "{call sp_buscarusuario(?)}";
-
-        try (Connection conexion = Conexion.getInstancia().conectar();
+        
+        try (Connection conexion = new Conexion().conectar();
              CallableStatement consultaCall = conexion.prepareCall(consultaSQL)) {
-
+             
             consultaCall.setInt(1, idUsuario);
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
@@ -83,10 +90,10 @@ public class UsuarioDAOImpl extends UsuarioDAO {
     @Override
     public boolean insertar(Usuario usuario) {
         String consulta = "{call sp_insertarusuario(?, ?, ?, ?)}";
-
-        try (Connection conexion = Conexion.getInstancia().conectar();
+        
+        try (Connection conexion = new Conexion().conectar();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-
+             
             consultaCall.setString(1, usuario.getNombreUsuario());
             consultaCall.setString(2, usuario.getCorreo());
             consultaCall.setString(3, usuario.getContrasena());

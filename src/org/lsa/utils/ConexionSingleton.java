@@ -21,7 +21,7 @@ public class ConexionSingleton {
         return instancia;
     }
 
-    public Connection conectar() throws SQLException {
-        return Conexion.getInstancia().conectar();
+   public Connection conectar() throws SQLException {
+        return new Conexion().conectar();
     }
 }
