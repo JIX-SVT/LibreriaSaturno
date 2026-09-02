@@ -47,6 +47,12 @@ public class DashboardAdminController implements Initializable {
     public void handleReportesInventario(ActionEvent event) {
         mostrarNotificacion("Reportes de Inventario", "Abriendo reporte de libros más vendidos y stock valorizado.");
     }
+    
+    @FXML
+    public void handleVolverMenu(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Navegador.cargarVista(stage, "/org/lsa/view/DashboardMenuView.fxml", "Menú Principal - Librería Saturno");
+    }
 
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
