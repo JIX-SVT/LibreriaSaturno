@@ -1,35 +1,41 @@
 package org.lsa.model;
 
 public class Usuario {
-    private int id;
-    private String nombre;
+    private int idUsuario;
+    private String nombreUsuario;
     private String correo;
-    private String password;
+    private String contrasena;
+    private String rol;
+    private boolean activo;
 
+    // Constructor vacío
     public Usuario() {
     }
 
-    public Usuario(int id, String nombre, String correo, String password) {
-        this.id = id;
-        this.nombre = nombre;
+    // Constructor completo
+    public Usuario(int idUsuario, String nombreUsuario, String correo, String rol, boolean activo) {
+        this.idUsuario = idUsuario;
+        this.nombreUsuario = nombreUsuario;
         this.correo = correo;
-        this.password = password;
+        this.rol = rol;
+        this.activo = activo;
     }
 
-    public int getId() {
-        return id;
+    // Getters y Setters
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public String getCorreo() {
@@ -40,11 +46,27 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public String getPassword() {
-        return password;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

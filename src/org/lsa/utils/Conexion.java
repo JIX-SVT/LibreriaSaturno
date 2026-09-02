@@ -7,62 +7,52 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * @author Gregory Jerónimo 2026116
+ */
 public class Conexion {
-    private static Conexion instancia;
+    private Connection conexion;
 
-    private static final String CONFIG_FILE = "/sql.properties";
-
-    private final String url;
-    private final String user;
-    private final String password;
-
-    //Constructor privado para evitar que hagan "new Conexion()" fuera de esta clase
-    private Conexion() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Error Driver: " + e.getMessage());
-        }
-
-        //consumo o uso del properties empezamos creando una clase Properties
-        Properties config = new Properties();
-        //cargar archivo db.properties
-        try (InputStream in = getClass().getResourceAsStream(CONFIG_FILE)) {
-            if (in == null) {
-                //excepcion si no encuentra el archivo o no existe
-                throw new IllegalStateException(
-                        "No se encontro " + CONFIG_FILE + " en el classpath. "
-                        + "Copia db.properties.example como src/db.properties y ajusta los valores.");
+    public Connection conectar() {
+        Properties propiedades = new Properties();
+        
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.example.properties")) {
+            
+            if (input == null) {
+                System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");
+                return null;
             }
-            //cargamos el archivo dentro de la clase propertis
-            config.load(in);
+
+            propiedades.load(input);
+
+            String url = propiedades.getProperty("url"); 
+            String user = propiedades.getProperty("user");
+            String password = propiedades.getProperty("password");
+
+            if (url == null || url.trim().isEmpty()) {
+                throw new SQLException("La URL de conexión es nula. Verifica que la clave 'url' exista en db.properties");
+            }
+
+            conexion = DriverManager.getConnection(url, user, password);
+            System.out.println("Conexión inicializada con éxito.");
+
         } catch (IOException e) {
-            throw new IllegalStateException("Error al leer " + CONFIG_FILE, e);
+            System.err.println("Error al leer el archivo de propiedades: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error de base de datos: " + e.getMessage());
         }
-        //llenamos nuestras varibles finales con los datos de db.properties.
-        this.url = config.getProperty("db.url");
-        this.user = config.getProperty("db.user");
-        this.password = config.getProperty("db.password");
-
-        //comprobación de datos del properties nulos para cada atributo o datos nulos.
-        if (url == null || user == null || password == null) {
-            throw new IllegalStateException(
-                    "Faltan propiedades (db.url, db.user, db.password) en " + CONFIG_FILE);
-        }
+        
+        return conexion;
     }
 
-    //Método público estático para obtener la única instancia del Gestor
-    public static synchronized Conexion getInstancia() {
-        if (instancia == null) {
-            instancia = new Conexion();
+    public void desconectar() {
+        try {
+            if (conexion != null && !conexion.isClosed()) {
+                conexion.close();
+                System.out.println("Conexión cerrada.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar la conexión: " + e.getMessage());
         }
-        return instancia;
     }
-
-    //Método para entregar una conexión fresca cada vez que se pida
-    public Connection conectar() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
-    }
-
-
 }
