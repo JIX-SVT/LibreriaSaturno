@@ -1,10 +1,11 @@
-package org.lsa.controler;
+package org.lsa.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.PasswordField;
 import org.lsa.dao.UsuarioDAO;
+import org.lsa.daoimpl.UsuarioDAOImpl;
 
 public class CambioContrasenaControler {
 
@@ -34,7 +35,7 @@ public class CambioContrasenaControler {
         }
 
         int idUsuarioActual = 1; 
-        UsuarioDAO dao = new UsuarioDAO();
+        UsuarioDAO dao = new UsuarioDAOImpl();
 
         boolean esValida = dao.validarContrasenaActual(idUsuarioActual, currentPass);
         if (!esValida) {

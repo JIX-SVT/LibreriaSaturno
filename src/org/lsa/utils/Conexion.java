@@ -16,7 +16,7 @@ public class Conexion {
     public Connection conectar() {
         Properties propiedades = new Properties();
         
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.example.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.properties")) {
             
             if (input == null) {
                 System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");

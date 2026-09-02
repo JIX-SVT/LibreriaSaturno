@@ -1,23 +1,24 @@
 package org.lsa.daoimpl;
 
-import java.sql.Connection;
 import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.model.Usuario;
-import org.lsa.utils.Conexion;
+import org.lsa.utils.ConexionSingleton;
 
-public class UsuarioDAOImpl extends UsuarioDAO {
+public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Usuario autenticar(String correo, String contrasena) {
         Usuario usuario = null;
         String consulta = "{call sp_autenticarusuario(?, ?)}";
         
-        try (Connection conexion = new Conexion().conectar();
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
              
             consultaCall.setString(1, correo);
@@ -26,11 +27,11 @@ public class UsuarioDAOImpl extends UsuarioDAO {
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
                     usuario = new Usuario();
-                    // Asegúrate de que los nombres de los campos coincidan con los que devuelve tu procedimiento almacenado
                     usuario.setIdUsuario(tablaResultado.getInt("id_usuario"));
                     usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
                     usuario.setCorreo(tablaResultado.getString("correo"));
                     usuario.setRol(tablaResultado.getString("rol"));
+                    usuario.setActivo(tablaResultado.getBoolean("activo"));
                 }
             }
         } catch (SQLException e) {
@@ -45,7 +46,7 @@ public class UsuarioDAOImpl extends UsuarioDAO {
         List<Usuario> usuarios = new ArrayList<>();
         String consulta = "{call sp_listarusuarios()}";
         
-        try (Connection conexion = new Conexion().conectar();
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta);
              ResultSet tablaResultado = consultaCall.executeQuery()) {
              
@@ -54,7 +55,8 @@ public class UsuarioDAOImpl extends UsuarioDAO {
                         tablaResultado.getInt("id_usuario"),
                         tablaResultado.getString("nombre_usuario"),
                         tablaResultado.getString("correo"),
-                        tablaResultado.getString("rol")
+                        tablaResultado.getString("rol"),
+                        tablaResultado.getBoolean("activo")
                 ));
             }
         } catch (SQLException e) {
@@ -63,11 +65,12 @@ public class UsuarioDAOImpl extends UsuarioDAO {
         return usuarios;
     }
 
+    @Override
     public Usuario buscarUsuario(int idUsuario) {
         Usuario usuario = new Usuario();
         String consultaSQL = "{call sp_buscarusuario(?)}";
         
-        try (Connection conexion = new Conexion().conectar();
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consultaSQL)) {
              
             consultaCall.setInt(1, idUsuario);
@@ -77,6 +80,7 @@ public class UsuarioDAOImpl extends UsuarioDAO {
                     usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
                     usuario.setCorreo(tablaResultado.getString("correo"));
                     usuario.setRol(tablaResultado.getString("rol"));
+                    usuario.setActivo(tablaResultado.getBoolean("activo"));
                 } else {
                     return null;
                 }
@@ -91,7 +95,7 @@ public class UsuarioDAOImpl extends UsuarioDAO {
     public boolean insertar(Usuario usuario) {
         String consulta = "{call sp_insertarusuario(?, ?, ?, ?)}";
         
-        try (Connection conexion = new Conexion().conectar();
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
              
             consultaCall.setString(1, usuario.getNombreUsuario());
@@ -108,11 +112,71 @@ public class UsuarioDAOImpl extends UsuarioDAO {
 
     @Override
     public boolean actualizar(Usuario usuario) {
-        return false;
+        String consulta = "{call sp_actualizarusuario(?, ?, ?, ?, ?)}";
+        
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
+             CallableStatement consultaCall = conexion.prepareCall(consulta)) {
+             
+            consultaCall.setInt(1, usuario.getIdUsuario());
+            consultaCall.setString(2, usuario.getNombreUsuario());
+            consultaCall.setString(3, usuario.getCorreo());
+            consultaCall.setString(4, usuario.getRol());
+            consultaCall.setBoolean(5, usuario.isActivo());
+            
+            return consultaCall.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar Usuario: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public boolean eliminar(int idUsuario) {
+        String consulta = "{call sp_eliminarusuario(?)}";
+        
+        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
+             CallableStatement consultaCall = conexion.prepareCall(consulta)) {
+             
+            consultaCall.setInt(1, idUsuario);
+            
+            return consultaCall.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar Usuario: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean validarContrasenaActual(int idUsuario, String contrasenaIngresada) {
+        String sql = "SELECT 1 FROM usuarios WHERE id_usuario = ? AND contrasena = SHA2(?, 256)";
+        try (Connection conn = ConexionSingleton.getInstancia().getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idUsuario);
+            pstmt.setString(2, contrasenaIngresada);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al validar contraseña actual: " + e.getMessage());
+        }
         return false;
+    }
+
+    @Override
+    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
+        String sql = "UPDATE usuarios SET contrasena = SHA2(?, 256) WHERE id_usuario = ?";
+        try (Connection conn = ConexionSingleton.getInstancia().getConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, nuevaPassword);
+            pstmt.setInt(2, idUsuario);
+            
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar contraseña: " + e.getMessage());
+            return false;
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -23,17 +24,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import org.lsa.dao.IMPL.UsuariosDAOIMPL;
-import org.lsa.model.Usuarios;
+import org.lsa.dao.UsuarioDAO;
+import org.lsa.daoimpl.UsuarioDAOImpl;
+import org.lsa.model.Usuario;
 
 public class ListaUsuariosController implements Initializable {
 
-@FXML private TableView<Usuarios> tblUsuarios;
-    @FXML private TableColumn<Usuarios, Integer> colId;
-    @FXML private TableColumn<Usuarios, String> colNombre;
-    @FXML private TableColumn<Usuarios, String> colUsuario;
-    @FXML private TableColumn<Usuarios, String> colRol;
-    @FXML private TableColumn<Usuarios, String> colEstado;
+    @FXML private TableView<Usuario> tblUsuarios;
+    @FXML private TableColumn<Usuario, Integer> colId;
+    @FXML private TableColumn<Usuario, String> colNombre;
+    @FXML private TableColumn<Usuario, String> colUsuario;
+    @FXML private TableColumn<Usuario, String> colRol;
+    @FXML private TableColumn<Usuario, String> colEstado;
 
     @FXML private Label lblTotalUsuarios;
     @FXML private Label lblUsuariosActivos;
@@ -47,8 +49,8 @@ public class ListaUsuariosController implements Initializable {
     @FXML private Button btnEditarUsuario;
     @FXML private Button btnDesactivarUsuario;
     
-    private final UsuariosDAOIMPL usuarioDAO = new UsuariosDAOIMPL();
-    private ObservableList<Usuarios> listaUsuariosMaster;
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+    private ObservableList<Usuario> listaUsuariosMaster;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -58,11 +60,13 @@ public class ListaUsuariosController implements Initializable {
     }
 
     private void configurarTabla() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("Id"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colUsuario.setCellValueFactory(new PropertyValueFactory<>("usuario"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idUsuario"));
+        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
+        colUsuario.setCellValueFactory(new PropertyValueFactory<>("correo"));
         colRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
-        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        colEstado.setCellValueFactory(cellData -> 
+            new SimpleStringProperty(cellData.getValue().isActivo() ? "Activo" : "Inactivo")
+        );
     }
     
     private void configurarFiltros() {
@@ -75,8 +79,9 @@ public class ListaUsuariosController implements Initializable {
             cmbFiltroEstado.getSelectionModel().select("Todos los Estados");
         }
     }
+
     public void cargarDatosTabla() {
-        List<Usuarios> usuariosObtenidos = usuarioDAO.listar();
+        List<Usuario> usuariosObtenidos = usuarioDAO.listarTodos();
         listaUsuariosMaster = FXCollections.observableArrayList(usuariosObtenidos);
         tblUsuarios.setItems(listaUsuariosMaster);
         actualizarMetricas();
@@ -86,7 +91,7 @@ public class ListaUsuariosController implements Initializable {
         if (listaUsuariosMaster == null) return;
         long total = listaUsuariosMaster.size();
         long activos = listaUsuariosMaster.stream()
-                .filter(u -> "Activo".equalsIgnoreCase(u.getEstado()))
+                .filter(Usuario::isActivo)
                 .count();
         long inactivos = total - activos;
 
@@ -94,6 +99,7 @@ public class ListaUsuariosController implements Initializable {
         if (lblUsuariosActivos != null) lblUsuariosActivos.setText(String.valueOf(activos));
         if (lblUsuariosInactivos != null) lblUsuariosInactivos.setText(String.valueOf(inactivos));
     }
+
     @FXML
     private void handleAplicarFiltros() {
         if (listaUsuariosMaster == null) return;
@@ -102,50 +108,53 @@ public class ListaUsuariosController implements Initializable {
         String rolSeleccionado = cmbFiltroRol.getValue();
         String estadoSeleccionado = cmbFiltroEstado.getValue();
 
-        List<Usuarios> listaFiltrada = listaUsuariosMaster.stream().filter(usuario -> {
+        List<Usuario> listaFiltrada = listaUsuariosMaster.stream().filter(usuario -> {
             boolean coincideTexto = busquedaTexto.isEmpty()
-                    || (usuario.getNombre() != null && usuario.getNombre().toLowerCase().contains(busquedaTexto))
-                    || (usuario.getUsuario() != null && usuario.getUsuario().toLowerCase().contains(busquedaTexto))
-                    || (usuario.getApellido() != null && usuario.getApellido().toLowerCase().contains(busquedaTexto));
+                    || (usuario.getNombreUsuario() != null && usuario.getNombreUsuario().toLowerCase().contains(busquedaTexto))
+                    || (usuario.getCorreo() != null && usuario.getCorreo().toLowerCase().contains(busquedaTexto));
 
             boolean coincideRol = rolSeleccionado == null 
                     || "Todos los Roles".equals(rolSeleccionado) 
                     || rolSeleccionado.equalsIgnoreCase(usuario.getRol());
 
+            String estadoUsuario = usuario.isActivo() ? "Activo" : "Inactivo";
             boolean coincideEstado = estadoSeleccionado == null 
                     || "Todos los Estados".equals(estadoSeleccionado) 
-                    || estadoSeleccionado.equalsIgnoreCase(usuario.getEstado());
+                    || estadoSeleccionado.equalsIgnoreCase(estadoUsuario);
 
             return coincideTexto && coincideRol && coincideEstado;
         }).collect(Collectors.toList());
 
         tblUsuarios.setItems(FXCollections.observableArrayList(listaFiltrada));
     }
+
     @FXML
     private void handleNuevoUsuario() {
         abrirFormulario(null);
     }
+
     @FXML
     private void handleEditarUsuario() {
-        Usuarios usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();
+        Usuario usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();
         if (usuarioSeleccionado != null) {
             abrirFormulario(usuarioSeleccionado);
         } else {
             mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, seleccione un usuario de la tabla para editar.");
         }
     }
+
     @FXML
     private void handleDesactivarUsuario() {
-        Usuarios usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();
+        Usuario usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();
         if (usuarioSeleccionado == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, seleccione un usuario para desactivar.");
             return;
         }
-        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION, "¿Está seguro de que desea desactivar al usuario " + usuarioSeleccionado.getUsuario() + "?", ButtonType.YES, ButtonType.NO);
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION, "¿Está seguro de que desea desactivar al usuario " + usuarioSeleccionado.getNombreUsuario() + "?", ButtonType.YES, ButtonType.NO);
         Optional<ButtonType> respuesta = confirmacion.showAndWait();
 
         if (respuesta.isPresent() && respuesta.get() == ButtonType.YES) {
-            usuarioSeleccionado.setEstado("Inactivo");
+            usuarioSeleccionado.setActivo(false);
             boolean exito = usuarioDAO.actualizar(usuarioSeleccionado);
             if (exito) {
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Usuario desactivado correctamente.");
@@ -155,7 +164,8 @@ public class ListaUsuariosController implements Initializable {
             }
         }
     }
-    private void abrirFormulario(Usuarios usuario) {
+
+    private void abrirFormulario(Usuario usuario) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/FormularioUsuarioView.fxml"));
             Parent root = loader.load();
@@ -174,6 +184,7 @@ public class ListaUsuariosController implements Initializable {
             mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar el formulario.");
         }
     }
+
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);

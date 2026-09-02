@@ -23,11 +23,9 @@ public class ConexionSingleton {
     }
 
     public Connection conectar() throws SQLException {
-        this.conexion = new Conexion().conectar();
-        return this.conexion;
-    }
-
-    public Connection getConexion() {
+        if (this.conexion == null || this.conexion.isClosed()) {
+            this.conexion = new Conexion().conectar();
+        }
         return this.conexion;
     }
 

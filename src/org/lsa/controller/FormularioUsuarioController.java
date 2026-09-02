@@ -10,8 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.lsa.dao.IMPL.UsuariosDAOIMPL;
-import org.lsa.model.Usuarios;
+import org.lsa.dao.UsuarioDAO;
+import org.lsa.daoimpl.UsuarioDAOImpl;
+import org.lsa.model.Usuario;
 
 public class FormularioUsuarioController implements Initializable {
 
@@ -26,9 +27,9 @@ public class FormularioUsuarioController implements Initializable {
     @FXML private Label lblFechaCreacion;
     @FXML private Label lblFechaActualizacion;
 
-    private final UsuariosDAOIMPL usuarioDAO = new UsuariosDAOIMPL();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
     private ListaUsuariosController listaController;
-    private Usuarios usuarioEdicion;
+    private Usuario usuarioEdicion;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -41,16 +42,14 @@ public class FormularioUsuarioController implements Initializable {
         this.listaController = controller;
     }
 
-    public void cargarDatos(Usuarios usuario) {
+    public void cargarDatos(Usuario usuario) {
         this.usuarioEdicion = usuario;
         
         if (txtID != null) {
-            txtID.setText(usuario.getID() != null ? usuario.getID() : "");
+            txtID.setText(usuario.getIdUsuario() > 0 ? String.valueOf(usuario.getIdUsuario()) : "");
         }
         
-        txtNombre.setText(usuario.getNombre());
-        txtUsuario.setText(usuario.getUsuario());
-        txtApellido.setText(usuario.getApellido() != null ? usuario.getApellido() : "");
+        txtNombre.setText(usuario.getNombreUsuario() != null ? usuario.getNombreUsuario() : "");
         
         if (txtCorreo != null) {
             txtCorreo.setText(usuario.getCorreo() != null ? usuario.getCorreo() : "");
@@ -58,17 +57,9 @@ public class FormularioUsuarioController implements Initializable {
 
         txtPassword.setText(""); 
         cbxRol.setValue(usuario.getRol());
-        cbxEstado.setValue(usuario.getEstado());
-
-        if (lblFechaCreacion != null) {
-            lblFechaCreacion.setText(usuario.getFechaCreacion() != null ? usuario.getFechaCreacion() : "N/A");
-        }
-        
-        if (lblFechaActualizacion != null) {
-            lblFechaActualizacion.setText(usuario.getFechaActualizacion() != null ? usuario.getFechaActualizacion() : "N/A");
-        }
+        cbxEstado.setValue(usuario.isActivo() ? "Activo" : "Inactivo");
     }
-// Handle Guardar
+
     @FXML
     private void handleGuardar() {
         if (!validarCampos()) {
@@ -76,15 +67,12 @@ public class FormularioUsuarioController implements Initializable {
         }
 
         if (usuarioEdicion == null) {
-            Usuarios nuevoUsuario = new Usuarios();
-            nuevoUsuario.setNombre(txtNombre.getText().trim());
-            nuevoUsuario.setUsuario(txtUsuario.getText().trim());
-            nuevoUsuario.setApellido(txtApellido.getText().trim());
+            Usuario nuevoUsuario = new Usuario();
+            nuevoUsuario.setNombreUsuario(txtNombre.getText().trim());
             if (txtCorreo != null) nuevoUsuario.setCorreo(txtCorreo.getText().trim());
-            nuevoUsuario.setContraseña(txtPassword.getText());
-            nuevoUsuario.setPasswordHash(txtPassword.getText());
+            nuevoUsuario.setContrasena(txtPassword.getText());
             nuevoUsuario.setRol(cbxRol.getValue());
-            nuevoUsuario.setEstado(cbxEstado.getValue());
+            nuevoUsuario.setActivo("Activo".equalsIgnoreCase(cbxEstado.getValue()));
 
             if (usuarioDAO.insertar(nuevoUsuario)) {
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Usuario creado correctamente.");
@@ -93,18 +81,14 @@ public class FormularioUsuarioController implements Initializable {
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo registrar el usuario.");
             }
         } else {
-            
-            usuarioEdicion.setNombre(txtNombre.getText().trim());
-            usuarioEdicion.setUsuario(txtUsuario.getText().trim());
-            usuarioEdicion.setApellido(txtApellido.getText().trim());
+            usuarioEdicion.setNombreUsuario(txtNombre.getText().trim());
             if (txtCorreo != null) usuarioEdicion.setCorreo(txtCorreo.getText().trim());
             
             if (!txtPassword.getText().isEmpty()) {
-                usuarioEdicion.setContraseña(txtPassword.getText());
-                usuarioEdicion.setPasswordHash(txtPassword.getText());
+                usuarioEdicion.setContrasena(txtPassword.getText());
             }
             usuarioEdicion.setRol(cbxRol.getValue());
-            usuarioEdicion.setEstado(cbxEstado.getValue());
+            usuarioEdicion.setActivo("Activo".equalsIgnoreCase(cbxEstado.getValue()));
 
             if (usuarioDAO.actualizar(usuarioEdicion)) {
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Usuario actualizado correctamente.");
@@ -119,12 +103,6 @@ public class FormularioUsuarioController implements Initializable {
         StringBuilder errores = new StringBuilder();
 
         if (txtNombre.getText() == null || txtNombre.getText().trim().isEmpty()) {
-            errores.append("- El nombre es obligatorio.\n");
-        }
-        if (txtApellido.getText() == null || txtApellido.getText().trim().isEmpty()) {
-            errores.append("- El apellido es obligatorio.\n");
-        }
-        if (txtUsuario.getText() == null || txtUsuario.getText().trim().isEmpty()) {
             errores.append("- El nombre de usuario es obligatorio.\n");
         }
         if (usuarioEdicion == null) {
@@ -149,6 +127,7 @@ public class FormularioUsuarioController implements Initializable {
         }
         return true;
     }
+
     @FXML
     private void handleCancelar() {
         cerrarVentana();
