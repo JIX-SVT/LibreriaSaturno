@@ -7,53 +7,54 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * @author Gregory Jerónimo
- */
 public class Conexion {
+    private Connection conexion;
 
-    private static Conexion instancia;
-    private String url;
-    private String user;
-    private String password;
-
-    private Conexion() {
-        cargarPropiedades();
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Error Driver: " + e.getMessage());
-        }
-    }
-
-    private void cargarPropiedades() {
-        Properties properties = new Properties();
-        try (InputStream input = Conexion.class.getResourceAsStream("/sql.example.properties")) {
-
+    public Connection conectar() {
+        Properties propiedades = new Properties();
+        
+        // Carga el archivo db.properties desde el classpath de la aplicación
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+            
             if (input == null) {
-                System.err.println("Error: No se encontró el archivo sql.properties en src/");
-                return;
+                System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");
+                return null;
             }
 
-            properties.load(input);
+            // Cargar las propiedades del archivo
+            propiedades.load(input);
 
-            this.url = properties.getProperty("db.url");
-            this.user = properties.getProperty("db.user");
-            this.password = properties.getProperty("db.password");
+            // Obtener las credenciales
+            String url = propiedades.getProperty("url"); 
+            String user = propiedades.getProperty("user");
+            String password = propiedades.getProperty("password");
 
-        } catch (IOException ex) {
-            System.err.println("Error al leer el archivo de propiedades: " + ex.getMessage());
+            // Validación de seguridad para evitar el error "The url cannot be null"
+            if (url == null || url.trim().isEmpty()) {
+                throw new SQLException("La URL de conexión es nula. Verifica que la clave 'url' exista en db.properties");
+            }
+
+            // Inicializar la conexión
+            conexion = DriverManager.getConnection(url, user, password);
+            System.out.println("Conexión inicializada con éxito.");
+
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo de propiedades: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error de base de datos: " + e.getMessage());
         }
+        
+        return conexion;
     }
 
-    public static synchronized Conexion getInstancia() {
-        if (instancia == null) {
-            instancia = new Conexion();
+    public void desconectar() {
+        try {
+            if (conexion != null && !conexion.isClosed()) {
+                conexion.close();
+                System.out.println("Conexión cerrada.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar la conexión: " + e.getMessage());
         }
-        return instancia;
-    }
-
-    public Connection conectar() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
     }
 }
