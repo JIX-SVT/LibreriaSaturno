@@ -16,28 +16,23 @@ public class Conexion {
     public Connection conectar() {
         Properties propiedades = new Properties();
         
-
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.example.properties")) {
             
             if (input == null) {
                 System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");
                 return null;
             }
 
-
             propiedades.load(input);
 
-            // Obtener las credenciales
             String url = propiedades.getProperty("url"); 
             String user = propiedades.getProperty("user");
             String password = propiedades.getProperty("password");
-
 
             if (url == null || url.trim().isEmpty()) {
                 throw new SQLException("La URL de conexión es nula. Verifica que la clave 'url' exista en db.properties");
             }
 
-            // Inicializar la conexión
             conexion = DriverManager.getConnection(url, user, password);
             System.out.println("Conexión inicializada con éxito.");
 

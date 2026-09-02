@@ -1,10 +1,10 @@
 package org.lsa.dao;
 
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.lsa.model.Usuario;
@@ -12,10 +12,42 @@ import org.lsa.utils.Conexion;
 
 public class UsuarioDAO {
 
-    // Método de la Tarea T1.3 - Crear consulta de autenticación
+    public boolean validarContrasenaActual(int idUsuario, String contrasenaIngresada) {
+        String sql = "SELECT 1 FROM usuarios WHERE id_usuario = ? AND contrasena = SHA2(?, 256)";
+        try (Connection conn = new Conexion().conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idUsuario);
+            pstmt.setString(2, contrasenaIngresada);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al validar contraseña actual: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
+        String sql = "UPDATE usuarios SET contrasena = SHA2(?, 256) WHERE id_usuario = ?";
+        try (Connection conn = new Conexion().conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, nuevaPassword);
+            pstmt.setInt(2, idUsuario);
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar contraseña: " + e.getMessage());
+            return false;
+        }
+    }
+
     public Usuario autenticar(String username, String password) {
         Usuario usuario = null;
-        // Consulta SQL directa
         String sql = "SELECT * FROM usuarios WHERE nombre_usuario = ? AND contrasena = ?";
         
         try (Connection conexion = new Conexion().conectar();
