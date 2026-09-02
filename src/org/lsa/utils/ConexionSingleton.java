@@ -23,7 +23,7 @@ public class ConexionSingleton {
     }
 
     public Connection conectar() throws SQLException {
-        this.conexion = Conexion.getInstancia().conectar();
+        this.conexion = new Conexion().conectar();
         return this.conexion;
     }
 
