@@ -6,20 +6,22 @@ public class Usuario {
     private String correo;
     private String contrasena;
     private String rol;
+    private boolean activo;
 
     // Constructor vacío
     public Usuario() {
     }
 
-    // Constructor con 4 parámetros (para listar)
-    public Usuario(int idUsuario, String nombreUsuario, String correo, String rol) {
+    // Constructor completo
+    public Usuario(int idUsuario, String nombreUsuario, String correo, String rol, boolean activo) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         this.correo = correo;
         this.rol = rol;
+        this.activo = activo;
     }
 
-    // Getters y Setters con los nombres EXACTOS que pide el error
+    // Getters y Setters
     public int getIdUsuario() {
         return idUsuario;
     }
@@ -58,5 +60,13 @@ public class Usuario {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

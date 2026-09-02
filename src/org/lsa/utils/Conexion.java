@@ -7,13 +7,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * @author Gregory Jerónimo 2026116
+ */
 public class Conexion {
     private Connection conexion;
 
     public Connection conectar() {
         Properties propiedades = new Properties();
         
-        // Carga el archivo db.properties desde el classpath de la aplicación
+
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
             
             if (input == null) {
@@ -21,7 +24,7 @@ public class Conexion {
                 return null;
             }
 
-            // Cargar las propiedades del archivo
+
             propiedades.load(input);
 
             // Obtener las credenciales
@@ -29,7 +32,7 @@ public class Conexion {
             String user = propiedades.getProperty("user");
             String password = propiedades.getProperty("password");
 
-            // Validación de seguridad para evitar el error "The url cannot be null"
+
             if (url == null || url.trim().isEmpty()) {
                 throw new SQLException("La URL de conexión es nula. Verifica que la clave 'url' exista en db.properties");
             }

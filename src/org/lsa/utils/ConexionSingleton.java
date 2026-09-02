@@ -9,6 +9,7 @@ import java.sql.SQLException;
 public class ConexionSingleton {
 
     private static ConexionSingleton instancia;
+    private Connection conexion;
 
     private ConexionSingleton() {
         System.out.println("Conexión inicializada con éxito.");
@@ -21,7 +22,12 @@ public class ConexionSingleton {
         return instancia;
     }
 
-   public Connection conectar() throws SQLException {
-        return new Conexion().conectar();
+    public Connection conectar() throws SQLException {
+        this.conexion = new Conexion().conectar();
+        return this.conexion;
+    }
+
+    public Connection getConexion() {
+        return this.conexion;
     }
 }

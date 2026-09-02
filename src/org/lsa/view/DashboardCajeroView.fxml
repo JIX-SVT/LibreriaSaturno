@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="15" stylesheets="@dashboardcajeroview.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+    <padding>
+        <Insets bottom="15" left="15" right="15" top="15" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Dashboard de Caja" />
+        <Region HBox.hgrow="ALWAYS" />
+      <Button mnemonicParsing="false" onAction="#handleVolverMenu" prefHeight="25.0" prefWidth="115.0" text="Volver a Menú" />
+        <Button onAction="#handleCerrarSesion" text="Cerrar Sesión" />
+    </HBox>
+
+    <HBox spacing="15">
+        <VBox style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #666666;" text="Ventas del Día" />
+            <Label fx:id="lblVentasHoy" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;" text="Q0.00" />
+        </VBox>
+        <Button onAction="#handleNuevaVenta" prefHeight="50" style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-size: 14px;" text="+ Nueva Venta" />
+    </HBox>
+
+    <Label style="-fx-font-weight: bold;" text="Buscador de Libros (Punto de Venta)" />
+
+    <HBox spacing="10">
+        <TextField fx:id="txtBusqueda" promptText="Buscar por Título, Autor o ISBN..." HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleBuscar" text="Buscar" />
+    </HBox>
+
+    <TableView fx:id="tblResultados" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIsbn" prefWidth="120" text="ISBN" />
+            <TableColumn fx:id="colTitulo" prefWidth="250" text="Título" />
+            <TableColumn fx:id="colAutor" prefWidth="180" text="Autor" />
+            <TableColumn fx:id="colPrecio" prefWidth="90" text="Precio" />
+            <TableColumn fx:id="colStock" prefWidth="90" text="Stock" />
+        </columns>
+    </TableView>
+</VBox>
