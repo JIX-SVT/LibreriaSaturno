@@ -1,95 +1,115 @@
-
 package org.lsa.dao.IMPL;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.lsa.dao.UsuariosDAO;
 import org.lsa.model.Usuarios;
 import org.lsa.utils.Conexion;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-public class UsuariosDAOIMPL implements UsuariosDAO{
-    
+public class UsuariosDAOIMPL implements UsuariosDAO {
+
     @Override
     public boolean insertar(Usuarios usuarios) {
-        return false;
+        String sql = "{call sp_insertarusuario(?, ?)}";
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setString(1, usuarios.getUsuario());
+            cs.setString(2, usuarios.getPasswordHash());
+            
+            return cs.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error [Insertar Usuario]: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public List<Usuarios> listar() {
-       
         List<Usuarios> usuarios = new ArrayList<>();
-        
         String consulta = "{call sp_listarusuarios()}";
-        
-        try (java.sql.Connection conexion = Conexion.getInstancia().conectar();
-             java.sql.CallableStatement consultaCall = conexion.prepareCall(consulta);
-              ResultSet tablaResultado = consultaCall.executeQuery();) {
-                
-                
-              while (tablaResultado.next()) {
-                  usuarios.add(new Usuarios(
-                          tablaResultado.getString("_username"),
-                          tablaResultado.getString("_passwordhash"),
-                          tablaResultado.getString("_confirmarPassword")                       
-                  ));
+
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consultaCall = conexion.prepareCall(consulta);
+             ResultSet tablaResultado = consultaCall.executeQuery()) {
+
+while (tablaResultado.next()) {
+    usuarios.add(new Usuarios(
+        tablaResultado.getString("id"),
+        tablaResultado.getString("nombre"),       
+        tablaResultado.getString("_username"),      
+        tablaResultado.getString("_Apellido"),   
+        null,                                  
+        tablaResultado.getString("rol"),            
+        tablaResultado.getString("correo"),        
+        tablaResultado.getString("estado"),          
+        tablaResultado.getString("_passwordhash"),    
+        tablaResultado.getString("fecha_creacion"),   
+        tablaResultado.getString("fecha_actualizacion") 
+    ));
             }
-         
-              
+
         } catch (SQLException e) {
-            System.err.print("Error al Listar Editoriales " + e.getMessage());
+            System.err.println("Error al Listar Usuarios: " + e.getMessage());
         }
-      
-         return usuarios;
+
+        return usuarios;
     }
 
     @Override
     public Usuarios buscar(String username) {
-             Usuarios usuarios = new Usuarios();
+        Usuarios usuario = null;
+        String consultaSQL = "{call sp_buscarusuario(?)}";
 
-        String consultaSQL = "{call sp_buscareditorial(?)}";
-        try (java.sql.Connection conexion = Conexion.getInstancia().conectar(); 
-                java.sql.CallableStatement consultaCall = conexion.prepareCall(consultaSQL);) {
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consultaCall = conexion.prepareCall(consultaSQL)) {
+
             consultaCall.setString(1, username);
-            ResultSet tablaResultado = consultaCall.executeQuery();
-            if (tablaResultado.next()) {
-                usuarios.setUsername(tablaResultado.getString("username"));
-                usuarios.setPasswordHash(tablaResultado.getString("passwordhash"));
-            } else {
-                return null;
+            try (ResultSet tablaResultado = consultaCall.executeQuery()) {
+                if (tablaResultado.next()) {
+                    usuario = new Usuarios();
+                    usuario.setUsuario(tablaResultado.getString("username"));
+                    usuario.setPasswordHash(tablaResultado.getString("passwordhash"));
+                }
             }
         } catch (SQLException e) {
-            System.err.print("Error al buscar su usuario: " + e.getMessage());
+            System.err.println("Error al buscar su usuario: " + e.getMessage());
         }
-        return usuarios;
+
+        return usuario;
     }
 
     @Override
     public boolean actualizar(Usuarios usuarios) {
         String sql = "{call sp_actualizarusuarios(?, ?)}";
-        try (java.sql.Connection con = Conexion.getInstancia().conectar();
-             java.sql.CallableStatement cs = con.prepareCall(sql)) {
-            cs.setString(1, usuarios.getUsername());
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+
+            cs.setString(1, usuarios.getUsuario());
             cs.setString(2, usuarios.getPasswordHash());
+
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error [Actualizar Usuario]: " + e.getMessage());
             return false;
         }
     }
-    
     @Override
     public boolean eliminar(String username) {
-   String sql = "{call sp_eliminarusuarios(?)}";
-        try (java.sql.Connection con = Conexion.getInstancia().conectar();
-             java.sql.CallableStatement cs = con.prepareCall(sql)) {
+        String sql = "{call sp_eliminarusuarios(?)}";
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+
             cs.setString(1, username);
+
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error [Eliminar Usuario]: " + e.getMessage());
+            System.err.println("ErrorEliminar Usuario: " + e.getMessage());
             return false;
         }
     }
 }
-
