@@ -24,7 +24,7 @@ public class Conexion {
             // Cargar las propiedades del archivo
             propiedades.load(input);
 
-            // Obtener las credenciales (Asegúrate de que los nombres coincidan con tu db.properties)
+            // Obtener las credenciales
             String url = propiedades.getProperty("url"); 
             String user = propiedades.getProperty("user");
             String password = propiedades.getProperty("password");
