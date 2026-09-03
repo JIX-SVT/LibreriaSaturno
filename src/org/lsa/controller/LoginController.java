@@ -43,24 +43,51 @@ public class LoginController {
             }
             
             mostrarAlerta(Alert.AlertType.INFORMATION, "Bienvenido", "¡Inicio de sesión exitoso!");
-            abrirMenuPrincipal();
+            
+            // Redirección basada en el rol del usuario autenticado
+            abrirMenuPorRol(usuario);
         } else {
             mostrarAlerta(Alert.AlertType.ERROR, "Error de autenticación", "Usuario o contraseña incorrectos.");
         }
     }
 
-    private void abrirMenuPrincipal() {
+    private void abrirMenuPorRol(Usuario usuario) {
+        String fxmlPath;
+        String tituloVentana;
+        
+        // Normalizamos el rol a minúsculas
+        String rol = usuario.getRol() != null ? usuario.getRol().toLowerCase() : "";
+
+        switch (rol) {
+            case "admin":
+                fxmlPath = "/org/lsa/view/DashboardAdminView.fxml";
+                tituloVentana = "Librería Saturno - Panel de Administración";
+                break;
+            case "cajero":
+                fxmlPath = "/org/lsa/view/DashboardCajeroView.fxml";
+                tituloVentana = "Librería Saturno - Módulo de Ventas";
+                break;
+            case "empleado":
+                fxmlPath = "/org/lsa/view/DashboardBodegaView.fxml";
+                tituloVentana = "Librería Saturno - Módulo de Inventario";
+                break;
+            default:
+                mostrarAlerta(Alert.AlertType.ERROR, "Error de acceso", "El rol asignado no tiene un panel configurado.");
+                return;
+        }
+
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/ListaUsuariosView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
             Stage stage = (Stage) btnIngresar.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Librería Saturno - Panel Principal");
+            stage.setTitle(tituloVentana);
+            stage.centerOnScreen();
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista principal.");
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de carga", "No se pudo abrir la vista: " + fxmlPath);
         }
     }
 
