@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
 import org.lsa.model.Usuario;
+import org.lsa.system.Main;
 import org.lsa.utils.Navegador;
 
 public class ListaUsuariosController implements Initializable {
@@ -132,20 +133,61 @@ public class ListaUsuariosController implements Initializable {
     }
 
     @FXML
-    private void handleNuevoUsuario() {
-        abrirFormulario(null);
+    private void handleNuevoUsuario(ActionEvent event) {
+                try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/FormularioUsuarioView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Librería Saturno - Menú Principal");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo cargar la vista del menú.", ButtonType.OK);
+            alerta.showAndWait();
+        }
     }
 
     @FXML
-    private void handleEditarUsuario() {
+    private void handleEditarUsuario(ActionEvent event) {
         Usuario usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();
-        if (usuarioSeleccionado != null) {
+                        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/FormularioUsuarioView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Librería Saturno");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo cargar la vista del menú.", ButtonType.OK);
+            alerta.showAndWait();
+        }
+        if (usuarioSeleccionado != null) 
+        {
             abrirFormulario(usuarioSeleccionado);
         } else {
             mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, seleccione un usuario de la tabla para editar.");
         }
+        
     }
-
+    public void handleRegresar(ActionEvent event) {
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardAdminView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Librería Saturno - Menú Principal");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo cargar la vista del menú.", ButtonType.OK);
+            alerta.showAndWait();
+        }
+    }
     @FXML
     private void handleDesactivarUsuario() {
         Usuario usuarioSeleccionado = tblUsuarios.getSelectionModel().getSelectedItem();

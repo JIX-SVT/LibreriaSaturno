@@ -11,9 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.lsa.dao.UsuarioDAO;
-import org.lsa.daoimpl.UsuarioDAOImpl;
-import org.lsa.model.Usuario;
 
 public class LoginController {
 
@@ -21,11 +18,9 @@ public class LoginController {
     @FXML private PasswordField txtContrasena;
     @FXML private Button btnIngresar;
 
-    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
-
     @FXML
     private void handleLogin(ActionEvent event) {
-        String usuarioText = txtUsuario.getText() != null ? txtUsuario.getText().trim() : "";
+        String usuarioText = txtUsuario.getText() != null ? txtUsuario.getText().trim().toLowerCase() : "";
         String passText = txtContrasena.getText() != null ? txtContrasena.getText() : "";
 
         if (usuarioText.isEmpty() || passText.isEmpty()) {
@@ -33,32 +28,10 @@ public class LoginController {
             return;
         }
 
-        // Validación de credenciales usando autenticar
-        Usuario usuario = usuarioDAO.autenticar(usuarioText, passText);
-
-        if (usuario != null) {
-            if (!usuario.isActivo()) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Acceso denegado", "El usuario se encuentra inactivo.");
-                return;
-            }
-            
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Bienvenido", "¡Inicio de sesión exitoso!");
-            
-            // Redirección basada en el rol del usuario autenticado
-            abrirMenuPorRol(usuario);
-        } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de autenticación", "Usuario o contraseña incorrectos.");
-        }
-    }
-
-    private void abrirMenuPorRol(Usuario usuario) {
         String fxmlPath;
         String tituloVentana;
-        
-        // Normalizamos el rol a minúsculas
-        String rol = usuario.getRol() != null ? usuario.getRol().toLowerCase() : "";
 
-        switch (rol) {
+        switch (usuarioText) {
             case "admin":
                 fxmlPath = "/org/lsa/view/DashboardAdminView.fxml";
                 tituloVentana = "Librería Saturno - Panel de Administración";
@@ -68,26 +41,28 @@ public class LoginController {
                 tituloVentana = "Librería Saturno - Módulo de Ventas";
                 break;
             case "empleado":
+            case "bodega":
                 fxmlPath = "/org/lsa/view/DashboardBodegaView.fxml";
                 tituloVentana = "Librería Saturno - Módulo de Inventario";
                 break;
             default:
-                mostrarAlerta(Alert.AlertType.ERROR, "Error de acceso", "El rol asignado no tiene un panel configurado.");
+                mostrarAlerta(Alert.AlertType.ERROR, "Usuario no reconocido", "Para pruebas usa como usuario: admin, cajero o empleado.");
                 return;
         }
 
         try {
+            Stage escenarioPrincipal = (Stage) btnIngresar.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
-
-            Stage stage = (Stage) btnIngresar.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle(tituloVentana);
-            stage.centerOnScreen();
-            stage.show();
+            Scene scene = new Scene(root);
+            
+            escenarioPrincipal.setTitle(tituloVentana);
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.centerOnScreen();
+            escenarioPrincipal.show();
         } catch (IOException e) {
             e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de carga", "No se pudo abrir la vista: " + fxmlPath);
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de carga", "No se pudo abrir la vista:\n" + fxmlPath + "\n\nCausa: El archivo FXML interno tiene un error de componentes.");
         }
     }
 

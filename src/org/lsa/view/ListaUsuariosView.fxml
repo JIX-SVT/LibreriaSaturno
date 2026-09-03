@@ -9,8 +9,9 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.ListaUsuariosController">
+<VBox spacing="20.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.ListaUsuariosController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
@@ -19,33 +20,41 @@
          <children>
             <VBox HBox.hgrow="ALWAYS">
                <children>
-                  <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Gestión de Usuarios" />
-                  <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Administra los accesos y roles de la plataforma" />
+                  <Label style="-fx-font-size: 24px; -fx-font: Century Gothic; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="Gestión de Usuarios" />
+                  <Label style="-fx-font-Century Gothic: 13px; -fx-text-fill: #64748b;" text="Administración de usuarios" />
                </children>
             </VBox>
-            <Button fx:id="btnNuevoUsuario" onAction="#handleNuevoUsuario" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="+ Nuevo Usuario" />
-            <Button fx:id="btnEditarUsuario" onAction="#handleEditarUsuario" style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Editar" />
-            <Button fx:id="btnDesactivarUsuario" onAction="#handleDesactivarUsuario" style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Desactivar" />
+            <Button fx:id="btnNuevoUsuario" onAction="#handleNuevoUsuario" style="-fx-background-color: #6383fa; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-font: Century Gothic;" text="+ Nuevo Usuario" />
+            <Button fx:id="btnEditarUsuario" onAction="#handleEditarUsuario" style="-fx-background-color: #1800ad; -fx-font: Century Gothic; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Editar">
+               <font>
+                  <Font name="Century Gothic" size="12.0" />
+               </font></Button>
+            <Button fx:id="btnDesactivarUsuario" onAction="#handleDesactivarUsuario" style="-fx-background-color: #1800ad; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-font: Century Gothic;" text="Desactivar" />
+            <Button onAction="#handleRegresar" style="-fx-background-color: #1800ad; -fx-font: Century Gothic; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Regresar">
+               <font>
+                  <Font name="Century Gothic" size="12.0" />
+               </font>
+            </Button>
          </children>
       </HBox>
       <HBox spacing="15.0">
          <children>
             <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
                <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-size: 12px;" text="Total Usuarios" />
+                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Total Usuarios" />
                   <Label fx:id="lblTotalUsuarios" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="0" />
                </children>
             </VBox>
             <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
                <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-size: 12px;" text="Usuarios Activos" />
-                  <Label fx:id="lblUsuariosActivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #16a34a;" text="0" />
+                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Usuarios Activos" />
+                  <Label fx:id="lblUsuariosActivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="0" />
                </children>
             </VBox>
             <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
                <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-size: 12px;" text="Inactivos / Bloqueados" />
-                  <Label fx:id="lblUsuariosInactivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #dc2626;" text="0" />
+                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Inactivos / Bloqueados" />
+                  <Label fx:id="lblUsuariosInactivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1800ad;" text="0" />
                </children>
             </VBox>
          </children>
@@ -55,7 +64,7 @@
             <TextField fx:id="txtBuscar" onKeyTyped="#handleAplicarFiltros" promptText="Buscar por nombre, usuario..." style="-fx-pref-width: 300;" HBox.hgrow="ALWAYS" />
             <ComboBox fx:id="cmbFiltroRol" onAction="#handleAplicarFiltros" prefWidth="160.0" promptText="Todos los Roles" />
             <ComboBox fx:id="cmbFiltroEstado" onAction="#handleAplicarFiltros" prefWidth="160.0" promptText="Todos los Estados" />
-            <Button fx:id="btnAplicarFiltro" onAction="#handleAplicarFiltros" style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold;" text="Filtrar" />
+            <Button fx:id="btnAplicarFiltro" onAction="#handleAplicarFiltros" style="-fx-background-color: gray; -fx-text-fill: white; -fx-font-weight: bold; -fx-font: Century Gothic;" text="Filtrar" />
          </children>
       </HBox>
       <VBox style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" VBox.vgrow="ALWAYS">

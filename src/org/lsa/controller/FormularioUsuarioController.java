@@ -1,10 +1,17 @@
 package org.lsa.controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -53,11 +60,10 @@ public class FormularioUsuarioController implements Initializable {
         cbxEstado.setValue(usuario.isActivo() ? "Activo" : "Inactivo");
     }
     @FXML
-    private void handleGuardar() {
+    private void handleGuardar(ActionEvent event) {
         if (!validarCampos()) {
             return;
         }
-
         if (usuarioEdicion == null) {
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setNombreUsuario(txtNombre.getText().trim());
@@ -67,8 +73,20 @@ public class FormularioUsuarioController implements Initializable {
             nuevoUsuario.setActivo("Activo".equalsIgnoreCase(cbxEstado.getValue()));
 
             if (usuarioDAO.insertar(nuevoUsuario)) {
-                mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Usuario creado correctamente.");
                 cerrarVentana();
+           try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/ListaUsuariosView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Librería Saturno - Menú Principal");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo cargar la vista del menú.", ButtonType.OK);
+            alerta.showAndWait();
+        }
             } else {
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo registrar el usuario.");
             }
@@ -88,6 +106,7 @@ public class FormularioUsuarioController implements Initializable {
             } else {
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo actualizar el usuario.");
             }
+            
         }
     }
     private boolean validarCampos() {

@@ -1,104 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
- 
-<VBox spacing="10" style="-fx-background-color: #ffffff;" stylesheets="@dashboardbodegaview.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardBodegaController">
+
+<VBox spacing="10" style="-fx-background-color: #ffffff;" stylesheets="@dashboardbodegaview.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardBodegaController">
 <padding>
 <Insets bottom="15" left="15" right="15" top="15" />
 </padding>
  
     <HBox alignment="CENTER_LEFT" spacing="20">
-<Label style="-fx-font-family: 'Century Gothic'; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="Dashboard de Bodega" />
+<Label style="-fx-font-family: 'Century Gothic'; -fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="Panel Bodega" />
 <Region HBox.hgrow="ALWAYS" />
-<Button mnemonicParsing="false" onAction="#handleVolverMenu" prefHeight="25.0" prefWidth="119.0" style="-fx-font-family: 'Century Gothic'; -fx-text-fill: white; -fx-background-color: #1800ad; -fx-cursor: hand;" text="Volver a Menú" />
-<Button onAction="#handleCerrarSesion" style="-fx-font-family: 'Century Gothic'; -fx-text-fill: white; -fx-background-color: #1800ad; -fx-cursor: hand;" text="Cerrar Sesión" />
 </HBox>
  
     <Label fx:id="lblAlertaBajoStock" style="-fx-font-family: 'Century Gothic'; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="Estado del Inventario" />
  
-    <SplitPane dividerPositions="0.6" style="-fx-background-color: #ffffff; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
-<VBox spacing="5" style="-fx-background-color: #ffffff;">
-<Label style="-fx-font-family: 'Century Gothic'; -fx-font-weight: bold; -fx-text-fill: black;" text="Consulta de Inventario" />
-<TableView fx:id="tblLibros" style="-fx-font-family: 'Century Gothic';" VBox.vgrow="ALWAYS">
-<columns>
-<TableColumn fx:id="colIsbn" prefWidth="100" style="-fx-font-family: 'Century Gothic';" text="ISBN" />
-<TableColumn fx:id="colTitulo" prefWidth="180" style="-fx-font-family: 'Century Gothic';" text="Título" />
-<TableColumn fx:id="colFechaPublicacion" prefWidth="110" style="-fx-font-family: 'Century Gothic';" text="Fecha Pub." />
-<TableColumn fx:id="colPrecio" prefWidth="80" style="-fx-font-family: 'Century Gothic';" text="Precio" />
-<TableColumn fx:id="colIdCategoria" prefWidth="90" style="-fx-font-family: 'Century Gothic';" text="ID Categoría" />
-<TableColumn fx:id="colNitEditorial" prefWidth="110" style="-fx-font-family: 'Century Gothic';" text="NIT Editorial" />
-</columns>
-</TableView>
-</VBox>
- 
-        <VBox spacing="10" style="-fx-background-color: #ffffff;">
-<padding>
-<Insets bottom="10" left="10" right="10" top="10" />
-</padding>
-<Label style="-fx-font-family: 'Century Gothic'; -fx-font-weight: bold; -fx-text-fill: black;" text="Gestión de Libro" />
-<GridPane hgap="8" vgap="8">
-<Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="ISBN:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-<TextField fx:id="txtIsbn" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
- 
-                <Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="Título:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-<TextField fx:id="txtTitulo" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
- 
-                <Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="Fecha Pub.:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-<DatePicker fx:id="dpFechaPublicacion" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="2" />
- 
-                <Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="Precio:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-<TextField fx:id="txtPrecio" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
- 
-                <Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="ID Categoría:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-<TextField fx:id="txtIdCategoria" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
- 
-                <Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="NIT Editorial:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-<TextField fx:id="txtNitEditorial" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
- 
-                <columnConstraints>
-<ColumnConstraints />
-<ColumnConstraints />
-</columnConstraints>
-<rowConstraints>
-<RowConstraints />
-<RowConstraints />
-<RowConstraints />
-<RowConstraints />
-<RowConstraints />
-<RowConstraints />
-</rowConstraints>
-</GridPane>
- 
-            <HBox spacing="10">
-<Button onAction="#handleGuardarLibro" style="-fx-font-family: 'Century Gothic'; -fx-background-color: #6383fa; -fx-text-fill: white; -fx-cursor: hand;" text="Guardar / Modificar" />
-<Button onAction="#handleLimpiarCampos" style="-fx-font-family: 'Century Gothic'; -fx-background-color: #a6a6a6; -fx-text-fill: white; -fx-cursor: hand;" text="Limpiar" />
-</HBox>
- 
-            <Separator style="-fx-background-color: #a6a6a6;" />
- 
-            <Label style="-fx-font-family: 'Century Gothic'; -fx-font-weight: bold; -fx-text-fill: Black;" text="Movimientos de Inventario" />
-<HBox alignment="CENTER_LEFT" spacing="8">
-<Label style="-fx-font-family: 'Century Gothic'; -fx-text-fill: black;" text="Cantidad:" />
-<TextField fx:id="txtCantidadMovimiento" prefWidth="80" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" />
-</HBox>
-<HBox spacing="10">
-<Button onAction="#handleRegistrarIngreso" style="-fx-font-family: 'Century Gothic'; -fx-background-color: #1800ad; -fx-text-fill: white; -fx-cursor: hand;" text="Registrar Ingreso" />
-<Button onAction="#handleRegistrarSalida" style="-fx-font-family: 'Century Gothic'; -fx-background-color: #1800ad; -fx-text-fill: white; -fx-cursor: hand;" text="Registrar Salida" />
-</HBox>
-</VBox>
+    <SplitPane style="-fx-background-color: #ffffff; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+      <GridPane prefHeight="387.0" prefWidth="355.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="222.0" minWidth="10.0" prefWidth="125.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="427.0" minWidth="10.0" prefWidth="119.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="427.0" minWidth="10.0" prefWidth="116.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+      <Button mnemonicParsing="false" onAction="#handleVolverMenu" prefHeight="25.0" prefWidth="119.0" style="-fx-font-family: 'Century Gothic'; -fx-text-fill: white; -fx-background-color: #1800ad; -fx-cursor: hand;" text="Volver a Menú" GridPane.columnIndex="1" />
+      <Button onAction="#handleCerrarSesion" style="-fx-font-family: 'Century Gothic'; -fx-text-fill: white; -fx-background-color: #1800ad; -fx-cursor: hand;" text="Cerrar Sesión" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
 </SplitPane>
 </VBox>

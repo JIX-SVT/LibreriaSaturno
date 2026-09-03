@@ -8,11 +8,9 @@ public class Usuario {
     private String rol;
     private boolean activo;
 
-    // Constructor vacío
     public Usuario() {
     }
 
-    // Constructor completo
     public Usuario(int idUsuario, String nombreUsuario, String correo, String rol, boolean activo) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
@@ -21,7 +19,6 @@ public class Usuario {
         this.activo = activo;
     }
 
-    // Getters y Setters
     public int getIdUsuario() {
         return idUsuario;
     }

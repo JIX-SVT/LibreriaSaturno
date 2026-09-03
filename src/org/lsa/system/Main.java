@@ -1,5 +1,6 @@
 package org.lsa.system;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,33 +9,42 @@ import javafx.stage.Stage;
 import org.lsa.utils.ConexionSingleton;
 
 public class Main extends Application {
+    
+    private static Stage escenarioPrincipal;
+
 
     @Override
-    public void start(Stage primaryStage) {
-        try {
-            ConexionSingleton miConexion = ConexionSingleton.getInstancia();
-            miConexion.conectar();
-            System.out.println("Bienvenido a Librería Saturno");
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            primaryStage.setTitle("Librería Saturno - Gestión de Usuarios");
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
-            primaryStage.show();
-        } catch (Exception e) {
-            System.err.println("Error al iniciar la aplicación: " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void start(Stage escenarioPrincipal) throws IOException {
+           this.escenarioPrincipal = escenarioPrincipal;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        escenarioPrincipal.setTitle("Librería Saturno");
+        escenarioPrincipal.setScene(scene);
+        escenarioPrincipal.show();
+        Main.escenarioPrincipal = escenarioPrincipal;     
+        cambiarEscena("/org/lsa/view/LoginView.fxml");
     }
 
-    @Override
-    public void stop() throws Exception {
-        super.stop();
+    public static void cambiarVista(String fxmlPath) throws Exception {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
+        Parent root = loader.load();
+        escenarioPrincipal.setScene(new Scene(root));
     }
-
+    
+    public static void cambiarEscena(String rutaFXML) throws IOException {
+        //Parent raiz = FXMLLoader.load(getClass().getResource(rutaFXML));
+        Parent raiz = FXMLLoader.load(Main.class.getResource(rutaFXML));                
+        Scene escena = new Scene(raiz); 
+        escenarioPrincipal.setScene(escena);
+        escenarioPrincipal.sizeToScene();
+        escenarioPrincipal.centerOnScreen();
+        escenarioPrincipal.show();        
+    }
+ 
+   
     public static void main(String[] args) {
         launch(args);
     }
+
 }

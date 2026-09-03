@@ -1,5 +1,6 @@
-package org.lsa.controller;
 
+package org.lsa.controller;
+ 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -13,81 +14,120 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.lsa.dao.LibroDAO;
-import org.lsa.utils.Navegador;
 import org.lsa.utils.SesionUsuario;
-
+ 
 public class DashboardAdminController implements Initializable {
-
+ 
     @FXML private Label lblVentasTotales;
     @FXML private Label lblTotalLibros;
     @FXML private Label lblUsuariosActivos;
-
-    private final LibroDAO libroDAO = new LibroDAO();
-
+ 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         cargarKpis();
     }
-
+ 
     private void cargarKpis() {
         lblVentasTotales.setText("Q0.00");
-        int cantidadLibros = libroDAO.listarLibros().size();
-        lblTotalLibros.setText(String.valueOf(cantidadLibros));
+        lblTotalLibros.setText("0"); 
         lblUsuariosActivos.setText("1");
     }
-
+ 
     @FXML
     public void handleReportesVentas(ActionEvent event) {
-      Stage stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-    Navegador.cargarVista(stage, "/org/lsa/view/DashboardCajeroView.fxml", "Reportes de Ventas");  
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Reportes de Ventas");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de ventas.");
+        }
     }
-
+ 
     @FXML
     public void handleReportesInventario(ActionEvent event) {
-      Stage stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-    Navegador.cargarVista(stage,"/org/lsa/view/DashboardBodegaView.fxml", "Reportes de Inventario");  
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardBodegaView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Reportes de Inventario");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de inventario.");
+        }
     }
-
-    
+ 
     @FXML
     public void handleVolverMenu(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Navegador.cargarVista(stage, "/org/lsa/view/DashboardMenuView.fxml", "Menú Principal - Librería Saturno");
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardMenuView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Menú Principal - Librería Saturno");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista del menú principal.");
+        }
     }
-    
+
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
         SesionUsuario.getInstancia().cerrarSesion();
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Navegador.cargarVista(stage, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Inicio de Sesión");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo regresar a la pantalla de inicio de sesión.");
+        }
     }
-    
-@FXML
-public void handleGestionarUsuarios(ActionEvent event) {
-    Stage stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-    Navegador.cargarVista(stage, "/org/lsa/view/ListaUsuariosView.fxml", "Gestionar Usuarios");
-}
-    private void mostrarNotificacion(String titulo, String contenido) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle(titulo);
-        alerta.setHeaderText(null);
-        alerta.setContentText(contenido);
-        alerta.showAndWait();
+  @FXML
+    public void handleGestionarUsuarios(ActionEvent event) {
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/ListaUsuariosView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Gestionar Usuarios");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de gestión de usuarios.");
+        }
     }
+   
+
     @FXML
-private void handleCambiarContraseña() {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/CambioContrasenaView.fxml"));
-        Parent root = loader.load();
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.show();
-    } catch (IOException e) {
-        e.printStackTrace();
-        mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de cambio de contraseña.");
+    private void handleCambiarContraseña() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/CambioContrasenaView.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de cambio de contraseña.");
+        }
     }
-}
+
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
@@ -96,4 +136,3 @@ private void handleCambiarContraseña() {
         alert.showAndWait();
     }
 }
-
