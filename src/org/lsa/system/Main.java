@@ -7,20 +7,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.lsa.utils.ConexionSingleton;
+import org.lsa.utils.Conexion;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws SQLException {
         try {
-            ConexionSingleton miConexion = ConexionSingleton.getInstancia();
+            Conexion miConexion = Conexion.getInstancia();
             miConexion.conectar();
             System.out.println("Bienvenido a Librería Saturno");
 
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
-            
             Parent root = loader.load();
             Scene scene = new Scene(root);
 
@@ -37,5 +35,4 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}   
-
+}

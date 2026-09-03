@@ -1,39 +1,45 @@
 package org.lsa.model;
 
 public class Usuario {
-    private int idUsuario;
-    private String nombreUsuario;
+    
+    
+    private int id;
+    private String username;
     private String correo;
     private String contrasena;
     private String rol;
+    private boolean activo;
+    private String nombre;
+    private String apellido;
 
-    // Constructor vacío
+    
     public Usuario() {
     }
 
-    // Constructor con 4 parámetros (para listar)
-    public Usuario(int idUsuario, String nombreUsuario, String correo, String rol) {
-        this.idUsuario = idUsuario;
-        this.nombreUsuario = nombreUsuario;
+    
+    public Usuario(int id, String username, String correo, String rol) {
+        this.id = id;
+        this.username = username;
         this.correo = correo;
         this.rol = rol;
     }
 
-    // Getters y Setters con los nombres EXACTOS que pide el error
-    public int getIdUsuario() {
-        return idUsuario;
+    // --- GETTERS Y SETTERS EXACTOS ---
+
+    public int getId() {
+        return id;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getUsername() {
+        return username;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getCorreo() {
@@ -58,5 +64,29 @@ public class Usuario {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
     }
 }
