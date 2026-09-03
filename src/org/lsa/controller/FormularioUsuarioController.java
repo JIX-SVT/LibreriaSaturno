@@ -15,7 +15,6 @@ import org.lsa.daoimpl.UsuarioDAOImpl;
 import org.lsa.model.Usuario;
 
 public class FormularioUsuarioController implements Initializable {
-
     @FXML private TextField txtID;
     @FXML private TextField txtNombre;
     @FXML private TextField txtUsuario;
@@ -37,29 +36,22 @@ public class FormularioUsuarioController implements Initializable {
         cbxEstado.getItems().addAll("Activo", "Inactivo");
         cbxEstado.getSelectionModel().select("Activo");
     }
-
     public void setListaController(ListaUsuariosController controller) {
         this.listaController = controller;
     }
-
     public void cargarDatos(Usuario usuario) {
-        this.usuarioEdicion = usuario;
-        
+        this.usuarioEdicion = usuario;    
         if (txtID != null) {
             txtID.setText(usuario.getIdUsuario() > 0 ? String.valueOf(usuario.getIdUsuario()) : "");
-        }
-        
+        }    
         txtNombre.setText(usuario.getNombreUsuario() != null ? usuario.getNombreUsuario() : "");
-        
         if (txtCorreo != null) {
             txtCorreo.setText(usuario.getCorreo() != null ? usuario.getCorreo() : "");
         }
-
         txtPassword.setText(""); 
         cbxRol.setValue(usuario.getRol());
         cbxEstado.setValue(usuario.isActivo() ? "Activo" : "Inactivo");
     }
-
     @FXML
     private void handleGuardar() {
         if (!validarCampos()) {
@@ -98,10 +90,8 @@ public class FormularioUsuarioController implements Initializable {
             }
         }
     }
-
     private boolean validarCampos() {
         StringBuilder errores = new StringBuilder();
-
         if (txtNombre.getText() == null || txtNombre.getText().trim().isEmpty()) {
             errores.append("- El nombre de usuario es obligatorio.\n");
         }
@@ -120,7 +110,6 @@ public class FormularioUsuarioController implements Initializable {
         if (cbxEstado.getValue() == null) {
             errores.append("- Debe seleccionar un estado.\n");
         }
-
         if (errores.length() > 0) {
             mostrarAlerta(Alert.AlertType.WARNING, "Campos inválidos", errores.toString());
             return false;
@@ -132,7 +121,6 @@ public class FormularioUsuarioController implements Initializable {
     private void handleCancelar() {
         cerrarVentana();
     }
-    
     private void cerrarVentana() {
         if (listaController != null) {
             listaController.cargarDatosTabla();
@@ -140,7 +128,6 @@ public class FormularioUsuarioController implements Initializable {
         Stage stage = (Stage) txtNombre.getScene().getWindow();
         stage.close();
     }
-
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);

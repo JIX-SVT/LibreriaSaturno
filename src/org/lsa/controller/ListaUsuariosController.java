@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -27,6 +29,7 @@ import javafx.stage.Stage;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
 import org.lsa.model.Usuario;
+import org.lsa.utils.Navegador;
 
 public class ListaUsuariosController implements Initializable {
 

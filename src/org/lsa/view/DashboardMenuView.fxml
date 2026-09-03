@@ -1,37 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+ 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox alignment="CENTER" spacing="25.0" prefWidth="600.0" prefHeight="450.0" 
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="org.lsa.controller.MenuPrincipalController">
-    <padding>
-        <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
-    </padding>
-
+ 
+<VBox alignment="CENTER" prefHeight="450.0" prefWidth="600.0" spacing="25.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.MenuPrincipalController">
+<padding>
+<Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+</padding>
+ 
     <VBox alignment="CENTER" spacing="5.0">
-        <Label text="Librería Saturno" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-        <Label text="Selecciona un módulo para acceder" style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
-    </VBox>
-
+<Label style="-fx-font-family: 'Century Gothic'; -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1800ad;" text="Librería Saturno" />
+<Label style="-fx-font-family: 'Century Gothic'; -fx-font-size: 14px; -fx-text-fill: #a6a6a6;" text="Selecciona un módulo para acceder" />
+</VBox>
+ 
     <HBox alignment="CENTER" spacing="20.0">
-        <Button text="Dashboard Admin" onAction="#handleAbrirAdmin" 
-                prefWidth="160.0" prefHeight="100.0" 
-                style="-fx-font-size: 14px; -fx-background-color: #2c3e50; -fx-text-fill: white; -fx-cursor: hand;"/>
-
-        <Button text="Dashboard Bodega" onAction="#handleAbrirBodega" 
-                prefWidth="160.0" prefHeight="100.0" 
-                style="-fx-font-size: 14px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"/>
-
-        <Button text="Dashboard Cajero" onAction="#handleAbrirCajero" 
-                prefWidth="160.0" prefHeight="100.0" 
-                style="-fx-font-size: 14px; -fx-background-color: #2980b9; -fx-text-fill: white; -fx-cursor: hand;"/>
-    </HBox>
-
-    <Button text="Cerrar Sesión" onAction="#handleCerrarSesion" 
-            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;"/>
+<Button onAction="#handleAbrirAdmin" prefHeight="100.0" prefWidth="160.0" style="-fx-font-family: 'Century Gothic'; -fx-font-size: 14px; -fx-background-color: #6383fa; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8;" text="Dashboard Admin" />
+ 
+        <Button onAction="#handleAbrirBodega" prefHeight="100.0" prefWidth="160.0" style="-fx-font-family: 'Century Gothic'; -fx-font-size: 14px; -fx-background-color: #6383fa; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8;" text="Dashboard Bodega" />
+ 
+        <Button onAction="#handleAbrirCajero" prefHeight="100.0" prefWidth="160.0" style="-fx-font-family: 'Century Gothic'; -fx-font-size: 14px; -fx-background-color: #6383fa; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8;" text="Dashboard Cajero" />
+</HBox>
+ 
+    <Button onAction="#handleCerrarSesion" style="-fx-font-family: 'Century Gothic'; -fx-background-color: #1800ad; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 13px;" text="Cerrar Sesión" />
 </VBox>

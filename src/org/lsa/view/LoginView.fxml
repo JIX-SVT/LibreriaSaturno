@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+ 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -9,51 +9,56 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.LoginController">
-    <stylesheets>
-        <URL value="@/org/lsa/view/style/loginview.css"/>
-    </stylesheets>
-    
-    <children>
-        <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <!-- Título de Bienvenida -->
-                <Label text="Bienvenido a LibreriaSaturno" textAlignment="CENTER">
-                    <font>
-                        <Font name="System Bold" size="26.0" />
-                    </font>
-                    <VBox.margin>
-                        <Insets bottom="20.0" />
-                    </VBox.margin>
-                </Label>
-
+ 
+<AnchorPane id="AnchorPane" prefHeight="518.0" prefWidth="390.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.LoginController">
+<stylesheets>
+<URL value="@/org/lsa/view/style/loginview.css" />
+</stylesheets>
+<children>
+<VBox alignment="CENTER" layoutX="5.0" layoutY="9.0" prefHeight="509.0" prefWidth="383.0" spacing="20.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="9.0">
+<children>
+<!-- Título de Bienvenida -->
+<Label prefHeight="33.0" prefWidth="179.0" text="Iniciar Sesión" textAlignment="CENTER" textFill="#6383fa">
+<font>
+<Font name="Century Gothic Bold" size="26.0" />
+</font>
+<VBox.margin>
+<Insets bottom="20.0" />
+</VBox.margin>
+</Label>
+ 
                 <!-- Campo de Usuario -->
-                <VBox maxWidth="250.0" spacing="5.0">
-                    <children>
-                        <Label text="Usuario:" />
-                        <TextField fx:id="txtUsuario" promptText="Ingrese su usuario" />
-                    </children>
-                </VBox>
-
+<VBox maxWidth="250.0" spacing="5.0">
+<children>
+<Label text="Usuario:">
+<font>
+<Font name="Century Gothic" size="12.0" />
+</font></Label>
+<TextField fx:id="txtUsuario" promptText="Ingrese su usuario" />
+</children>
+</VBox>
+ 
                 <!-- Campo de Contraseña -->
-                <VBox maxWidth="250.0" spacing="5.0">
-                    <children>
-                        <Label text="Contraseña:" />
-                        <PasswordField fx:id="txtContrasena" promptText="Ingrese su contraseña" />
-                    </children>
-                </VBox>
-
+<VBox maxWidth="250.0" spacing="5.0">
+<children>
+<Label text="Contraseña:">
+<font>
+<Font name="Century Gothic" size="12.0" />
+</font></Label>
+<PasswordField fx:id="txtContrasena" promptText="Ingrese su contraseña" />
+</children>
+</VBox>
+ 
                 <!-- Botón de Inicio de Sesión -->
-                <Button fx:id="btnIngresar" mnemonicParsing="false" onAction="#handleLogin" prefHeight="35.0" prefWidth="250.0" text="Ingresar">
-                    <VBox.margin>
-                        <Insets top="15.0" />
-                    </VBox.margin>
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Button>
-            </children>
-        </VBox>
-    </children>
+<Button fx:id="btnIngresar" mnemonicParsing="false" onAction="#handleLogin" prefHeight="35.0" prefWidth="250.0" style="-fx-background-color: #6383fa;" text="Ingresar" textFill="#fffbf9">
+<VBox.margin>
+<Insets top="15.0" />
+</VBox.margin>
+<font>
+<Font name="Century Gothic Bold" size="14.0" />
+</font>
+</Button>
+</children>
+</VBox>
+</children>
 </AnchorPane>

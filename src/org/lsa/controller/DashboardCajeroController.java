@@ -91,6 +91,6 @@ public class DashboardCajeroController implements Initializable {
     public void handleCerrarSesion(ActionEvent event) {
         SesionUsuario.getInstancia().cerrarSesion();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Navegador.cargarVista(stage, "/org/lsa/view/Login.fxml", "Inicio de Sesión");
+        Navegador.cargarVista(stage, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
     }
 }
