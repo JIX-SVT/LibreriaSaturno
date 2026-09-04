@@ -21,7 +21,6 @@ public class DashboardCajeroController implements Initializable {
     @FXML private TableColumn<?, ?> colIsbn, colTitulo, colAutor;
     @FXML private TableColumn<?, ?> colPrecio;
     @FXML private TableColumn<?, ?> colStock;
-    @FXML private Label lblVentasHoy;
  
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -29,7 +28,6 @@ public class DashboardCajeroController implements Initializable {
     }
  
     private void actualizarVentasHoy() {
-        lblVentasHoy.setText("Q0.00");
     }
  
     @FXML
@@ -37,15 +35,6 @@ public class DashboardCajeroController implements Initializable {
         
     }
  
-    @FXML
-    public void handleNuevaVenta(ActionEvent event) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Punto de Venta");
-        alerta.setHeaderText(null);
-        alerta.setContentText("Módulo de caja listo para procesar una nueva venta.");
-        alerta.showAndWait();
-    }
-
     @FXML
     public void handleVolverMenu(ActionEvent event) {
         try {
