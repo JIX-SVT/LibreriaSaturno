@@ -14,12 +14,12 @@ import org.lsa.utils.ConexionSingleton;
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
-    public Usuario autenticar(String correo, String contraseña) {
+    public Usuario autenticar(String nombreUsuario, String contraseña) {
         Usuario usuario = null;
         String consulta = "{call sp_autenticarusuario(?, ?)}";
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-            consultaCall.setString(1, correo);
+            consultaCall.setString(1, nombreUsuario);
             consultaCall.setString(2, contraseña);
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {

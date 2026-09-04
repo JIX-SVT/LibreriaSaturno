@@ -120,7 +120,7 @@ private void configurarTabla() {
             nuevoUsuario.setRol(cmbRol.getValue());
             nuevoUsuario.setEstado(EstadoActivo);
             if (usuarioDAO.insertar(nuevoUsuario)) {
-                mostrarError("Usuario creado correctamente.");
+                mostrarAlerta("Usuario creado correctamente.");
                 handleLimpiarUsuario();
                 cargarDatosTabla();
             } else {
