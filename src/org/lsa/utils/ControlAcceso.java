@@ -1,4 +1,3 @@
-
 package org.lsa.utils;
 
 import org.lsa.model.Usuario;
@@ -8,8 +7,23 @@ import org.lsa.model.Usuario;
  * @author Gregory Jerónimo
  */
 public class ControlAcceso {
+
+    private static Usuario usuarioLogueado;
+
+    public static Usuario getUsuarioLogueado() {
+        return usuarioLogueado;
+    }
+
+    public static void setUsuarioLogueado(Usuario usuario) {
+        usuarioLogueado = usuario;
+    }
+
+    public static void cerrarSesion() {
+        usuarioLogueado = null;
+    }
+
     public static boolean tienePermiso(Usuario usuario, String vistaDestino) {
-        if (usuario == null || !usuario.isActivo()) {
+        if (usuario == null || !usuario.isEstado()) {
             return false;
         }
 
@@ -17,11 +31,11 @@ public class ControlAcceso {
 
         switch (vistaDestino) {
             case "DashboardAdminController.fxml":
-                return rol.equals("admin");
+                return rol.equals("admin") || rol.equals("administrador");
             case "DashboardBodegaController.fxml":
-                return rol.equals("admin") || rol.equals("bodega");
+                return rol.equals("admin") || rol.equals("administrador") || rol.equals("bodega") || rol.equals("empleado");
             case "DashboardCajeroController.fxml":
-                return rol.equals("admin") || rol.equals("cajero");
+                return rol.equals("admin") || rol.equals("administrador") || rol.equals("cajero");
             default:
                 return false;
         }

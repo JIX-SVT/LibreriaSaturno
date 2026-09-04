@@ -14,16 +14,13 @@ import org.lsa.utils.ConexionSingleton;
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
-    public Usuario autenticar(String correo, String contrasena) {
+    public Usuario autenticar(String correo, String contraseña) {
         Usuario usuario = null;
         String consulta = "{call sp_autenticarusuario(?, ?)}";
-        
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-             
             consultaCall.setString(1, correo);
-            consultaCall.setString(2, contrasena);
-            
+            consultaCall.setString(2, contraseña);
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
                     usuario = new Usuario();
@@ -31,13 +28,12 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
                     usuario.setCorreo(tablaResultado.getString("correo"));
                     usuario.setRol(tablaResultado.getString("rol"));
-                    usuario.setActivo(tablaResultado.getBoolean("activo"));
+                    usuario.setEstado(tablaResultado.getBoolean("activo"));
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error al autenticar Usuario: " + e.getMessage());
         }
-        
         return usuario;
     }
 
@@ -45,19 +41,22 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
         String consulta = "{call sp_listarusuarios()}";
-        
+
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta);
-             ResultSet tablaResultado = consultaCall.executeQuery()) {
-             
-            while (tablaResultado.next()) {
-                usuarios.add(new Usuario(
-                        tablaResultado.getInt("id_usuario"),
-                        tablaResultado.getString("nombre_usuario"),
-                        tablaResultado.getString("correo"),
-                        tablaResultado.getString("rol"),
-                        tablaResultado.getBoolean("activo")
-                ));
+             ResultSet rs = consultaCall.executeQuery()) {
+
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setIdUsuario(rs.getInt("id_usuario"));
+                u.setNombreUsuario(rs.getString("nombre_usuario"));
+                u.setNombre(rs.getString("nombre"));
+                u.setApellido(rs.getString("apellido"));
+                u.setCorreo(rs.getString("correo"));
+                u.setRol(rs.getString("rol"));
+                u.setEstado(rs.getBoolean("activo"));
+
+                usuarios.add(u);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar usuarios: " + e.getMessage());
@@ -69,10 +68,8 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public Usuario buscarUsuario(int idUsuario) {
         Usuario usuario = new Usuario();
         String consultaSQL = "{call sp_buscarusuario(?)}";
-        
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consultaSQL)) {
-             
             consultaCall.setInt(1, idUsuario);
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
@@ -80,7 +77,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
                     usuario.setCorreo(tablaResultado.getString("correo"));
                     usuario.setRol(tablaResultado.getString("rol"));
-                    usuario.setActivo(tablaResultado.getBoolean("activo"));
+                    usuario.setEstado(tablaResultado.getBoolean("activo"));
                 } else {
                     return null;
                 }
@@ -93,17 +90,20 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean insertar(Usuario usuario) {
-        String consulta = "{call sp_insertarusuario(?, ?, ?, ?)}";
-        
-        try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
-             CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-             
-            consultaCall.setString(1, usuario.getNombreUsuario());
-            consultaCall.setString(2, usuario.getCorreo());
-            consultaCall.setString(3, usuario.getContrasena());
-            consultaCall.setString(4, usuario.getRol());
-            
-            return consultaCall.executeUpdate() > 0;
+        String sql = "{call sp_insertarusuario(?, ?, ?, ?, ?, ?, ?)}";
+
+        try (Connection conn = ConexionSingleton.getInstancia().getConexion();
+             CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setString(1, usuario.getNombreUsuario());
+            cs.setString(2, usuario.getNombre());
+            cs.setString(3, usuario.getApellido());
+            cs.setString(4, usuario.getCorreo());
+            cs.setString(5, usuario.getContraseña());
+            cs.setString(6, usuario.getRol().toLowerCase());
+            cs.setBoolean(7, usuario.isEstado()); 
+
+            return cs.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al crear Usuario: " + e.getMessage());
             return false;
@@ -112,16 +112,17 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean actualizar(Usuario usuario) {
-        String consulta = "{call sp_actualizarusuario(?, ?, ?, ?, ?)}";
-        
+        String consulta = "{call sp_actualizarusuario(?, ?, ?, ?, ?, ?, ?)}";
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-             
+            
             consultaCall.setInt(1, usuario.getIdUsuario());
             consultaCall.setString(2, usuario.getNombreUsuario());
-            consultaCall.setString(3, usuario.getCorreo());
-            consultaCall.setString(4, usuario.getRol());
-            consultaCall.setBoolean(5, usuario.isActivo());
+            consultaCall.setString(3, usuario.getNombre());
+            consultaCall.setString(4, usuario.getApellido());
+            consultaCall.setString(5, usuario.getCorreo());
+            consultaCall.setString(6, usuario.getRol().toLowerCase());
+            consultaCall.setBoolean(7, usuario.isEstado());
             
             return consultaCall.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -133,12 +134,9 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     @Override
     public boolean eliminar(int idUsuario) {
         String consulta = "{call sp_eliminarusuario(?)}";
-        
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-             
             consultaCall.setInt(1, idUsuario);
-            
             return consultaCall.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al eliminar Usuario: " + e.getMessage());
@@ -151,10 +149,8 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql = "SELECT 1 FROM usuarios WHERE id_usuario = ? AND contrasena = SHA2(?, 256)";
         try (Connection conn = ConexionSingleton.getInstancia().getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
             pstmt.setInt(1, idUsuario);
             pstmt.setString(2, contrasenaIngresada);
-            
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next();
             }
@@ -169,10 +165,8 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql = "UPDATE usuarios SET contrasena = SHA2(?, 256) WHERE id_usuario = ?";
         try (Connection conn = ConexionSingleton.getInstancia().getConexion();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
             pstmt.setString(1, nuevaPassword);
             pstmt.setInt(2, idUsuario);
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al actualizar contraseña: " + e.getMessage());

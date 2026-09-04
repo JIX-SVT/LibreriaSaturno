@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
+
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -9,16 +9,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
- 
-<AnchorPane id="AnchorPane" prefHeight="518.0" prefWidth="390.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.LoginController">
+
+<AnchorPane id="AnchorPane" prefHeight="518.0" prefWidth="390.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.LoginController">
 <stylesheets>
 <URL value="@/org/lsa/view/style/loginview.css" />
 </stylesheets>
 <children>
-<VBox alignment="CENTER" layoutX="5.0" layoutY="9.0" prefHeight="509.0" prefWidth="383.0" spacing="20.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="9.0">
+<VBox alignment="CENTER" layoutX="-2.0" layoutY="-7.0" prefHeight="525.0" prefWidth="401.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-2.0" AnchorPane.rightAnchor="-9.0" AnchorPane.topAnchor="-7.0">
 <children>
 <!-- Título de Bienvenida -->
-<Label prefHeight="33.0" prefWidth="179.0" text="Iniciar Sesión" textAlignment="CENTER" textFill="#6383fa">
+<Label prefHeight="33.0" prefWidth="179.0" style="-fx-font-size: Black;" text="Iniciar Sesión" textAlignment="CENTER" textFill="#0a0a0a">
 <font>
 <Font name="Century Gothic Bold" size="26.0" />
 </font>
@@ -50,7 +50,7 @@
 </VBox>
  
                 <!-- Botón de Inicio de Sesión -->
-<Button fx:id="btnIngresar" mnemonicParsing="false" onAction="#handleLogin" prefHeight="35.0" prefWidth="250.0" style="-fx-background-color: #6383fa;" text="Ingresar" textFill="#fffbf9">
+<Button fx:id="btnIngresar" mnemonicParsing="false" onAction="#handleLogin" prefHeight="35.0" prefWidth="250.0" text="Ingresar" textFill="#030303">
 <VBox.margin>
 <Insets top="15.0" />
 </VBox.margin>

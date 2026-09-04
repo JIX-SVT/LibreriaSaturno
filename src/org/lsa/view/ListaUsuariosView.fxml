@@ -1,89 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+ 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<VBox spacing="20.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.ListaUsuariosController">
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
-   <children>
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label style="-fx-font-size: 24px; -fx-font: Century Gothic; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="Gestión de Usuarios" />
-                  <Label style="-fx-font-Century Gothic: 13px; -fx-text-fill: #64748b;" text="Administración de usuarios" />
-               </children>
-            </VBox>
-            <Button fx:id="btnNuevoUsuario" onAction="#handleNuevoUsuario" style="-fx-background-color: #6383fa; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-font: Century Gothic;" text="+ Nuevo Usuario" />
-            <Button fx:id="btnEditarUsuario" onAction="#handleEditarUsuario" style="-fx-background-color: #1800ad; -fx-font: Century Gothic; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Editar">
-               <font>
-                  <Font name="Century Gothic" size="12.0" />
-               </font></Button>
-            <Button fx:id="btnDesactivarUsuario" onAction="#handleDesactivarUsuario" style="-fx-background-color: #1800ad; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-font: Century Gothic;" text="Desactivar" />
-            <Button onAction="#handleRegresar" style="-fx-background-color: #1800ad; -fx-font: Century Gothic; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16;" text="Regresar">
-               <font>
-                  <Font name="Century Gothic" size="12.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox spacing="15.0">
-         <children>
-            <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Total Usuarios" />
-                  <Label fx:id="lblTotalUsuarios" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="0" />
-               </children>
-            </VBox>
-            <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Usuarios Activos" />
-                  <Label fx:id="lblUsuariosActivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #6383fa;" text="0" />
-               </children>
-            </VBox>
-            <VBox alignment="CENTER_LEFT" prefWidth="200.0" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label style="-fx-text-fill: #64748b; -fx-font-Century Gothic: 12px;" text="Inactivos / Bloqueados" />
-                  <Label fx:id="lblUsuariosInactivos" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1800ad;" text="0" />
-               </children>
-            </VBox>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #ffffff; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
-         <children>
-            <TextField fx:id="txtBuscar" onKeyTyped="#handleAplicarFiltros" promptText="Buscar por nombre, usuario..." style="-fx-pref-width: 300;" HBox.hgrow="ALWAYS" />
-            <ComboBox fx:id="cmbFiltroRol" onAction="#handleAplicarFiltros" prefWidth="160.0" promptText="Todos los Roles" />
-            <ComboBox fx:id="cmbFiltroEstado" onAction="#handleAplicarFiltros" prefWidth="160.0" promptText="Todos los Estados" />
-            <Button fx:id="btnAplicarFiltro" onAction="#handleAplicarFiltros" style="-fx-background-color: gray; -fx-text-fill: white; -fx-font-weight: bold; -fx-font: Century Gothic;" text="Filtrar" />
-         </children>
-      </HBox>
-      <VBox style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" VBox.vgrow="ALWAYS">
-         <children>
-            <TableView fx:id="tblUsuarios" VBox.vgrow="ALWAYS">
-               <columns>
-                  <TableColumn fx:id="colId" prefWidth="60.0" text="ID" />
-                  <TableColumn fx:id="colNombre" prefWidth="180.0" text="Nombre" />
-                  <TableColumn fx:id="colUsuario" prefWidth="220.0" text="Usuario" />
-                  <TableColumn fx:id="colRol" prefWidth="120.0" text="Rol" />
-                  <TableColumn fx:id="colEstado" prefWidth="100.0" text="Estado" />
-               </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;" />
-         </children>
-      </VBox>
-
-   </children>
+ 
+<BorderPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.ListaUsuariosController">
+<padding>
+<Insets bottom="20" left="20" right="20" top="20" />
+</padding>
+ 
+    <left>
+<VBox maxWidth="300" minWidth="300" spacing="10">
+<padding>
+<Insets right="20" />
+</padding>
+<Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Registra tu Usuario" />
+<TextField fx:id="txtID" promptText="ID" />
+<TextField fx:id="txtUsuario" promptText="Usuario" />
+<TextField fx:id="txtNombre" promptText="Nombre" />
+<TextField fx:id="txtApellido" promptText="Apellido" />
+<TextField fx:id="txtCorreo" promptText="Correo" />
+<PasswordField fx:id="txtContraseña" promptText="Contraseña" />
+<!-- ComboBox con fx:id asignados -->
+<ComboBox fx:id="cmbRol" prefWidth="300.0" promptText="Rol" />
+<ComboBox fx:id="cmbEstado" prefWidth="300.0" promptText="Estado" />
+<HBox spacing="10">
+<Button fx:id="btnGuardar" onAction="#handleGuardarUsuario" prefWidth="120" text="Guardar" />
+<Button fx:id="btnEditar" onAction="#handleEditarUsuario" prefWidth="120" text="Editar" />
+<Button fx:id="btnDesactivar" onAction="#handleDesactivarUsuario" prefWidth="120" text="Desactivar" />
+<Button fx:id="btnLimpiar" onAction="#handleLimpiarUsuario" prefWidth="120" text="Limpiar" />
+</HBox>
+<Button fx:id="btnVolverMenu" onAction="#handleCambiarContraseña" prefWidth="120" text="Cambiar Contraseña" />
+<Button fx:id="btnVolverMenu1" onAction="#handleVolverMenu" prefWidth="120" text="Volver al Menú" />
 </VBox>
+</left>
+ 
+    <center>
+<VBox spacing="10">
+<Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="Lista de Usuarios" />
+<TableView fx:id="tblUsuarios">
+<columns>
+<TableColumn fx:id="colId" prefWidth="60" text="ID" />
+<TableColumn fx:id="colUsuario" prefWidth="120" text="Usuario" />
+<TableColumn fx:id="colNombre" prefWidth="120" text="Nombre" />
+<TableColumn fx:id="colApellido" prefWidth="120" text="Apellido" />
+<TableColumn fx:id="colCorreo" prefWidth="150" text="Correo" />
+<TableColumn fx:id="colRol" prefWidth="100" text="Rol" />
+<TableColumn fx:id="colEstado" prefWidth="80" text="Estado" />
+</columns>
+</TableView>
+</VBox>
+</center>
+</BorderPane>

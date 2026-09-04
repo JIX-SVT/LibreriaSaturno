@@ -11,6 +11,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.lsa.dao.UsuarioDAO;
+import org.lsa.daoimpl.UsuarioDAOImpl;
+import org.lsa.model.Usuario;
+import org.lsa.utils.ControlAcceso; // O la clase donde guardes la sesión del usuario
 
 public class LoginController {
 
@@ -18,21 +22,34 @@ public class LoginController {
     @FXML private PasswordField txtContrasena;
     @FXML private Button btnIngresar;
 
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+
     @FXML
     private void handleLogin(ActionEvent event) {
-        String usuarioText = txtUsuario.getText() != null ? txtUsuario.getText().trim().toLowerCase() : "";
+        String correoText = txtUsuario.getText() != null ? txtUsuario.getText().trim() : "";
         String passText = txtContrasena.getText() != null ? txtContrasena.getText() : "";
 
-        if (usuarioText.isEmpty() || passText.isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campos vacíos", "Por favor, ingrese su usuario y contraseña.");
+        if (correoText.isEmpty() || passText.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos vacíos", "Por favor, ingrese su correo/usuario y contraseña.");
             return;
         }
 
+        Usuario usuarioLogueado = usuarioDAO.autenticar(correoText, passText);
+
+        if (usuarioLogueado == null) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Correo o contraseña incorrectos, o usuario inactivo.");
+            return;
+        }
+
+        ControlAcceso.setUsuarioLogueado(usuarioLogueado);
+
         String fxmlPath;
         String tituloVentana;
+        String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().toLowerCase() : "";
 
-        switch (usuarioText) {
+        switch (rol) {
             case "admin":
+            case "administrador":
                 fxmlPath = "/org/lsa/view/DashboardAdminView.fxml";
                 tituloVentana = "Librería Saturno - Panel de Administración";
                 break;
@@ -46,7 +63,7 @@ public class LoginController {
                 tituloVentana = "Librería Saturno - Módulo de Inventario";
                 break;
             default:
-                mostrarAlerta(Alert.AlertType.ERROR, "Usuario no reconocido", "Para pruebas usa como usuario: admin, cajero o empleado.");
+                mostrarAlerta(Alert.AlertType.ERROR, "Rol no autorizado", "El rol asignado (" + rol + ") no tiene una interfaz configurada.");
                 return;
         }
 
@@ -55,7 +72,7 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            
+
             escenarioPrincipal.setTitle(tituloVentana);
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.centerOnScreen();

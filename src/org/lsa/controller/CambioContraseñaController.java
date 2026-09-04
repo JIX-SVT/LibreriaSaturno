@@ -7,7 +7,7 @@ import javafx.scene.control.PasswordField;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
 
-public class CambioContrasenaControler {
+public class CambioContraseñaController {
 
     @FXML
     private PasswordField txtCurrentPassword;
