@@ -88,21 +88,11 @@ public class DashboardCajeroController implements Initializable {
     }
 
     private void actualizarVentasHoy() {
-        lblVentasHoy.setText("Q0.00");
     }
 
     @FXML
     public void handleBuscar(ActionEvent event) {
         filtrarLibros();
-    }
-
-    @FXML
-    public void handleNuevaVenta(ActionEvent event) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Punto de Venta");
-        alerta.setHeaderText(null);
-        alerta.setContentText("Módulo de caja listo para procesar una nueva venta.");
-        alerta.showAndWait();
     }
 
     @FXML

@@ -64,7 +64,22 @@ public class DashboardAdminController implements Initializable {
             mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de inventario.");
         }
     }
- 
+  
+    @FXML
+    public void handleGestionarLibros(ActionEvent event) {
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Reportes de Inventario");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de inventario.");
+        }
+    }
     @FXML
     public void handleVolverMenu(ActionEvent event) {
         try {
