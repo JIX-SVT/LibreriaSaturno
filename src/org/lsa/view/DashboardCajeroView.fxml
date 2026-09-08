@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox spacing="15" style="-fx-background-color: WHITE;" stylesheets="@dashboardcajeroview.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+<VBox spacing="15" style="-fx-background-color: WHITE;" stylesheets="@dashboardcajeroview.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
 <padding>
 <Insets bottom="15" left="15" right="15" top="15" />
 </padding>
@@ -20,10 +20,15 @@
          <font>
             <Font size="36.0" />
          </font></Label>
+<HBox spacing="15" />
 <Region HBox.hgrow="ALWAYS" />
 <Button mnemonicParsing="false" onAction="#handleVolverMenu" prefHeight="25.0" prefWidth="115.0" text="Volver a Menú" />
 <Button onAction="#handleCerrarSesion" text="Cerrar Sesión" />
 </HBox>
+<VBox style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #ffffff;">
+<Label text="Ventas del Día" />
+<Label fx:id="lblVentasHoy" text="Q0.00" />
+</VBox>
 <Label text="Buscador de Libros" />
 <HBox spacing="15" />
 <HBox spacing="10">
