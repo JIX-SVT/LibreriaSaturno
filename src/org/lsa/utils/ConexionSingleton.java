@@ -9,6 +9,10 @@ import java.sql.SQLException;
 public class ConexionSingleton {
 
     private static ConexionSingleton instancia;
+
+    public static Object getInstance() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     private Connection conexion;
 
     private ConexionSingleton() {
