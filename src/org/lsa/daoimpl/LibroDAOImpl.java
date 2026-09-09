@@ -19,30 +19,30 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public List<Libro> listarTodos() {
         List<Libro> lista = new ArrayList<>();
-        String sql = "SELECT isbn, titulo, precio FROM Libros";
+        String sql = "SELECT isbn, titulo, precio, stock FROM Libros";
         String consulta = "{call sp_listarlibros()}";
         try (Connection con = ConexionSingleton.getInstance().getConexion();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-
             while (rs.next()) {
-                Libro libro = new Libro();
-                libro.setIsbn(rs.getString("isbn"));
-                libro.setTitulo(rs.getString("titulo"));
-                libro.setPrecio(rs.getDouble("precio"));
-                lista.add(libro);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al listar libros: " + e.getMessage());
-            e.printStackTrace();
+            Libro libro = new Libro();
+            libro.setIsbn(rs.getString("isbn"));
+            libro.setTitulo(rs.getString("titulo"));
+            libro.setPrecio(rs.getDouble("precio"));
+            libro.setStock(rs.getInt("stock"));
+            lista.add(libro);
         }
-
-        return lista;
+    } catch (SQLException e) {
+        System.err.println("Error al listar libros: " + e.getMessage());
+        e.printStackTrace();
     }
+
+    return lista;
+}
 
     @Override
     public Libro buscarLibro(int isbn) {
-        String sql = "SELECT isbn, titulo, precio  FROM Libros WHERE isbn = ?";
+        String sql = "SELECT isbn, titulo, precio, stock  FROM Libros WHERE isbn = ?";
         Libro libro = null;
 
         try (Connection con = ConexionSingleton.getInstance().getConexion();
@@ -55,6 +55,7 @@ public class LibroDAOImpl implements LibroDAO {
                     libro.setIsbn(rs.getString("isbn"));
                     libro.setTitulo(rs.getString("titulo"));
                     libro.setPrecio(rs.getDouble("precio"));
+                    libro.setPrecio(rs.getInt("stock"));
                 }
             }
         } catch (SQLException e) {
@@ -85,7 +86,7 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public boolean actualizar(Libro libro) {
-        String sql = "UPDATE Libros SET titulo = ?, precio = ? WHERE isbn = ?";
+        String sql = "UPDATE Libros SET titulo = ?, precio = ?, stock = ? WHERE isbn = ?";
 
         try (Connection con = ConexionSingleton.getInstance().getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {

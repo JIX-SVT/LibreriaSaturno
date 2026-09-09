@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import org.lsa.dao.LibroDAO;
 import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.model.Carrito;
 import org.lsa.model.Libro;
 import org.lsa.utils.SesionUsuario;
 
@@ -29,14 +30,24 @@ public class DashboardCajeroController implements Initializable {
     @FXML private TableView<Libro> tblLibros; 
     @FXML private TableColumn<Libro, String> colIsbn;
     @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, String> colAutor;
     @FXML private TableColumn<Libro, Double> colPrecio;
+    @FXML private TableColumn<Libro, String> colStock;
     @FXML private Label lblVentasHoy;
 
+   
+    @FXML private TableView<Carrito> tblCarrito;
+    @FXML private TableColumn<Carrito, String> colCarritoIsbn;
+    @FXML private TableColumn<Carrito, String> colCarritoTitulo;
+    @FXML private TableColumn<Carrito, Double> colCarritoPrecio;
+    @FXML private TableColumn<Carrito, Integer> colCarritoStock;
+    @FXML private TableColumn<Carrito, Double> colCarritoSubtotal;
+    
+    @FXML private Label lblTotalPagar;
     private final LibroDAO libroDAO = new LibroDAOImpl();
 
     private final ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
     private final FilteredList<Libro> librosFiltrados = new FilteredList<>(listaLibros, p -> true);
+private final ObservableList<Carrito> listaCarrito = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -44,15 +55,24 @@ public class DashboardCajeroController implements Initializable {
         cargarTabla();
         tblLibros.setItems(librosFiltrados);
         configurarBusqueda();
-        actualizarVentasHoy();
     }
 
     private void configurarTabla() {
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));        
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-        cargarDatosTabla();
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+
+        colCarritoIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colCarritoTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colCarritoPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        colCarritoStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        colCarritoSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
+        tblCarrito.setItems(listaCarrito);
+        tblLibros.setItems(FXCollections.observableArrayList(libroDAO.listarTodos()));
+         cargarDatosTabla();
     }
+    
 
     private void cargarTabla() {
         listaLibros.clear();
@@ -85,10 +105,6 @@ public class DashboardCajeroController implements Initializable {
             });
         }
     }
-
-    private void actualizarVentasHoy() {
-    }
-
     @FXML
     public void handleBuscar(ActionEvent event) {
         filtrarLibros();
@@ -135,5 +151,59 @@ public void cargarDatosTabla() {
             alerta.showAndWait();
         }
     }
+    @FXML
+    public void handleAgregarAlCarrito(ActionEvent event) {
+        Libro libroSeleccionado = tblLibros.getSelectionModel().getSelectedItem();
+        if (libroSeleccionado == null) {
+            System.out.println("Debe seleccionar un libro primero.");
+            return;
+        }
+        boolean encontrado = false;
+        for (Carrito item : listaCarrito) {
+            if (item.getIsbn().equals(libroSeleccionado.getIsbn())) {
+                item.setStock(item.getStock() + 1);
+                tblCarrito.refresh();
+                encontrado = true;
+                break;
+            }
+        }
+        if (!encontrado) {
+            Carrito nuevoItem = new Carrito(
+                libroSeleccionado.getIsbn(),
+                libroSeleccionado.getTitulo(),
+                libroSeleccionado.getPrecio(),
+                1
+            );
+            listaCarrito.add(nuevoItem);
+        }
 
+        actualizarTotal();
+    }
+    @FXML
+    public void handleQuitarDelCarrito(ActionEvent event) {
+        Carrito seleccionado = tblCarrito.getSelectionModel().getSelectedItem();
+        if (seleccionado != null) {
+            listaCarrito.remove(seleccionado);
+            actualizarTotal();
+        }
+    }
+    private void actualizarTotal() {
+        double total = 0.0;
+        for (Carrito item : listaCarrito) {
+            total += item.getSubtotal();
+        }
+        lblTotalPagar.setText(String.format("Total: Q%.2f", total));
+    }
+
+    @FXML
+    public void handleProcesarPago(ActionEvent event) {
+        if (listaCarrito.isEmpty()) {
+            System.out.println("El carrito está vacío.");
+            return;
+        }
+
+        System.out.println("Pago procesado correctamente.");
+        listaCarrito.clear();
+        actualizarTotal();
+    }
 }

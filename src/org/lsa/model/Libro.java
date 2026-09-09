@@ -10,11 +10,11 @@ public class Libro {
     private int idCategoria;
     private String nitEditorial;
     private String autor;
-    private int stockActual;
+    private int stock;
  
     public Libro() {}
 
-    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stockActual) {
+    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stock) {
         this.isbn = isbn;
         this.titulo = titulo;
         this.fechaPublicacion = fechaPublicacion;
@@ -22,7 +22,7 @@ public class Libro {
         this.idCategoria = idCategoria;
         this.nitEditorial = nitEditorial;
         this.autor = autor;
-        this.stockActual = stockActual;
+        this.stock = stock;
     }
 
     public String getIsbn() {
@@ -81,21 +81,13 @@ public class Libro {
         this.autor = autor;
     }
 
-    public int getStockActual() {
-        return stockActual;
-    }
-
-    public void setStockActual(int stockActual) {
-        this.stockActual = stockActual;
-    }
-
-    public void setStock(int aInt) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
     public int getStock() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return stock;
     }
- 
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
    
 }
