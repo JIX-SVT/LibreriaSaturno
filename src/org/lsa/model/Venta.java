@@ -31,14 +31,7 @@ public class Venta extends DetalleVenta {
         this.total = 0.0;
     }
 
-    public Venta(int idVenta, Date fecha, int idCajero, int idCliente, List<DetalleVenta> detalles) {
-        this.idVenta = idVenta;
-        this.fecha = fecha;
-        this.idCajero = idCajero;
-        this.idCliente = idCliente;
-        this.detalles = detalles != null ? detalles : new ArrayList<>();
-        this.calcularTotal();
-    }
+  
 
     public int getIdVenta() {
         return idVenta;
