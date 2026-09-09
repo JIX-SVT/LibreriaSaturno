@@ -1,6 +1,5 @@
-// DAOImpl
-package org.lsa.dao.impl;
-import org.lsa.util.Conexion;
+package org.lsa.daoimpl;
+import org.lsa.utils.Conexion;
 import org.lsa.model.Venta;
 import org.lsa.dao.VentaDAO;
 import java.sql.*;
@@ -10,7 +9,7 @@ import java.util.List;
 public class VentaDAOImpl implements VentaDAO {
     @Override
     public boolean insertar(Venta objeto) {
-        String sql = "{call sp_insertarventa(?, ?)}"; // Nota: El SP de tu script solo pide total y CUI
+        String sql = "{call sp_insertarventa(?, ?)}"; 
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             cs.setDouble(1, objeto.getTotalVenta());
@@ -32,7 +31,6 @@ public class VentaDAOImpl implements VentaDAO {
         } catch (SQLException e) { }
         return lista;
     }
-    // Implementar buscar, actualizar y eliminar con sus respectivos SP (sp_buscarventa, etc.) de manera idéntica.
 
     @Override
     public Venta buscar(Integer id) {

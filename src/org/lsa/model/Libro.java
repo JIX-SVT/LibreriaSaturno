@@ -1,7 +1,7 @@
 package org.lsa.model;
-
+ 
 import java.util.Date;
-
+ 
 public class Libro {
     private String isbn;
     private String titulo;
@@ -11,7 +11,7 @@ public class Libro {
     private String nitEditorial;
     private String autor;
     private int stockActual;
-
+ 
     public Libro() {}
 
     public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stockActual) {
@@ -25,28 +25,77 @@ public class Libro {
         this.stockActual = stockActual;
     }
 
-    public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
+    public String getIsbn() {
+        return isbn;
+    }
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
 
-    public Date getFechaPublicacion() { return fechaPublicacion; }
-    public void setFechaPublicacion(Date fechaPublicacion) { this.fechaPublicacion = fechaPublicacion; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public int getIdCategoria() { return idCategoria; }
-    public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
+    public Date getFechaPublicacion() {
+        return fechaPublicacion;
+    }
 
-    public String getNitEditorial() { return nitEditorial; }
-    public void setNitEditorial(String nitEditorial) { this.nitEditorial = nitEditorial; }
+    public void setFechaPublicacion(Date fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
+    }
 
-  
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
+    public double getPrecio() {
+        return precio;
+    }
 
-    public int getStockActual() { return stockActual; }
-    public void setStockActual(int stockActual) { this.stockActual = stockActual; }
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public String getNitEditorial() {
+        return nitEditorial;
+    }
+
+    public void setNitEditorial(String nitEditorial) {
+        this.nitEditorial = nitEditorial;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
+    public int getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(int stockActual) {
+        this.stockActual = stockActual;
+    }
+
+    public void setStock(int aInt) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public int getStock() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+ 
+   
 }

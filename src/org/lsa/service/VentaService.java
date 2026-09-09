@@ -12,7 +12,6 @@ import org.lsa.utils.Conexion;
 
 public class VentaService {
 
-    // T2.17: Validar stock disponible
     public boolean validarStock(String isbn, int cantidad) {
         String sql = "{call sp_buscarlibro(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
@@ -31,10 +30,8 @@ public class VentaService {
         return false;
     }
 
-    // T2.18 & T2.19: Transacción Completa de Venta (Maestro + Detalle + Stock)
     public boolean procesarVenta(Venta venta, List<DetalleVenta> detalles) {
         
-        // 1. Validar existencias en inventario antes de iniciar
         for (DetalleVenta det : detalles) {
             if (!validarStock(det.getIsbn(), 1)) {
                 System.err.println("Stock insuficiente para el libro ISBN: " + det.getIsbn());
@@ -45,7 +42,7 @@ public class VentaService {
         Connection con = null;
         try {
             con = Conexion.getInstancia().conectar();
-            con.setAutoCommit(false); // Iniciar Transacción JDBC
+            con.setAutoCommit(false); 
 
             // A. Registrar Venta Maestra (compras)
             String sqlVenta = "{call sp_insertarventa(?, ?, ?)}";
@@ -54,7 +51,7 @@ public class VentaService {
             try (CallableStatement csVenta = con.prepareCall(sqlVenta)) {
                 csVenta.setDouble(1, venta.getTotalVenta());
                 csVenta.setLong(2, venta.getCuiCliente());
-                csVenta.registerOutParameter(3, Types.INTEGER); // Asigna no_compra generado
+                csVenta.registerOutParameter(3, Types.INTEGER); 
                 
                 csVenta.executeUpdate();
                 noVentaGenerado = csVenta.getInt(3);
@@ -65,22 +62,18 @@ public class VentaService {
                 return false;
             }
 
-            // B. Registrar Detalles y Descontar Stock
             String sqlDetalle = "{call sp_insertardetallecompra(?, ?)}";
             String sqlStock = "{call sp_descontarstock(?, ?)}";
 
             for (DetalleVenta det : detalles) {
-                // Asignar el ID recién generado de la venta maestro
                 det.setNoVenta(noVentaGenerado);
 
-                // Insertar detalle_compra
                 try (CallableStatement csDetalle = con.prepareCall(sqlDetalle)) {
                     csDetalle.setInt(1, det.getNoVenta());
                     csDetalle.setString(2, det.getIsbn());
                     csDetalle.executeUpdate();
                 }
 
-                // T2.19: Descontar 1 unidad del stock por libro
                 try (CallableStatement csStock = con.prepareCall(sqlStock)) {
                     csStock.setString(1, det.getIsbn());
                     csStock.setInt(2, 1);
@@ -88,7 +81,6 @@ public class VentaService {
                 }
             }
 
-            // Commit final: Confirmar todos los cambios
             con.commit();
             return true;
 
@@ -96,7 +88,7 @@ public class VentaService {
             System.err.println("Error en la transacción de venta. Ejecutando Rollback... " + e.getMessage());
             if (con != null) {
                 try {
-                    con.rollback(); // T2.20 Rollback en caso de falla
+                    con.rollback(); 
                 } catch (SQLException ex) {
                     System.err.println("Error al ejecutar Rollback: " + ex.getMessage());
                 }

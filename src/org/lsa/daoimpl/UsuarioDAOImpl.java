@@ -14,12 +14,12 @@ import org.lsa.utils.ConexionSingleton;
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
-    public Usuario autenticar(String correo, String contraseña) {
+    public Usuario autenticar(String nombreUsuario, String contraseña) {
         Usuario usuario = null;
         String consulta = "{call sp_autenticarusuario(?, ?)}";
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-            consultaCall.setString(1, correo);
+            consultaCall.setString(1, nombreUsuario);
             consultaCall.setString(2, contraseña);
             try (ResultSet tablaResultado = consultaCall.executeQuery()) {
                 if (tablaResultado.next()) {
@@ -47,16 +47,16 @@ public class UsuarioDAOImpl implements UsuarioDAO {
              ResultSet rs = consultaCall.executeQuery()) {
 
             while (rs.next()) {
-                Usuario u = new Usuario();
-                u.setIdUsuario(rs.getInt("id_usuario"));
-                u.setNombreUsuario(rs.getString("nombre_usuario"));
-                u.setNombre(rs.getString("nombre"));
-                u.setApellido(rs.getString("apellido"));
-                u.setCorreo(rs.getString("correo"));
-                u.setRol(rs.getString("rol"));
-                u.setEstado(rs.getBoolean("activo"));
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("id_usuario"));
+                usuario.setNombreUsuario(rs.getString("nombre_usuario"));
+                usuario.setNombre(rs.getString("nombre"));
+                usuario.setApellido(rs.getString("apellido"));
+                usuario.setCorreo(rs.getString("correo"));
+                usuario.setRol(rs.getString("rol"));
+                usuario.setEstado(rs.getBoolean("activo"));
 
-                usuarios.add(u);
+                usuarios.add(usuario);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar usuarios: " + e.getMessage());
