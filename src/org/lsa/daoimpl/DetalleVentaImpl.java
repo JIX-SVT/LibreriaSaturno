@@ -1,6 +1,5 @@
 package org.lsa.daoimpl;
 
-import org.lsa.utils.Conexion;
 import org.lsa.model.DetalleVenta;
 import org.lsa.dao.DetalleVentaDAO;
 
@@ -10,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.lsa.utils.Conexion;
 public class DetalleVentaImpl implements DetalleVentaDAO {
 
     @Override

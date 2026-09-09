@@ -5,10 +5,6 @@ import java.util.Date;
 import java.util.List;
 import org.lsa.daoimpl.DetalleVenta;
 
-/**
- *
- * @author Gregory Jerónimo 2026116
- */
 public class Venta extends DetalleVenta {
 
     private int idVenta;
