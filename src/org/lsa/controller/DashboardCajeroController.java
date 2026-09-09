@@ -2,6 +2,7 @@ package org.lsa.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +26,11 @@ import org.lsa.utils.SesionUsuario;
 public class DashboardCajeroController implements Initializable {
 
     @FXML private TextField txtBusqueda;
-    @FXML private TableView<Libro> tblResultados; 
+    @FXML private TableView<Libro> tblLibros; 
     @FXML private TableColumn<Libro, String> colIsbn;
     @FXML private TableColumn<Libro, String> colTitulo;
     @FXML private TableColumn<Libro, String> colAutor;
     @FXML private TableColumn<Libro, Double> colPrecio;
-    @FXML private TableColumn<Libro, Integer> colStock;
     @FXML private Label lblVentasHoy;
 
     private final LibroDAO libroDAO = new LibroDAOImpl();
@@ -42,17 +42,16 @@ public class DashboardCajeroController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         configurarTabla();
         cargarTabla();
-        tblResultados.setItems(librosFiltrados);
+        tblLibros.setItems(librosFiltrados);
         configurarBusqueda();
         actualizarVentasHoy();
     }
 
     private void configurarTabla() {
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colAutor.setCellValueFactory(new PropertyValueFactory<>("autor"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));        
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-        colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        cargarDatosTabla();
     }
 
     private void cargarTabla() {
@@ -94,6 +93,13 @@ public class DashboardCajeroController implements Initializable {
     public void handleBuscar(ActionEvent event) {
         filtrarLibros();
     }
+    @FXML
+public void cargarDatosTabla() {
+    List<Libro> librosObtenidos = libroDAO.listarTodos();
+    listaLibros.clear();
+    listaLibros.addAll(librosObtenidos);
+    tblLibros.setItems(listaLibros); 
+}
 
     @FXML
     public void handleVolverMenu(ActionEvent event) {
@@ -129,4 +135,5 @@ public class DashboardCajeroController implements Initializable {
             alerta.showAndWait();
         }
     }
+
 }

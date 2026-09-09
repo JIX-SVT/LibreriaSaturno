@@ -3,7 +3,7 @@ package org.lsa.model;
 import java.util.Date;
  
 public class Libro {
-    private int isbn;
+    private String isbn;
     private String titulo;
     private Date fechaPublicacion;
     private double precio;
@@ -14,7 +14,7 @@ public class Libro {
  
     public Libro() {}
 
-    public Libro(int isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stockActual) {
+    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stockActual) {
         this.isbn = isbn;
         this.titulo = titulo;
         this.fechaPublicacion = fechaPublicacion;
@@ -25,11 +25,11 @@ public class Libro {
         this.stockActual = stockActual;
     }
 
-    public int getIsbn() {
+    public String getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(int isbn) {
+    public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
 
