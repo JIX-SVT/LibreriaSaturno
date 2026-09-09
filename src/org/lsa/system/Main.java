@@ -18,7 +18,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             
-            Parent root = FXMLLoader.load(getClass().getResource("/org/lsa/view/DetalleVentaView.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/org/lsa/view/LoginView.fxml"));
 
             Scene scene = new Scene(root);
             primaryStage.setTitle("Librería Saturno - Módulo de Gestión de Ventas y Facturación");
