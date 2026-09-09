@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.TextField;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.model.Usuario;
 import org.lsa.utils.ConexionSingleton;
@@ -172,5 +173,10 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             System.err.println("Error al actualizar contraseña: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public Usuario autenticar(TextField txtUsuario, String passText) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

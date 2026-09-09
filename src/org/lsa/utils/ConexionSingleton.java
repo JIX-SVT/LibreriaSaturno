@@ -10,8 +10,8 @@ public class ConexionSingleton {
     private Connection conexion;
 
     private final String URL = "jdbc:mysql://localhost:3306/libreriadb_in4cm";
-    private final String USUARIO = "root"; 
-    private final String CLAVE = "BEBE"; 
+    private final String USUARIO = "IN4CM"; 
+    private final String CLAVE = "#NdimAM4"; 
 
     private ConexionSingleton() {
         try {
