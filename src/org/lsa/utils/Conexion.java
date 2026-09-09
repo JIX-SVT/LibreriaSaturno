@@ -1,58 +1,33 @@
 package org.lsa.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
-/**
- * @author Gregory Jerónimo 2026116
- */
 public class Conexion {
-    private Connection conexion;
+    private static Conexion instancia;
 
-    public Connection conectar() {
-        Properties propiedades = new Properties();
-        
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.properties")) {
-            
-            if (input == null) {
-                System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");
-                return null;
-            }
+    private static final String URL = "jdbc:mysql://localhost:3306/libreriadb_in4cm?serverTimezone=UTC";
+    private static final String USER = "admin";
+    private static final String PASSWORD = "admin"; 
 
-            propiedades.load(input);
-
-            String url = propiedades.getProperty("url"); 
-            String user = propiedades.getProperty("user");
-            String password = propiedades.getProperty("password");
-
-            if (url == null || url.trim().isEmpty()) {
-                throw new SQLException("La URL de conexión es nula. Verifica que la clave 'url' exista en db.properties");
-            }
-
-            conexion = DriverManager.getConnection(url, user, password);
-            System.out.println("Conexión inicializada con éxito.");
-
-        } catch (IOException e) {
-            System.err.println("Error al leer el archivo de propiedades: " + e.getMessage());
-        } catch (SQLException e) {
-            System.err.println("Error de base de datos: " + e.getMessage());
-        }
-        
-        return conexion;
-    }
-
-    public void desconectar() {
+    private Conexion() {
         try {
-            if (conexion != null && !conexion.isClosed()) {
-                conexion.close();
-                System.out.println("Conexión cerrada.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al cerrar la conexión: " + e.getMessage());
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error Driver: " + e.getMessage());
         }
     }
+
+    public static synchronized Conexion getInstancia() {
+        if (instancia == null) {
+            instancia = new Conexion();
+        }
+        return instancia;
+    }
+    public Connection conectar() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+    
+    
 }
