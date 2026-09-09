@@ -1,4 +1,3 @@
-
 package org.lsa.dao;
 
 import java.util.List;

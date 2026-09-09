@@ -1,92 +1,51 @@
+// DAOImpl
 package org.lsa.dao.impl;
-
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import org.lsa.util.Conexion;
+import org.lsa.model.Venta;
+import org.lsa.dao.VentaDAO;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.lsa.dao.VentaDAO;
-import org.lsa.model.Venta;
-import org.lsa.util.Conexion;
 
 public class VentaDAOImpl implements VentaDAO {
-
     @Override
-    public int registrarVenta(Venta venta) {
-        String consulta = "{call sp_insertarcompra(?, ?, ?)}";
-        int idGenerado = -1;
-
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-
-            consultaCall.setDouble(1, venta.getTotalCompra());
-            consultaCall.setLong(2, venta.getCuiCliente());
-            consultaCall.registerOutParameter(3, Types.INTEGER);
-
-            int filasAfectadas = consultaCall.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                idGenerado = consultaCall.getInt(3);
-            }
-
-        } catch (SQLException e) {
-            System.err.print("Error al registrar Venta: " + e.getMessage());
-        }
-
-        return idGenerado;
+    public boolean insertar(Venta objeto) {
+        String sql = "{call sp_insertarventa(?, ?)}"; // Nota: El SP de tu script solo pide total y CUI
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+            cs.setDouble(1, objeto.getTotalVenta());
+            cs.setLong(2, objeto.getCuiCliente());
+            return cs.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
     }
 
     @Override
-    public Venta buscarPorNoCompra(int noCompra) {
-        Venta venta = new Venta();
-        String consulta = "{call sp_buscarventa(?)}";
-
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-
-            consultaCall.setInt(1, noCompra);
-            ResultSet tablaResultado = consultaCall.executeQuery();
-
-            if (tablaResultado.next()) {
-                venta.setNoCompra(tablaResultado.getInt("no_compra"));
-                venta.setFechaCompra(tablaResultado.getTimestamp("fecha_compra"));
-                venta.setTotalCompra(tablaResultado.getDouble("total_compra"));
-                venta.setCuiCliente(tablaResultado.getLong("cui_cliente"));
-            } else {
-                return null;
+    public List<Venta> listar() {
+        List<Venta> lista = new ArrayList<>();
+        String sql = "{call sp_listarventas()}";
+        try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql);
+             ResultSet rs = cs.executeQuery()) {
+            while (rs.next()) {
+                lista.add(new Venta(rs.getInt("no_venta"), rs.getTimestamp("fecha_venta"), rs.getDouble("total_venta"), rs.getLong("cui_cliente")));
             }
+        } catch (SQLException e) { }
+        return lista;
+    }
+    // Implementar buscar, actualizar y eliminar con sus respectivos SP (sp_buscarventa, etc.) de manera idéntica.
 
-        } catch (SQLException e) {
-            System.err.print("Error al buscar Venta: " + e.getMessage());
-        }
-
-        return venta;
+    @Override
+    public Venta buscar(Integer id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<Venta> listarTodas() {
-        List<Venta> ventas = new ArrayList<>();
-        String consulta = "{call sp_listarventas()}";
+    public boolean actualizar(Venta objeto) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
-        try (Connection conexion = Conexion.getInstancia().conectar();
-             CallableStatement consultaCall = conexion.prepareCall(consulta);
-             ResultSet tablaResultado = consultaCall.executeQuery()) {
-
-            while (tablaResultado.next()) {
-                Venta venta = new Venta();
-                venta.setNoCompra(tablaResultado.getInt("no_compra"));
-                venta.setFechaCompra(tablaResultado.getTimestamp("fecha_compra"));
-                venta.setTotalCompra(tablaResultado.getDouble("total_compra"));
-                venta.setCuiCliente(tablaResultado.getLong("cui_cliente"));
-                ventas.add(venta);
-            }
-
-        } catch (SQLException e) {
-            System.err.print("Error al listar Ventas: " + e.getMessage());
-        }
-
-        return ventas;
+    @Override
+    public boolean eliminar(Integer id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
