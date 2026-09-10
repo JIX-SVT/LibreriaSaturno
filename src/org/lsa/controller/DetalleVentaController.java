@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.lsa.daoimpl.CompraDAOImpl;
 import org.lsa.model.DetalleCompra.VentaDTO;
  
 public class DetalleVentaController implements Initializable {
@@ -34,20 +35,21 @@ public class DetalleVentaController implements Initializable {
     @FXML private Label lblEmpleadoDetalle;
     @FXML private Label lblTotalDetalle;
     @FXML private TextArea txtAreaFacturaVisual;
-    @FXML private Button btnImprimirLateral;
- 
+    
     private ObservableList<VentaDTO> listaVentas = FXCollections.observableArrayList(
-        new VentaDTO("F-001/2026", "Renta Sol S.L.", "Admin", 1235.00),
-        new VentaDTO("F-002/2026", "Librería Central", "Cajero1", 450.50),
-        new VentaDTO("F-003/2026", "Juan Pérez", "Admin", 89.00)
+        
     );
  
-    @Override
+        @Override
     public void initialize(URL url, ResourceBundle rb) {
         colIdVenta.setCellValueFactory(new PropertyValueFactory<>("idVenta"));
         colCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         colCajero.setCellValueFactory(new PropertyValueFactory<>("cajero"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
+ 
+        // =============== AÑADE ESTA LÍNEA AQUÍ ===============
+        cargarHistorialBaseDatos(); 
+        // =====================================================
  
         tblVentas.setItems(listaVentas);
  
@@ -61,6 +63,28 @@ public class DetalleVentaController implements Initializable {
  
         LOGGER.info("Vista Maestro-Detalle con ticket visual cargada correctamente.");
     }
+
+    //Metodo para mostrar ventas
+public void recibirNuevaFactura(VentaDTO nuevaVenta) {
+        if (nuevaVenta != null) {
+            this.listaVentas.add(nuevaVenta);
+            this.tblVentas.getSelectionModel().select(nuevaVenta);
+            mostrarDetalleEnPanelLateral(nuevaVenta);
+            LOGGER.info("Nueva factura recibida del cajero e inyectada en reportes: " + nuevaVenta.getIdVenta());
+        }
+    }
+
+     private void cargarHistorialBaseDatos() {
+        listaVentas.clear();
+        
+        // 1. Instanciamos el DAO de manera local para conectarnos a la base de datos
+        org.lsa.daoimpl.CompraDAOImpl compraDAO = new org.lsa.daoimpl.CompraDAOImpl();
+        
+        // 2. Extraemos el historial y lo agregamos a la lista de la interfaz
+        listaVentas.addAll(compraDAO.listarHistorialCompras());
+        tblVentas.setItems(listaVentas);
+    }
+
  
     private void mostrarDetalleEnPanelLateral(VentaDTO venta) {
         lblFacturaNumero.setText("Factura: " + venta.getIdVenta());
@@ -92,5 +116,9 @@ public class DetalleVentaController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+
+    int obtenerCantidadVentas() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

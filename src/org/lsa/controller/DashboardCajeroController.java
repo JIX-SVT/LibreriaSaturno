@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import org.lsa.dao.LibroDAO;
 import org.lsa.daoimpl.LibroDAOImpl;
 import org.lsa.model.Carrito;
+import org.lsa.model.DetalleCompra.VentaDTO;
 import org.lsa.model.Libro;
 import org.lsa.utils.SesionUsuario;
 
@@ -47,6 +48,8 @@ public class DashboardCajeroController implements Initializable {
     
     @FXML private Label lblTotalPagar;
     private final LibroDAO libroDAO = new LibroDAOImpl();
+    @FXML private TextField txtCuiCliente;
+
 
     private final ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
     private final FilteredList<Libro> librosFiltrados = new FilteredList<>(listaLibros, p -> true);
@@ -219,24 +222,122 @@ public class DashboardCajeroController implements Initializable {
         lblTotalPagar.setText(String.format("Total: Q%.2f", total));
     }
 
-    @FXML
+        @FXML
     public void handleProcesarPago(ActionEvent event) {
-        log.info("Procesando pago con " + listaCarrito.size() + " elementos en el carrito.");
+        log.info("Iniciando guardado automático del carrito en el historial de compras.");
+
+        if (listaCarrito.isEmpty()) {
+            Alert alerta = new Alert(Alert.AlertType.WARNING, "El carrito de compras está vacío.", ButtonType.OK);
+            alerta.showAndWait();
+            return;
+        }
+
+        double totalCompra = 0.0;
+        for (Carrito item : listaCarrito) {
+            totalCompra += item.getSubtotal();
+        }
+
+        String nombreCajero = "Cajero General";
+        if (SesionUsuario.getInstancia().getUsuarioActual() != null) {
+            nombreCajero = SesionUsuario.getInstancia().getUsuarioActual().getNombre();
+        }
+
+        String sqlBuscarCliente = "SELECT cui FROM clientes LIMIT 1";
+        String sqlCompra = "INSERT INTO compras (total_compra, cui_cliente, fecha_compra) VALUES (?, ?, NOW())";
+        String sqlDetalle = "INSERT INTO detalle_compra (no_compra, isbn) VALUES (?, ?)";
+        String sqlStock = "UPDATE libros SET stock = stock - 1 WHERE isbn = ?"; 
+
+        java.sql.Connection conn = null;
         try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            conn = org.lsa.utils.ConexionSingleton.getInstancia().getConexion();
+            conn.setAutoCommit(false); 
+
+            long cuiCliente = 0;
+            try (java.sql.PreparedStatement psCliente = conn.prepareStatement(sqlBuscarCliente);
+                 java.sql.ResultSet rsCliente = psCliente.executeQuery()) {
+                if (rsCliente.next()) {
+                    cuiCliente = rsCliente.getLong("cui");
+                } else {
+                    conn.rollback();
+                    Alert alerta = new Alert(Alert.AlertType.ERROR, "No se puede procesar el pago porque no hay ningún cliente registrado en la base de datos. Registre uno primero.", ButtonType.OK);
+                    alerta.showAndWait();
+                    return;
+                }
+            }
+
+            int noCompraGenerado = -1;
+
+            try (java.sql.PreparedStatement psCompra = conn.prepareStatement(sqlCompra, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                psCompra.setDouble(1, totalCompra);
+                psCompra.setLong(2, cuiCliente);
+                psCompra.executeUpdate();
+
+                try (java.sql.ResultSet rs = psCompra.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        noCompraGenerado = rs.getInt(1);
+                    }
+                }
+            }
+
+            if (noCompraGenerado == -1) {
+                throw new java.sql.SQLException("No se pudo obtener el número de compra autogenerado.");
+            }
+
+            try (java.sql.PreparedStatement psDetalle = conn.prepareStatement(sqlDetalle);
+                 java.sql.PreparedStatement psStock = conn.prepareStatement(sqlStock)) {
+                
+                for (Carrito item : listaCarrito) {
+                    int unidadesAComprar = item.getStock(); 
+                    
+                    for (int i = 0; i < unidadesAComprar; i++) {
+                        psDetalle.setInt(1, noCompraGenerado);
+                        psDetalle.setString(2, item.getIsbn());
+                        psDetalle.addBatch();
+
+                        psStock.setString(1, item.getIsbn());
+                        psStock.addBatch();
+                    }
+                }
+
+                psDetalle.executeBatch();
+                psStock.executeBatch();
+            }
+
+            conn.commit();
+            log.info("Compra guardada exitosamente en la BD real. Número de Transacción: " + noCompraGenerado);
+
+            String facturaFormateada = "FAC-" + noCompraGenerado;
+            VentaDTO nuevaVentaDTO = new VentaDTO(
+                facturaFormateada,
+                "Cliente CUI: " + cuiCliente,
+                nombreCajero,
+                totalCompra
+            );
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DetalleVentaview.fxml"));
             Parent root = loader.load();
+
+            DetalleVentaController detalleController = loader.getController();
+            detalleController.recibirNuevaFactura(nuevaVentaDTO);
+
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Reportes de Ventas");
+            escenarioPrincipal.setTitle("Reportes de Ventas - Registro Histórico");
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error de I/O al cargar la vista DetalleVentaview.fxml en procesar pago", e);
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de ventas.");
+
+            listaCarrito.clear();
+
+        } catch (java.sql.SQLException | IOException e) {
+            log.log(java.util.logging.Level.SEVERE, "Error crítico durante la transacción SQL real", e);
+            if (conn != null) {
+                try { conn.rollback(); } catch (java.sql.SQLException ex) { ex.printStackTrace(); }
+            }
+            Alert alerta = new Alert(Alert.AlertType.ERROR, "Error de sincronización con la Base de Datos al procesar el pago.", ButtonType.OK);
+            alerta.showAndWait();
         }
-        listaCarrito.clear();
-        actualizarTotal();
     }
+
 
     @FXML
     public void handleResumenDia(ActionEvent event) {

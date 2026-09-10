@@ -3,6 +3,7 @@ package org.lsa.daoimpl;
 import org.lsa.utils.Conexion;
 import org.lsa.model.Compra;
 import org.lsa.dao.CompraDAO;
+import org.lsa.model.DetalleCompra.VentaDTO; // Importante para mapear al formato de la tabla
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,5 +105,25 @@ public class CompraDAOImpl implements CompraDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // =========================================================================
+    // METODO NUEVO ADICIONAL: Convierte tus entidades 'Compra' a objetos 'VentaDTO'
+    // =========================================================================
+    public List<VentaDTO> listarHistorialCompras() {
+        List<VentaDTO> historialDTO = new ArrayList<>();
+        // Reutilizamos de forma interna el método listar() que ya tenías programado
+        List<Compra> listaComprasBase = this.listar(); 
+        
+        for (Compra c : listaComprasBase) {
+            String idFactura = "FAC-" + c.getNoCompra();
+            String cliente = "Cliente CUI: " + c.getCuiCliente();
+            String cajero = "Cajero General"; 
+            double total = c.getTotalCompra();
+
+            VentaDTO dto = new VentaDTO(idFactura, cliente, cajero, total);
+            historialDTO.add(dto);
+        }
+        return historialDTO;
     }
 }
