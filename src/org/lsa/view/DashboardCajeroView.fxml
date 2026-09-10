@@ -53,9 +53,10 @@
             </columns>
         </TableView>
         <HBox alignment="CENTER_RIGHT" spacing="15">
-            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total a Pagar:" />
             <Label fx:id="lblTotalPagar" text="Q 0.00" />
-            <Button onAction="#handleProcesarPago" text="Procesar Pago" />
+            <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total a Pagar:" />
+            <Button onAction="#handleResumenDia" text="Resumen del Dìa" />
+         <Button onAction="#handleProcesarPago" text="Procesar Pago" />
         </HBox>
     </VBox>
 </VBox>

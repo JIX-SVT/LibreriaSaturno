@@ -197,13 +197,41 @@ public void cargarDatosTabla() {
 
     @FXML
     public void handleProcesarPago(ActionEvent event) {
-        if (listaCarrito.isEmpty()) {
-            System.out.println("El carrito está vacío.");
-            return;
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DetalleVentaview.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Reportes de Ventas");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de ventas.");
         }
-
-        System.out.println("Pago procesado correctamente.");
         listaCarrito.clear();
         actualizarTotal();
+    }
+     @FXML
+    public void handleResumenDia(ActionEvent event) {
+        try {
+            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DetalleVentaview.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            escenarioPrincipal.setTitle("Reportes de Ventas");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de ventas.");
+        }
+    }
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
