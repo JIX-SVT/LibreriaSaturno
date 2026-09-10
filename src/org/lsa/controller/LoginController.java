@@ -1,6 +1,8 @@
 package org.lsa.controller;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,9 +16,11 @@ import javafx.stage.Stage;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
 import org.lsa.model.Usuario;
-import org.lsa.utils.ControlAcceso; // O la clase donde guardes la sesión del usuario
+import org.lsa.utils.ControlAcceso;
 
 public class LoginController {
+
+    private static final Logger log = Logger.getLogger(LoginController.class.getName());
 
     @FXML private TextField txtUsuario;
     @FXML private PasswordField txtContrasena;
@@ -29,7 +33,10 @@ public class LoginController {
         String correoText = txtUsuario.getText() != null ? txtUsuario.getText().trim() : "";
         String passText = txtContrasena.getText() != null ? txtContrasena.getText() : "";
 
+        log.info("Intento de inicio de sesión registrado para el usuario: " + correoText);
+
         if (correoText.isEmpty() || passText.isEmpty()) {
+            log.warning("Intento de login fallido: Uno o más campos se encuentran vacíos.");
             mostrarAlerta(Alert.AlertType.WARNING, "Campos vacíos", "Por favor, ingrese su correo/usuario y contraseña.");
             return;
         }
@@ -37,6 +44,7 @@ public class LoginController {
         Usuario usuarioLogueado = usuarioDAO.autenticar(correoText, passText);
 
         if (usuarioLogueado == null) {
+            log.warning("Acceso denegado para el correo/usuario: " + correoText + " (Credenciales inválidas o usuario inactivo).");
             mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Correo o contraseña incorrectos, o usuario inactivo.");
             return;
         }
@@ -46,6 +54,8 @@ public class LoginController {
         String fxmlPath;
         String tituloVentana;
         String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().toLowerCase() : "";
+
+        log.info("Autenticación exitosa. Usuario: " + correoText + " | Rol asignado: " + rol);
 
         switch (rol) {
             case "admin":
@@ -63,11 +73,13 @@ public class LoginController {
                 tituloVentana = "Librería Saturno - Módulo de Inventario";
                 break;
             default:
+                log.severe("El rol '" + rol + "' asignado al usuario " + correoText + " no tiene una vista FXML configurada.");
                 mostrarAlerta(Alert.AlertType.ERROR, "Rol no autorizado", "El rol asignado (" + rol + ") no tiene una interfaz configurada.");
                 return;
         }
 
         try {
+            log.info("Cargando la interfaz desde: " + fxmlPath);
             Stage escenarioPrincipal = (Stage) btnIngresar.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
@@ -78,12 +90,14 @@ public class LoginController {
             escenarioPrincipal.centerOnScreen();
             escenarioPrincipal.show();
         } catch (IOException e) {
+            log.log(Level.SEVERE, "Error de I/O al cargar la vista FXML: " + fxmlPath, e);
             e.printStackTrace();
             mostrarAlerta(Alert.AlertType.ERROR, "Error de carga", "No se pudo abrir la vista:\n" + fxmlPath + "\n\nCausa: El archivo FXML interno tiene un error de componentes.");
         }
     }
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        log.info("Mostrando alerta [Tipo: " + tipo + "]: " + titulo);
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
