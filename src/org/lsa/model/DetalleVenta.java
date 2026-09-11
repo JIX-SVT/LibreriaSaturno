@@ -19,11 +19,6 @@ public class DetalleVenta {
         this.precioUnitario = precioUnitario;
         this.subTotalDetalle = subTotalDetalle;
     }
-
-   
-   
-
-
     @Override
     public String toString() {
         return "detalle_venta{" + 

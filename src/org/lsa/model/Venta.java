@@ -118,9 +118,4 @@ public class Venta {
                 ", id_usuario=" + id_usuario +
                 '}';
     }
-
-    public String getidVenta() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
 }

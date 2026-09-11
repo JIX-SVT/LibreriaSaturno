@@ -138,7 +138,7 @@ public class DashboardCajeroController implements Initializable {
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.show();
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al intentar volver a la vista de Login", e);
+            log.log(Level.SEVERE, "Error al intentar volver a la vista de venta", e);
             mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo regresar al login.");
         }
     }

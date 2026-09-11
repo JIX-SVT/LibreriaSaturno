@@ -88,7 +88,7 @@ public class DetalleVentaController implements Initializable {
         lblTotalDetalle.setText(String.format("Total: Q %.2f", venta.getTotalVenta()));
 
         String textoTicket = GeneradorTicket.generarFormatoTicket(
-            venta.getidVenta(), 
+            venta.getIdVenta(), 
             String.valueOf(venta.getId_usuario()), 
             venta.getTotalVenta()
         );
