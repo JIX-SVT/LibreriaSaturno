@@ -1,81 +1,55 @@
 package org.lsa.model;
 
-public class DetalleCompra {
+public class DetalleVenta {
 
-    public static class VentaDTO {
-        private String idVenta;
-        private String cliente;
-        private String cajero;
-        private double total;
-
-        public VentaDTO(String idVenta, String cliente, String cajero, double total) {
-            this.idVenta = idVenta;
-            this.cliente = cliente;
-            this.cajero = cajero;
-            this.total = total;
-        }
-
-        public String getIdVenta() {
-            return idVenta;
-        }
-
-        public void setIdVenta(String idVenta) {
-            this.idVenta = idVenta;
-        }
-
-        public String getCliente() {
-            return cliente;
-        }
-
-        public void setCliente(String cliente) {
-            this.cliente = cliente;
-        }
-
-        public String getCajero() {
-            return cajero;
-        }
-
-        public void setCajero(String cajero) {
-            this.cajero = cajero;
-        }
-
-        public double getTotal() {
-            return total;
-        }
-
-        public void setTotal(double total) {
-            this.total = total;
-        }
-
-    }
+   
     
-    private int idDetalleCompra;
-    private int noCompra;
+    private int idDetalleventa;
+    private int noVenta;
     private String isbn;
+    private int cantidad;
+    private double precioUnitario;
+    private double subTotalDetalle;
 
-    public DetalleCompra() {
-    }
-
-    public DetalleCompra(int idDetalleCompra, int noCompra, String isbn) {
-        this.idDetalleCompra = idDetalleCompra;
-        this.noCompra = noCompra;
+    public DetalleVenta(int idDetalleventa, int noVenta, String isbn, int cantidad, double precioUnitario, double subTotalDetalle) {
+        this.idDetalleventa = idDetalleventa;
+        this.noVenta = noVenta;
         this.isbn = isbn;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subTotalDetalle = subTotalDetalle;
     }
 
-    public int getIdDetalleCompra() {
-        return idDetalleCompra;
+   
+   
+
+
+    @Override
+    public String toString() {
+        return "detalle_venta{" + 
+               "id_detalle=" + idDetalleventa + 
+               ", id_Venta=" + noVenta + 
+                ", cantidad=" + cantidad + 
+                ", precio_unitario=" + precioUnitario + 
+                ", subtotal=" + subTotalDetalle + 
+               ", isbn='" + isbn + '\'' + 
+               '}';
     }
 
-    public void setIdDetalleCompra(int idDetalleCompra) {
-        this.idDetalleCompra = idDetalleCompra;
+    public int getIdDetalleventa() {
+        return idDetalleventa;
     }
 
-    public int getNoCompra() {
-        return noCompra;
+    public void setIdDetalleventa(int idDetalleventa) {
+        this.idDetalleventa = idDetalleventa;
     }
 
-    public void setNoCompra(int noCompra) {
-        this.noCompra = noCompra;
+    public int getNoVenta() {
+        return noVenta;
+    }
+
+    public void setNoVenta(int noVenta) {
+        this.noVenta = noVenta;
     }
 
     public String getIsbn() {
@@ -86,12 +60,27 @@ public class DetalleCompra {
         this.isbn = isbn;
     }
 
-    @Override
-    public String toString() {
-        return "DetalleCompra{" + 
-               "idDetalleCompra=" + idDetalleCompra + 
-               ", noCompra=" + noCompra + 
-               ", isbn='" + isbn + '\'' + 
-               '}';
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public double getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public double getSubTotalDetalle() {
+        return subTotalDetalle;
+    }
+
+    public void setSubTotalDetalle(double subTotalDetalle) {
+        this.subTotalDetalle = subTotalDetalle;
     }
 }
