@@ -1,7 +1,7 @@
 package org.lsa.dao;
 
-import org.lsa.model.Compra;
+import org.lsa.model.Venta;
 
-public interface CompraDAO extends CRUD<Compra, Integer> {
+public interface VentaDAO extends CRUD<Venta, Integer> {
     
 }
