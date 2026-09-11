@@ -4,48 +4,66 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Compra {
+public class Venta {
 
-    private int noCompra;
-    private Timestamp fechaCompra;
-    private double totalCompra;
+    private int idVenta;
+    private Timestamp fechaVenta; 
+    private double totalVenta;
+    private String subTotal;
     private long cuiCliente;
-    private List<DetalleCompra> detalles;
+    private double descuento;
+    private String estado;
+    private int id_usuario;
+    private List<DetalleVenta> detalles;
 
-    public Compra() {
+    public Venta() {
         this.detalles = new ArrayList<>();
     }
 
-    public Compra(int noCompra, Timestamp fechaCompra, double totalCompra, long cuiCliente) {
-        this.noCompra = noCompra;
-        this.fechaCompra = fechaCompra;
-        this.totalCompra = totalCompra;
+    public Venta(int idVenta, Timestamp fechaVenta, double totalVenta, String subTotal, long cuiCliente, double descuento, String estado, int id_usuario, List<DetalleVenta> detalles) {
+        this.idVenta = idVenta;
+        this.fechaVenta = fechaVenta;
+        this.totalVenta = totalVenta;
+        this.subTotal = subTotal;
         this.cuiCliente = cuiCliente;
-        this.detalles = new ArrayList<>();
+        this.descuento = descuento;
+        this.estado = estado;
+        this.id_usuario = id_usuario;
+        this.detalles = detalles;
     }
 
-    public int getNoCompra() {
-        return noCompra;
+  
+ 
+    public int getIdVenta() {
+        return idVenta;
     }
 
-    public void setNoCompra(int noCompra) {
-        this.noCompra = noCompra;
+    public void setIdVenta(int idVenta) {
+        this.idVenta = idVenta;
     }
 
-    public Timestamp getFechaCompra() {
-        return fechaCompra;
+    public Timestamp getFechaVenta() {
+        return fechaVenta;
     }
 
-    public void setFechaCompra(Timestamp fechaCompra) {
-        this.fechaCompra = fechaCompra;
+    public void setFechaVenta(Timestamp fechaVenta) {
+        this.fechaVenta = fechaVenta;
     }
 
-    public double getTotalCompra() {
-        return totalCompra;
+    public double getTotalVenta() {
+        return totalVenta;
     }
 
-    public void setTotalCompra(double totalCompra) {
-        this.totalCompra = totalCompra;
+    public void setTotalVenta(double totalVenta) {
+        this.totalVenta = totalVenta;
+    }
+
+    public String getSubTotal() {
+        return subTotal;
+    }
+
+    public void setSubTotal(String subTotal) {
+        this.subTotal = subTotal;
     }
 
     public long getCuiCliente() {
@@ -56,29 +74,53 @@ public class Compra {
         this.cuiCliente = cuiCliente;
     }
 
-    public List<DetalleCompra> getDetalles() {
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getId_usuario() {
+        return id_usuario;
+    }
+
+    public void setId_usuario(int id_usuario) {
+        this.id_usuario = id_usuario;
+    }
+
+    public List<DetalleVenta> getDetalles() {
         return detalles;
     }
 
-    public void setDetalles(List<DetalleCompra> detalles) {
+    public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
     }
-
-    public void agregarDetalle(DetalleCompra detalle) {
-        if (this.detalles == null) {
-            this.detalles = new ArrayList<>();
-        }
-        this.detalles.add(detalle);
-    }
-
-    @Override
+    
+      @Override
     public String toString() {
-        return "Compra{" +
-                "noCompra=" + noCompra +
-                ", fechaCompra=" + fechaCompra +
-                ", totalCompra=" + totalCompra +
-                ", cuiCliente=" + cuiCliente +
-                ", detalles=" + detalles +
+        return "ventas{" +
+                "id_venta=" + idVenta +
+                ", fecha_venta=" + fechaVenta +
+                ", descuento=" + subTotal +
+                ", cui_Cliente=" + cuiCliente +
+                 ", estado=" + estado +
+                 ", cui_Cliente=" + cuiCliente +
+                ", id_usuario=" + id_usuario +
                 '}';
     }
+
+    public String getidVenta() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 }

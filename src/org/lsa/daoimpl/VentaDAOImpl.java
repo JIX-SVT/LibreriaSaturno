@@ -1,52 +1,61 @@
 package org.lsa.daoimpl;
 
 import org.lsa.utils.Conexion;
-import org.lsa.model.Compra;
-import org.lsa.dao.CompraDAO;
-import org.lsa.model.DetalleCompra.VentaDTO; // Importante para mapear al formato de la tabla
+import org.lsa.model.Venta;
+import org.lsa.dao.VentaDAO;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompraDAOImpl implements CompraDAO {
+public class VentaDAOImpl implements VentaDAO {
 
     @Override
-    public boolean insertar(Compra objeto) {
-        String sql = "{call sp_insertarcompra(?, ?, ?)}"; 
+    public boolean insertar(Venta objeto) {
+        String sql = "{call sp_insertarventa(?, ?, ?, ?, ?, ?)}"; 
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setDouble(1, objeto.getTotalCompra());
-            cs.setLong(2, objeto.getCuiCliente());
-            cs.registerOutParameter(3, Types.INTEGER);
+            double subtotalNum = Double.parseDouble(objeto.getSubTotal().replace(",", "."));
+
+            cs.setDouble(1, subtotalNum);
+            cs.setDouble(2, objeto.getDescuento());
+            cs.setDouble(3, objeto.getTotalVenta());
+            cs.setLong(4, objeto.getCuiCliente());
+            cs.setInt(5, objeto.getId_usuario());
+            cs.registerOutParameter(6, Types.INTEGER);
             
             int filasAfectadas = cs.executeUpdate();
             if (filasAfectadas > 0) {
-                objeto.setNoCompra(cs.getInt(3));
+                objeto.setIdVenta(cs.getInt(6));
                 return true;
             }
             return false;
-        } catch (SQLException e) {
+        } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
             return false;
         }
     }
 
     @Override
-    public List<Compra> listar() {
-        List<Compra> lista = new ArrayList<>();
-        String sql = "{call sp_listarcompras()}";
+    public List<Venta> listar() {
+        List<Venta> lista = new ArrayList<>();
+        String sql = "{call sp_listarventas()}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql);
              ResultSet rs = cs.executeQuery()) {
             
             while (rs.next()) {
-                Compra compra = new Compra();
-                compra.setNoCompra(rs.getInt("no_compra"));
-                compra.setFechaCompra(rs.getTimestamp("fecha_compra"));
-                compra.setTotalCompra(rs.getDouble("total_compra"));
-                compra.setCuiCliente(rs.getLong("cui_cliente"));
-                lista.add(compra);
+                Venta venta = new Venta();
+                venta.setIdVenta(rs.getInt("id_venta"));
+                venta.setFechaVenta(rs.getTimestamp("fecha_venta"));
+                venta.setSubTotal(String.valueOf(rs.getDouble("subtotal")));
+                venta.setDescuento(rs.getDouble("descuento"));
+                venta.setTotalVenta(rs.getDouble("total"));
+                venta.setEstado(rs.getString("estado"));
+                venta.setCuiCliente(rs.getLong("cui_cliente"));
+                venta.setId_usuario(rs.getInt("id_usuario"));
+                lista.add(venta);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,75 +64,41 @@ public class CompraDAOImpl implements CompraDAO {
     }
 
     @Override
-    public Compra buscar(Integer id) {
-        Compra compra = null;
-        String sql = "{call sp_buscarcompra(?)}";
+    public Venta buscar(Integer id) {
+        Venta venta = null;
+        String sql = "{call sp_buscarventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
             cs.setInt(1, id);
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
-                    compra = new Compra();
-                    compra.setNoCompra(rs.getInt("no_compra"));
-                    compra.setFechaCompra(rs.getTimestamp("fecha_compra"));
-                    compra.setTotalCompra(rs.getDouble("total_compra"));
-                    compra.setCuiCliente(rs.getLong("cui_cliente"));
+                    venta = new Venta();
+                    venta.setIdVenta(rs.getInt("id_venta"));
+                    venta.setFechaVenta(rs.getTimestamp("fecha_venta"));
+                    venta.setSubTotal(String.valueOf(rs.getDouble("subtotal")));
+                    venta.setDescuento(rs.getDouble("descuento"));
+                    venta.setTotalVenta(rs.getDouble("total"));
+                    venta.setEstado(rs.getString("estado"));
+                    venta.setCuiCliente(rs.getLong("cui_cliente"));
+                    venta.setId_usuario(rs.getInt("id_usuario"));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return compra;
+        return venta;
     }
 
     @Override
-    public boolean actualizar(Compra objeto) {
-        String sql = "{call sp_actualizarcompra(?, ?, ?)}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-            
-            cs.setInt(1, objeto.getNoCompra());
-            cs.setDouble(2, objeto.getTotalCompra());
-            cs.setLong(3, objeto.getCuiCliente());
-            return cs.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean actualizar(Venta objeto) {
+        // Implementar en caso de requerir modificación de estado o total
+        return false;
     }
 
     @Override
     public boolean eliminar(Integer id) {
-        String sql = "{call sp_eliminarcompra(?)}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-            
-            cs.setInt(1, id);
-            return cs.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // =========================================================================
-    // METODO NUEVO ADICIONAL: Convierte tus entidades 'Compra' a objetos 'VentaDTO'
-    // =========================================================================
-    public List<VentaDTO> listarHistorialCompras() {
-        List<VentaDTO> historialDTO = new ArrayList<>();
-        // Reutilizamos de forma interna el método listar() que ya tenías programado
-        List<Compra> listaComprasBase = this.listar(); 
-        
-        for (Compra c : listaComprasBase) {
-            String idFactura = "FAC-" + c.getNoCompra();
-            String cliente = "Cliente CUI: " + c.getCuiCliente();
-            String cajero = "Cajero General"; 
-            double total = c.getTotalCompra();
-
-            VentaDTO dto = new VentaDTO(idFactura, cliente, cajero, total);
-            historialDTO.add(dto);
-        }
-        return historialDTO;
+        // Implementar en caso de requerir anulación de venta
+        return false;
     }
 }
