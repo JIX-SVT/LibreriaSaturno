@@ -1,5 +1,5 @@
 package org.lsa.controller;
-
+ 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,27 +25,27 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.lsa.model.Cliente;
 import org.lsa.utils.Conexion;
-
+ 
 public class NuevaVentaController implements Initializable {
-
-    @FXML private ComboBox<Cliente> cmbRol;   // ComboBox de Cliente
-    @FXML private ComboBox<Libro> cmbEstado;  // ComboBox de Libro
+ 
+    @FXML private ComboBox<Cliente> cmbCliente;  
+    @FXML private ComboBox<Libro> cmbLibro; 
     @FXML private Spinner<Integer> spnCantidad;
     @FXML private Label lblTotal;
-
+ 
     @FXML private TableView<DetalleVenta> tblUsuarios;
     @FXML private TableColumn<DetalleVenta, String> colId;
     @FXML private TableColumn<DetalleVenta, String> colUsuario;
     @FXML private TableColumn<DetalleVenta, Double> colNombre;
     @FXML private TableColumn<DetalleVenta, Integer> colApellido;
     @FXML private TableColumn<DetalleVenta, Double> colCorreo;
-
+ 
     private ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
     private ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
     private ObservableList<DetalleVenta> listaDetalles = FXCollections.observableArrayList();
-
+ 
     private double totalVenta = 0.0;
-
+ 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarTabla();
@@ -67,32 +67,32 @@ public class NuevaVentaController implements Initializable {
         spnCantidad.setValueFactory(valueFactory);
     }
         private void cargarClientes() {
-        String sql = "SELECT cui, nombre_cliente, apellido_cliente, correo_electronico FROM Cliente";
+        String sql = "SELECT cui, nombre_cliente, apellido_cliente, correo_electronico FROM clientes";
             try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
+ 
             listaClientes.clear();
             while (rs.next()) {
                 listaClientes.add(new Cliente(
-                    rs.getInt("cui"),
+                    rs.getLong("cui"),
                     rs.getString("nombre_cliente"),
                     rs.getString("apellido_cliente"),
                     rs.getString("correo_electronico")
                 ));
             }
-            cmbRol.setItems(listaClientes);
+            cmbCliente.setItems(listaClientes);
         } catch (SQLException e) {
             e.printStackTrace();
             mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudieron cargar los clientes.");
         }
     }     
 private void cargarLibros() {
-        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, autor, stock FROM Libro";
+        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, stock FROM libros";
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
+ 
             listaLibros.clear();
             while (rs.next()) {
                 listaLibros.add(new Libro(
@@ -102,28 +102,27 @@ private void cargarLibros() {
                     rs.getDouble("precio"),
                     rs.getInt("id_categoria"),
                     rs.getString("nit_editorial"),
-                    rs.getString("autor"),
                     rs.getInt("stock")
                 ));
             }
-            cmbEstado.setItems(listaLibros);
+            cmbLibro.setItems(listaLibros);
         } catch (SQLException e) {
             e.printStackTrace();
             mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudieron cargar los libros.");
         }
     }
-
+ 
     private void calcularTotal() {
         totalVenta = 0.0;
         for (DetalleVenta detalle : listaDetalles) {
-            totalVenta += detalle.getSubtotal();
+            totalVenta += detalle.getSubTotalDetalle();
         }
         lblTotal.setText(String.format("Total: Q%.2f", totalVenta));
     }
-
+ 
     @FXML
     public void handleRegistrarventa(ActionEvent event) {
-        Cliente cliente = cmbRol.getValue();
+        Cliente cliente = cmbCliente.getValue();
         if (cliente == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar un cliente.");
             return;
@@ -134,16 +133,16 @@ private void cargarLibros() {
         }
         String sqlVenta = "INSERT INTO Venta (id_cliente, total, fecha) VALUES (?, ?, NOW())";
         String sqlDetalle = "INSERT INTO DetalleVenta (id_venta, isbn, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
-
+ 
         Connection conn = null;
         try {
-            conn = Conexion.getInstance().getConnection();
+            conn = Conexion.getInstancia().conectar();
             conn.setAutoCommit(false);
             PreparedStatement stmtVenta = conn.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
-            stmtVenta.setInt(1, cliente.getCui());
+            stmtVenta.setLong(1, cliente.getCui());
             stmtVenta.setDouble(2, totalVenta);
             stmtVenta.executeUpdate();
-
+ 
             ResultSet rsKeys = stmtVenta.getGeneratedKeys();
             int idVenta = 0;
             if (rsKeys.next()) {
@@ -161,7 +160,7 @@ private void cargarLibros() {
             conn.commit(); 
             mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Venta registrada correctamente.");
             limpiarFormulario();
-
+ 
         } catch (SQLException e) {
             if (conn != null) {
                 try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
@@ -170,11 +169,11 @@ private void cargarLibros() {
             mostrarAlerta(Alert.AlertType.ERROR, "Error", "Falló el registro de la venta.");
         }
     }
-
+ 
     private void limpiarFormulario() {
         listaDetalles.clear();
-        cmbRol.getSelectionModel().clearSelection();
-        cmbEstado.getSelectionModel().clearSelection();
+        cmbCliente.getSelectionModel().clearSelection();
+        cmbLibro.getSelectionModel().clearSelection();
         spnCantidad.getValueFactory().setValue(1);
         calcularTotal();
     }
@@ -188,4 +187,4 @@ private void cargarLibros() {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-}  
+}   
