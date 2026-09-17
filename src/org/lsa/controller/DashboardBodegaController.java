@@ -254,7 +254,7 @@ private void cargarOpcionesCombos() {
         log.info("Navegando de regreso al menú principal.");
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardMenuView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/MenuBodegaView.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             escenarioPrincipal.setTitle("Librería Saturno - Menú");

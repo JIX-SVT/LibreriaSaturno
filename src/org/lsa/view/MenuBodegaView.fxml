@@ -14,10 +14,9 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
  
-<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.view.MenuBodegaController">
+<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.MenuBodegaController">
 <stylesheets>
-<URL value="@/org/ac/view/style/base.css" />
-<URL value="@/org/ac/view/style/admindashboradview.css" />
+    <URL value="@/org/lsa/view/menubodegaview.css" />
 </stylesheets>
  
     <top>

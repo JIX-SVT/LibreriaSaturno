@@ -69,7 +69,7 @@ public class LoginController {
                 break;
             case "empleado":
             case "bodega":
-                fxmlPath = "/org/lsa/view/DashboardBodegaView.fxml";
+                fxmlPath = "/org/lsa/view/MenuBodegaView.fxml";
                 tituloVentana = "Librería Saturno - Módulo de Inventario";
                 break;
             default:
