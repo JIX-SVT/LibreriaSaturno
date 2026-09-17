@@ -1,93 +1,105 @@
 package org.lsa.model;
- 
+
 import java.util.Date;
- 
 public class Libro {
+
     private String isbn;
     private String titulo;
     private Date fechaPublicacion;
     private double precio;
     private int idCategoria;
     private String nitEditorial;
-    private String autor;
-    private int stock;
- 
-    public Libro() {}
-
-    public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, String autor, int stock) {
-        this.isbn = isbn;
-        this.titulo = titulo;
-        this.fechaPublicacion = fechaPublicacion;
-        this.precio = precio;
-        this.idCategoria = idCategoria;
-        this.nitEditorial = nitEditorial;
-        this.autor = autor;
-        this.stock = stock;
+    private int stockActual;
+    private int stockMinimo;
+    private boolean activo;
+    public Libro() {
     }
 
-    public String getIsbn() {
-        return isbn;
-    }
+        public Libro(String isbn, String titulo, Date fechaPublicacion, double precio, int idCategoria, String nitEditorial, int stockActual, int stockMinimo, boolean activo) {
+            this.isbn = isbn;
+            this.titulo = titulo;
+            this.fechaPublicacion = fechaPublicacion;
+            this.precio = precio;
+            this.idCategoria = idCategoria;
+            this.nitEditorial = nitEditorial;
+            this.stockActual = stockActual;
+            this.stockMinimo = stockMinimo;
+            this.activo = activo;
+        }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
+        public String getIsbn() {
+            return isbn;
+        }
 
-    public String getTitulo() {
-        return titulo;
-    }
+        public void setIsbn(String isbn) {
+            this.isbn = isbn;
+        }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+        public String getTitulo() {
+            return titulo;
+        }
 
-    public Date getFechaPublicacion() {
-        return fechaPublicacion;
-    }
+        public void setTitulo(String titulo) {
+            this.titulo = titulo;
+        }
 
-    public void setFechaPublicacion(Date fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
-    }
+        public Date getFechaPublicacion() {
+            return fechaPublicacion;
+        }
 
-    public double getPrecio() {
-        return precio;
-    }
+        public void setFechaPublicacion(Date fechaPublicacion) {
+            this.fechaPublicacion = fechaPublicacion;
+        }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
+        public double getPrecio() {
+            return precio;
+        }
 
-    public int getIdCategoria() {
-        return idCategoria;
-    }
+        public void setPrecio(double precio) {
+            this.precio = precio;
+        }
 
-    public void setIdCategoria(int idCategoria) {
-        this.idCategoria = idCategoria;
-    }
+        public int getIdCategoria() {
+            return idCategoria;
+        }
 
-    public String getNitEditorial() {
-        return nitEditorial;
-    }
+        public void setIdCategoria(int idCategoria) {
+            this.idCategoria = idCategoria;
+        }
 
-    public void setNitEditorial(String nitEditorial) {
-        this.nitEditorial = nitEditorial;
-    }
+        public String getNitEditorial() {
+            return nitEditorial;
+        }
 
-    public String getAutor() {
-        return autor;
-    }
+        public void setNitEditorial(String nitEditorial) {
+            this.nitEditorial = nitEditorial;
+        }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
-    }
 
-    public int getStock() {
-        return stock;
-    }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
+        public int getStockActual() {
+            return stockActual;
+        }
 
-   
-}
+        public void setStockActual(int stockActual) {
+            this.stockActual = stockActual;
+        }
+
+        public int getStockMinimo() {
+            return stockMinimo;
+        }
+
+        public void setStockMiinimo(int stockMinimo) {
+            this.stockMinimo = stockMinimo;
+        }
+
+        public boolean isActivo() {
+            return activo;
+        }
+
+        public void setActivo(boolean activo) {
+            this.activo = activo;
+        }
+
+  
+    }
