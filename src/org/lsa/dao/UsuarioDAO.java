@@ -1,6 +1,7 @@
 package org.lsa.dao;
 
 import java.util.List;
+import javafx.scene.control.TextField;
 import org.lsa.model.Usuario;
 
 public interface UsuarioDAO {
@@ -20,4 +21,6 @@ public interface UsuarioDAO {
     boolean validarContrasenaActual(int idUsuario, String contrasenaIngresada);
 
     boolean actualizarPassword(int idUsuario, String nuevaPassword);
+
+    public Usuario autenticar(TextField txtUsuario, String passText);
 }

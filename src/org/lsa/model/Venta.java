@@ -1,45 +1,39 @@
 package org.lsa.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import org.lsa.daoimpl.DetalleVenta;
 
-/**
- *
- * @author Gregory Jerónimo 2026116
- */
-public class Venta extends DetalleVenta {
+public class Venta {
 
     private int idVenta;
-    private Date fecha;
-    private double total;
-    private int idCajero;
-    private int idCliente;
+    private Timestamp fechaVenta; 
+    private double totalVenta;
+    private String subTotal;
+    private long cuiCliente;
+    private double descuento;
+    private String estado;
+    private int id_usuario;
     private List<DetalleVenta> detalles;
 
     public Venta() {
         this.detalles = new ArrayList<>();
     }
 
-    public Venta(int idVenta, Date fecha, int idCajero, int idCliente) {
+    public Venta(int idVenta, Timestamp fechaVenta, double totalVenta, String subTotal, long cuiCliente, double descuento, String estado, int id_usuario, List<DetalleVenta> detalles) {
         this.idVenta = idVenta;
-        this.fecha = fecha;
-        this.idCajero = idCajero;
-        this.idCliente = idCliente;
-        this.detalles = new ArrayList<>();
-        this.total = 0.0;
+        this.fechaVenta = fechaVenta;
+        this.totalVenta = totalVenta;
+        this.subTotal = subTotal;
+        this.cuiCliente = cuiCliente;
+        this.descuento = descuento;
+        this.estado = estado;
+        this.id_usuario = id_usuario;
+        this.detalles = detalles;
     }
 
-    public Venta(int idVenta, Date fecha, int idCajero, int idCliente, List<DetalleVenta> detalles) {
-        this.idVenta = idVenta;
-        this.fecha = fecha;
-        this.idCajero = idCajero;
-        this.idCliente = idCliente;
-        this.detalles = detalles != null ? detalles : new ArrayList<>();
-        this.calcularTotal();
-    }
-
+  
+ 
     public int getIdVenta() {
         return idVenta;
     }
@@ -48,36 +42,60 @@ public class Venta extends DetalleVenta {
         this.idVenta = idVenta;
     }
 
-    public Date getFecha() {
-        return fecha;
+    public Timestamp getFechaVenta() {
+        return fechaVenta;
     }
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
+    public void setFechaVenta(Timestamp fechaVenta) {
+        this.fechaVenta = fechaVenta;
     }
 
-    public double getTotal() {
-        return total;
+    public double getTotalVenta() {
+        return totalVenta;
     }
 
-    public void setTotal(double total) {
-        this.total = total;
+    public void setTotalVenta(double totalVenta) {
+        this.totalVenta = totalVenta;
     }
 
-    public int getIdCajero() {
-        return idCajero;
+    public String getSubTotal() {
+        return subTotal;
     }
 
-    public void setIdCajero(int idCajero) {
-        this.idCajero = idCajero;
+    public void setSubTotal(String subTotal) {
+        this.subTotal = subTotal;
     }
 
-    public int getIdCliente() {
-        return idCliente;
+    public long getCuiCliente() {
+        return cuiCliente;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
+    public void setCuiCliente(long cuiCliente) {
+        this.cuiCliente = cuiCliente;
+    }
+
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getId_usuario() {
+        return id_usuario;
+    }
+
+    public void setId_usuario(int id_usuario) {
+        this.id_usuario = id_usuario;
     }
 
     public List<DetalleVenta> getDetalles() {
@@ -86,33 +104,18 @@ public class Venta extends DetalleVenta {
 
     public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
-        this.calcularTotal();
     }
-
-    public void agregarDetalle(DetalleVenta detalle) {
-        this.detalles.add(detalle);
-        this.calcularTotal();
-    }
-
-    public void calcularTotal() {
-        double suma = 0.0;
-        if (this.detalles != null) {
-            for (DetalleVenta detalle : this.detalles) {
-                suma += detalle.getSubtotal();
-            }
-        }
-        this.total = suma;
-    }
-
-    @Override
+    
+      @Override
     public String toString() {
-        return "Venta{" +
-                "idVenta=" + idVenta +
-                ", fecha=" + fecha +
-                ", total=" + total +
-                ", idCajero=" + idCajero +
-                ", idCliente=" + idCliente +
-                ", detalles=" + detalles +
+        return "ventas{" +
+                "id_venta=" + idVenta +
+                ", fecha_venta=" + fechaVenta +
+                ", descuento=" + subTotal +
+                ", cui_Cliente=" + cuiCliente +
+                 ", estado=" + estado +
+                 ", cui_Cliente=" + cuiCliente +
+                ", id_usuario=" + id_usuario +
                 '}';
     }
 }
