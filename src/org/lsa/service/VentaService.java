@@ -10,7 +10,7 @@ import org.lsa.model.DetalleCompra;
 import org.lsa.model.Compra;
 import org.lsa.utils.Conexion;
 
-public class CompraService {
+public class VentaService {
 
     public boolean validarStock(String isbn, int cantidad) {
         String sql = "{call sp_buscarlibro(?)}";
