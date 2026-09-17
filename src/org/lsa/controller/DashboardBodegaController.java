@@ -57,7 +57,6 @@ public class DashboardBodegaController implements Initializable {
         configurarBusqueda();
         verificarAlertasStock();
 
-        // Autocompletar formulario al hacer clic en una fila de la TableView
         tblLibros.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 txtIsbn.setText(newSelection.getIsbn());
@@ -89,11 +88,9 @@ public class DashboardBodegaController implements Initializable {
     }
 
 private void cargarOpcionesCombos() {
-    // Carga dinámica de IDs de Categorías desde la base de datos
     List<Integer> categoriasBD = libroDAO.listarIdsCategorias();
     cmbIdCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
 
-    // Carga dinámica de NITs de Editoriales desde la base de datos
     List<String> editorialesBD = libroDAO.listarNitsEditoriales();
     cmbNitEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
 }
