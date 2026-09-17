@@ -1,22 +1,21 @@
-
-
 package org.lsa.dao;
 
 import java.util.List;
 import org.lsa.model.Libro;
 
-/**
- *
- * @author informatica
- */
-public interface LibroDAO{
-    List<Libro> listarTodos();
-    Libro buscarLibro (String isbn);
-    boolean insertar(Libro libro);
-    boolean actualizar(Libro libro);
-    boolean eliminar(String isbn);
-    Libro filtrarLibros();
-public List<Libro> obtenerLibrosStockCritico();
-    
- 
+public interface LibroDAO {
+
+    public List<Libro> listar();
+
+    public Libro buscarPorIsbn(String isbn);
+
+    public boolean agregar(Libro libro);
+
+    public boolean actualizar(Libro libro);
+
+    public boolean eliminar(String isbn);
+
+    public boolean actualizarStock(String isbn, int cantidad);
+
+    public List<Libro> obtenerLibrosStockCritico();
 }
