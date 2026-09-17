@@ -2,11 +2,15 @@ package org.lsa.controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import org.lsa.dao.LibroDAO;
@@ -27,10 +32,11 @@ public class DashboardBodegaController implements Initializable {
     private static final Logger log = Logger.getLogger(DashboardBodegaController.class.getName());
 
     private final LibroDAO libroDAO = new LibroDAOImpl();
+    private final ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
 
     @FXML private TableView<Libro> tblLibros; 
     @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colNitEditorial;
-    @FXML private TableColumn<Libro, Object> colFechaPublicacion;
+    @FXML private TableColumn<Libro, Date> colFechaPublicacion;
     @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colIdCategoria;
 
@@ -41,9 +47,47 @@ public class DashboardBodegaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         log.info("Inicializando DashboardBodegaController...");
+        configurarTabla();
+        cargarLibros();
         verificarAlertasStock();
+
+        // Listener para autocompletar campos desde la tabla seleccionada
+        tblLibros.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                txtIsbn.setText(newSelection.getIsbn());
+                txtTitulo.setText(newSelection.getTitulo());
+                
+                if (newSelection.getFechaPublicacion() != null) {
+                    // Casteo explícito a java.sql.Date para asegurar el método toLocalDate()
+                    dpFechaPublicacion.setValue(((java.sql.Date) newSelection.getFechaPublicacion()).toLocalDate());
+                } else {
+                    dpFechaPublicacion.setValue(null);
+                }
+                
+                txtPrecio.setText(String.valueOf(newSelection.getPrecio()));
+                txtIdCategoria.setText(String.valueOf(newSelection.getIdCategoria()));
+                txtNitEditorial.setText(newSelection.getNitEditorial());
+            }
+        });
     }
 
+    private void configurarTabla() {
+        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colFechaPublicacion.setCellValueFactory(new PropertyValueFactory<>("fechaPublicacion"));
+        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        colIdCategoria.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
+        colNitEditorial.setCellValueFactory(new PropertyValueFactory<>("nitEditorial"));
+        tblLibros.setItems(listaLibros);
+    }
+
+    private void cargarLibros() {
+        listaLibros.clear();
+List<Libro> libros = libroDAO.listar();        
+if (libros != null) {
+            listaLibros.addAll(libros);
+        }
+    }
 
     private void verificarAlertasStock() {
         List<Libro> librosCriticos = libroDAO.obtenerLibrosStockCritico();
@@ -54,15 +98,6 @@ public class DashboardBodegaController implements Initializable {
                 lblAlertaBajoStock.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-padding: 5px; -fx-background-radius: 4px;");
                 lblAlertaBajoStock.setVisible(true);
             }
-
-            StringBuilder detalles = new StringBuilder("Los siguientes libros tienen stock crítico (<= 10 unidades):\n\n");
-            for (Libro libro : librosCriticos) {
-                detalles.append("• ").append(libro.getTitulo())
-                        .append(" (ISBN: ").append(libro.getIsbn())
-                        .append(") - Unidades: ").append(libro.getStock()).append("\n");
-            }
-
-            mostrarAlerta("Alerta de Inventario", detalles.toString(), Alert.AlertType.WARNING);
         } else {
             if (lblAlertaBajoStock != null) {
                 lblAlertaBajoStock.setVisible(false);
@@ -72,24 +107,90 @@ public class DashboardBodegaController implements Initializable {
 
     @FXML
     public void handleGuardarLibro(ActionEvent event) {
-        log.info("Ejecutando proceso de guardado de libro (Simulación).");
-        mostrarAlerta("Éxito", "Simulación: Libro guardado correctamente.", Alert.AlertType.INFORMATION);
-        limpiarCampos();
-        verificarAlertasStock(); 
+        log.info("Ejecutando proceso de guardado de libro.");
+
+        if (txtIsbn.getText().trim().isEmpty() || txtTitulo.getText().trim().isEmpty() ||
+            dpFechaPublicacion.getValue() == null || txtPrecio.getText().trim().isEmpty() ||
+            txtIdCategoria.getText().trim().isEmpty() || txtNitEditorial.getText().trim().isEmpty()) {
+            mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos requeridos.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            String isbn = txtIsbn.getText().trim();
+            String titulo = txtTitulo.getText().trim();
+            Date fecha = Date.valueOf(dpFechaPublicacion.getValue());
+            double precio = Double.parseDouble(txtPrecio.getText().trim());
+            int idCategoria = Integer.parseInt(txtIdCategoria.getText().trim());
+            String nitEditorial = txtNitEditorial.getText().trim();
+
+            Libro libro = new Libro(isbn, titulo, fecha, precio, idCategoria, nitEditorial, 0);
+
+            boolean exito;
+            Libro libroExistente = libroDAO.buscarPorIsbn(isbn);
+            if (libroExistente != null) {
+                exito = libroDAO.actualizar(libro);
+            } else {
+                exito = libroDAO.agregar(libro);
+            }
+
+            if (exito) {
+                mostrarAlerta("Éxito", "Libro guardado correctamente en la base de datos.", Alert.AlertType.INFORMATION);
+                limpiarCampos();
+                cargarLibros();
+                verificarAlertasStock();
+            } else {
+                mostrarAlerta("Error", "No se pudo guardar el libro en la base de datos.", Alert.AlertType.ERROR);
+            }
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Error de Formato", "Asegúrese de ingresar números válidos para Precio e ID Categoría.", Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
     public void handleRegistrarIngreso(ActionEvent event) {
-        log.info("Registrando ingreso de inventario (Simulación).");
-        mostrarAlerta("Éxito", "Simulación: Ingreso registrado correctamente.", Alert.AlertType.INFORMATION);
-        verificarAlertasStock(); 
+        log.info("Registrando ingreso de inventario.");
+        procesarMovimientoInventario(true);
     }
 
     @FXML
     public void handleRegistrarSalida(ActionEvent event) {
-        log.info("Registrando salida de inventario (Simulación).");
-        mostrarAlerta("Éxito", "Simulación: Salida registrada correctamente.", Alert.AlertType.INFORMATION);
-        verificarAlertasStock(); 
+        log.info("Registrando salida de inventario.");
+        procesarMovimientoInventario(false);
+    }
+
+    private void procesarMovimientoInventario(boolean esIngreso) {
+        String isbn = txtIsbn.getText().trim();
+        String cantStr = txtCantidadMovimiento.getText().trim();
+
+        if (isbn.isEmpty() || cantStr.isEmpty()) {
+            mostrarAlerta("Advertencia", "Seleccione un libro e ingrese una cantidad válida.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            int cantidad = Integer.parseInt(cantStr);
+            if (cantidad <= 0) {
+                mostrarAlerta("Advertencia", "La cantidad debe ser mayor a cero.", Alert.AlertType.WARNING);
+                return;
+            }
+
+            if (!esIngreso) {
+                cantidad = -cantidad;
+            }
+
+            boolean exito = libroDAO.actualizarStock(isbn, cantidad);
+            if (exito) {
+                mostrarAlerta("Éxito", "Stock actualizado correctamente.", Alert.AlertType.INFORMATION);
+                limpiarCampos();
+                cargarLibros();
+                verificarAlertasStock();
+            } else {
+                mostrarAlerta("Error", "No se pudo actualizar el stock en la base de datos.", Alert.AlertType.ERROR);
+            }
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Error de Formato", "Ingrese una cantidad entera válida.", Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
@@ -100,7 +201,7 @@ public class DashboardBodegaController implements Initializable {
 
     @FXML
     public void handleVolverMenu(ActionEvent event) {
-        log.info("Navegando de regreso al menú principal (DashboardMenuView.fxml).");
+        log.info("Navegando de regreso al menú principal.");
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardMenuView.fxml"));
@@ -110,15 +211,14 @@ public class DashboardBodegaController implements Initializable {
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.show();
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al intentar cargar la vista del menú principal: /org/lsa/view/DashboardMenuView.fxml", e);
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error al intentar cargar la vista del menú principal", e);
             mostrarAlerta("Error", "No se pudo cargar la vista del menú.", Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
-        log.info("Cerrando sesión del usuario de bodega y redirigiendo al Login.");
+        log.info("Cerrando sesión del usuario de bodega.");
         SesionUsuario.getInstancia().cerrarSesion();
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -129,14 +229,13 @@ public class DashboardBodegaController implements Initializable {
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.show();
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al intentar redirigir a la pantalla de Inicio de Sesión: /org/lsa/view/LoginView.fxml", e);
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error al intentar redirigir a la pantalla de Inicio de Sesión", e);
             mostrarAlerta("Error", "No se pudo regresar a la pantalla de inicio de sesión.", Alert.AlertType.ERROR);
         }
     }
 
     private void limpiarCampos() {
-        log.info("Limpiando los campos de entrada de datos de la vista de bodega.");
+        log.info("Limpiando los campos de entrada de datos.");
         txtIsbn.clear();
         txtTitulo.clear();
         dpFechaPublicacion.setValue(null);
@@ -144,10 +243,10 @@ public class DashboardBodegaController implements Initializable {
         txtIdCategoria.clear();
         txtNitEditorial.clear();
         txtCantidadMovimiento.clear();
+        tblLibros.getSelectionModel().clearSelection();
     }
 
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
-        log.info("Desplegando alerta gráfica [Tipo: " + tipo + "] - Título: " + titulo);
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
