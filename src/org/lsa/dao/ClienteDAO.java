@@ -11,4 +11,6 @@ public interface ClienteDAO {
     boolean insertar(Cliente cliente);
     boolean actualizar(Cliente cliente);
     boolean eliminar(long cui);   
+
+    public Cliente[] listar();
 }
