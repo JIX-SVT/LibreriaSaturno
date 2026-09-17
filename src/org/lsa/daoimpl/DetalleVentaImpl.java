@@ -40,13 +40,10 @@ public class DetalleVentaImpl implements DetalleVentaDAO {
             
             while (rs.next()) {
                 lista.add(new DetalleVenta(
-                    rs.getInt("id_detalle_venta"),
-                    rs.getInt("id_venta"),
-                    rs.getString("isbn"),
-                    rs.getInt("cantidad"),
-                    rs.getDouble("precio_unitario"),
-                    rs.getDouble("subtotal")
-                ));
+                        rs.getString("isbn"),
+                    rs.getString("id_venta"),
+                        rs.getDouble("precio_unitario"),
+                    rs.getInt("cantidad")));
             }
         } catch (SQLException e) {
             System.err.println("Error [Listar Detalle Venta]: " + e.getMessage());
@@ -63,13 +60,10 @@ public class DetalleVentaImpl implements DetalleVentaDAO {
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
                     return new DetalleVenta(
-                        rs.getInt("id_detalle_venta"),
-                        rs.getInt("id_venta"),
-                        rs.getString("isbn"),
-                        rs.getInt("cantidad"),
-                        rs.getDouble("precio_unitario"),
-                        rs.getDouble("subtotal")
-                    );
+                            rs.getString("isbn"),
+                        rs.getString("id_venta"),
+                            rs.getDouble("precio_unitario"),
+                        rs.getInt("cantidad"));
                 }
             }
         } catch (SQLException e) {

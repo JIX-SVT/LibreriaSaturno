@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,17 +99,21 @@ public class DashboardCajeroController implements Initializable {
         if (busqueda.isEmpty()) {
             librosFiltrados.setPredicate(p -> true);
         } else {
-            librosFiltrados.setPredicate(libro -> {
-                boolean coincideTitulo = libro.getTitulo() != null 
-                        && libro.getTitulo().toLowerCase().contains(busqueda);
-
-                boolean coincideAutor = libro.getAutor() != null 
-                        && libro.getAutor().toLowerCase().contains(busqueda);
-
-                String isbnStr = String.valueOf(libro.getIsbn());
-                boolean coincideIsbn = isbnStr.contains(busqueda);
-
-                return coincideTitulo || coincideAutor || coincideIsbn;
+            librosFiltrados.setPredicate(new Predicate<Libro>() {
+                @Override
+                public boolean test(Libro libro) {
+                    boolean coincideTitulo = libro.getTitulo() != null
+                            && libro.getTitulo().toLowerCase().contains(busqueda);
+                    
+                    boolean coincideAutor;
+                    coincideAutor = libro.getAutor() != null
+                            && libro.getAutor().toLowerCase().contains(busqueda);
+                    
+                    String isbnStr = String.valueOf(libro.getIsbn());
+                    boolean coincideIsbn = isbnStr.contains(busqueda);
+                    
+                    return coincideTitulo || coincideAutor || coincideIsbn;
+                }
             });
         }
     }

@@ -2,10 +2,11 @@ package org.lsa.controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,17 +16,23 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
+import org.lsa.dao.LibroDAO;
+import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.model.Libro;
 import org.lsa.utils.SesionUsuario;
 
 public class DashboardBodegaController implements Initializable {
 
     private static final Logger log = Logger.getLogger(DashboardBodegaController.class.getName());
 
-    @FXML private TableView<?> tblLibros; 
-    @FXML private TableColumn<?, ?> colIsbn, colTitulo, colNitEditorial;
-    @FXML private TableColumn<?, ?> colFechaPublicacion;
-    @FXML private TableColumn<?, ?> colPrecio;
-    @FXML private TableColumn<?, ?> colIdCategoria;
+    private final LibroDAO libroDAO = new LibroDAOImpl();
+
+    @FXML private TableView<Libro> tblLibros; 
+    @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colNitEditorial;
+    @FXML private TableColumn<Libro, Object> colFechaPublicacion;
+    @FXML private TableColumn<Libro, Double> colPrecio;
+    @FXML private TableColumn<Libro, Integer> colIdCategoria;
 
     @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtIdCategoria, txtNitEditorial, txtCantidadMovimiento;
     @FXML private DatePicker dpFechaPublicacion;
@@ -34,6 +41,33 @@ public class DashboardBodegaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         log.info("Inicializando DashboardBodegaController...");
+        verificarAlertasStock();
+    }
+
+
+    private void verificarAlertasStock() {
+        List<Libro> librosCriticos = libroDAO.obtenerLibrosStockCritico();
+
+        if (librosCriticos != null && !librosCriticos.isEmpty()) {
+            if (lblAlertaBajoStock != null) {
+                lblAlertaBajoStock.setText("⚠️ Alerta: " + librosCriticos.size() + " producto(s) en stock crítico");
+                lblAlertaBajoStock.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-padding: 5px; -fx-background-radius: 4px;");
+                lblAlertaBajoStock.setVisible(true);
+            }
+
+            StringBuilder detalles = new StringBuilder("Los siguientes libros tienen stock crítico (<= 10 unidades):\n\n");
+            for (Libro libro : librosCriticos) {
+                detalles.append("• ").append(libro.getTitulo())
+                        .append(" (ISBN: ").append(libro.getIsbn())
+                        .append(") - Unidades: ").append(libro.getStock()).append("\n");
+            }
+
+            mostrarAlerta("Alerta de Inventario", detalles.toString(), Alert.AlertType.WARNING);
+        } else {
+            if (lblAlertaBajoStock != null) {
+                lblAlertaBajoStock.setVisible(false);
+            }
+        }
     }
 
     @FXML
@@ -41,18 +75,21 @@ public class DashboardBodegaController implements Initializable {
         log.info("Ejecutando proceso de guardado de libro (Simulación).");
         mostrarAlerta("Éxito", "Simulación: Libro guardado correctamente.", Alert.AlertType.INFORMATION);
         limpiarCampos();
+        verificarAlertasStock(); 
     }
 
     @FXML
     public void handleRegistrarIngreso(ActionEvent event) {
         log.info("Registrando ingreso de inventario (Simulación).");
         mostrarAlerta("Éxito", "Simulación: Ingreso registrado correctamente.", Alert.AlertType.INFORMATION);
+        verificarAlertasStock(); 
     }
 
     @FXML
     public void handleRegistrarSalida(ActionEvent event) {
         log.info("Registrando salida de inventario (Simulación).");
         mostrarAlerta("Éxito", "Simulación: Salida registrada correctamente.", Alert.AlertType.INFORMATION);
+        verificarAlertasStock(); 
     }
 
     @FXML

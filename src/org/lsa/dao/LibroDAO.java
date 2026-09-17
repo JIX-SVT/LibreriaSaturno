@@ -11,11 +11,12 @@ import org.lsa.model.Libro;
  */
 public interface LibroDAO{
     List<Libro> listarTodos();
-    Libro buscarLibro (int isbn);
+    Libro buscarLibro (String isbn);
     boolean insertar(Libro libro);
     boolean actualizar(Libro libro);
-    boolean eliminar(int isbn);
+    boolean eliminar(String isbn);
     Libro filtrarLibros();
+public List<Libro> obtenerLibrosStockCritico();
     
  
 }
