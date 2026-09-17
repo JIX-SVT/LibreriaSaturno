@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -16,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="10" style="-fx-background-color: #ffffff;" stylesheets="@dashboardbodegaview.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardBodegaController">
+<VBox prefHeight="534.0" prefWidth="901.0" spacing="10" style="-fx-background-color: #ffffff;" stylesheets="@dashboardbodegaview.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardBodegaController">
     <padding>
         <Insets bottom="15" left="15" right="15" top="15" />
     </padding>
@@ -27,9 +28,12 @@
         <Button onAction="#handleCerrarSesion" text="Cerrar Sesión" />
     </HBox>
     <Label fx:id="lblAlertaBajoStock" style="-fx-font-size: 14px;" text="Estado del Inventario" />
+    
+    <!-- Campo de Búsqueda -->
+    <TextField fx:id="txtBusqueda" promptText="Buscar Libro por ISBN o Título..." />
+    
     <SplitPane dividerPositions="0.6" style="-fx-background-color: #ffffff; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
         <VBox spacing="5" style="-fx-background-color: #ffffff;">
-            <Label style="-fx-font-family: 'Century Gothic'; -fx-font-weight: bold; -fx-text-fill: black;" text="Consulta de Inventario" />
             <TableView fx:id="tblLibros" style="-fx-font-family: 'Century Gothic';" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colIsbn" prefWidth="100" style="-fx-font-family: 'Century Gothic';" text="ISBN" />
@@ -42,24 +46,30 @@
                 </columns>
             </TableView>
         </VBox>
-        <VBox spacing="10" style="-fx-background-color: #ffffff;">
+        <VBox prefHeight="420.0" prefWidth="347.0" spacing="10" style="-fx-background-color: #ffffff;">
             <padding>
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
             <Label style="-fx-font-family: 'Century Gothic'; -fx-font-weight: bold; -fx-text-fill: black;" text="Gestión de Libro" />
-            <GridPane hgap="8" vgap="8">
+            <GridPane hgap="8" prefHeight="188.0" prefWidth="307.0" vgap="8">
                 <Label style="-fx-text-fill: black;" text="ISBN:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <TextField fx:id="txtIsbn" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                
                 <Label style="-fx-text-fill: black;" text="Título:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <TextField fx:id="txtTitulo" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
                 <Label style="-fx-text-fill: black;" text="Fecha Pub.:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <DatePicker fx:id="dpFechaPublicacion" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <DatePicker fx:id="dpFechaPublicacion" prefHeight="23.0" prefWidth="198.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                
                 <Label style="-fx-text-fill: black;" text="Precio:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <TextField fx:id="txtPrecio" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                
                 <Label style="-fx-text-fill: black;" text="ID Categoría:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <TextField fx:id="txtIdCategoria" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <ComboBox fx:id="cmbIdCategoria" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                
                 <Label style="-fx-text-fill: black;" text="NIT Editorial:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                <TextField fx:id="txtNitEditorial" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <ComboBox fx:id="cmbNitEditorial" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                
                 <columnConstraints>
                     <ColumnConstraints />
                     <ColumnConstraints />

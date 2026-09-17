@@ -146,6 +146,42 @@ public class LibroDAOImpl implements LibroDAO {
         return lista;
     }
 
+    @Override
+    public List<Integer> listarIdsCategorias() {
+        List<Integer> lista = new ArrayList<>();
+        String sql = "SELECT DISTINCT id_categoria FROM libros ORDER BY id_categoria ASC";
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(rs.getInt("id_categoria"));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al listar IDs de categorías", e);
+        }
+        return lista;
+    }
+
+    @Override
+    public List<String> listarNitsEditoriales() {
+        List<String> lista = new ArrayList<>();
+        String sql = "SELECT DISTINCT nit_editorial FROM libros ORDER BY nit_editorial ASC";
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(rs.getString("nit_editorial"));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al listar NITs de editoriales", e);
+        }
+        return lista;
+    }
+
     private Libro mapearLibro(ResultSet rs) throws SQLException {
         return new Libro(
             rs.getString("isbn"),

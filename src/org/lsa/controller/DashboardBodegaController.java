@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +41,10 @@ public class DashboardBodegaController implements Initializable {
     @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colIdCategoria, colStock;
 
-    @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtIdCategoria, txtNitEditorial, txtCantidadMovimiento;
+    @FXML private TextField txtBusqueda;
+    @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtCantidadMovimiento;
+    @FXML private ComboBox<Integer> cmbIdCategoria;
+    @FXML private ComboBox<String> cmbNitEditorial;
     @FXML private DatePicker dpFechaPublicacion;
     @FXML private Label lblAlertaBajoStock;
 
@@ -47,10 +52,12 @@ public class DashboardBodegaController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         log.info("Inicializando DashboardBodegaController...");
         configurarTabla();
+        cargarOpcionesCombos();
         cargarLibros();
+        configurarBusqueda();
         verificarAlertasStock();
 
-        // Listener para autocompletar campos desde la tabla seleccionada
+        // Autocompletar formulario al hacer clic en una fila de la TableView
         tblLibros.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 txtIsbn.setText(newSelection.getIsbn());
@@ -63,8 +70,8 @@ public class DashboardBodegaController implements Initializable {
                 }
                 
                 txtPrecio.setText(String.valueOf(newSelection.getPrecio()));
-                txtIdCategoria.setText(String.valueOf(newSelection.getIdCategoria()));
-                txtNitEditorial.setText(newSelection.getNitEditorial());
+                cmbIdCategoria.setValue(newSelection.getIdCategoria());
+                cmbNitEditorial.setValue(newSelection.getNitEditorial());
             }
         });
     }
@@ -79,8 +86,17 @@ public class DashboardBodegaController implements Initializable {
         if (colStock != null) {
             colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
         }
-        tblLibros.setItems(listaLibros);
     }
+
+private void cargarOpcionesCombos() {
+    // Carga dinámica de IDs de Categorías desde la base de datos
+    List<Integer> categoriasBD = libroDAO.listarIdsCategorias();
+    cmbIdCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
+
+    // Carga dinámica de NITs de Editoriales desde la base de datos
+    List<String> editorialesBD = libroDAO.listarNitsEditoriales();
+    cmbNitEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
+}
 
     private void cargarLibros() {
         listaLibros.clear();
@@ -90,12 +106,36 @@ public class DashboardBodegaController implements Initializable {
         }
     }
 
+    private void configurarBusqueda() {
+        FilteredList<Libro> filteredData = new FilteredList<>(listaLibros, p -> true);
+
+        txtBusqueda.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(libro -> {
+                if (newValue == null || newValue.trim().isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase().trim();
+
+                if (libro.getTitulo() != null && libro.getTitulo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (libro.getIsbn() != null && libro.getIsbn().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false;
+            });
+        });
+
+        SortedList<Libro> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tblLibros.comparatorProperty());
+        tblLibros.setItems(sortedData);
+    }
+
     private void verificarAlertasStock() {
         List<Libro> librosCriticos = libroDAO.obtenerLibrosStockCritico();
 
         if (librosCriticos != null && !librosCriticos.isEmpty()) {
             if (lblAlertaBajoStock != null) {
-                lblAlertaBajoStock.setText("⚠️ Alerta: " + librosCriticos.size() + " libro(s) en stock crítico");
+                lblAlertaBajoStock.setText(" Alerta: " + librosCriticos.size() + " libro(s) en stock crítico");
                 lblAlertaBajoStock.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-padding: 5px; -fx-background-radius: 4px; -fx-font-weight: bold;");
                 lblAlertaBajoStock.setVisible(true);
             }
@@ -115,50 +155,50 @@ public class DashboardBodegaController implements Initializable {
         }
     }
 
-   @FXML
-public void handleGuardarLibro(ActionEvent event) {
-    log.info("Ejecutando proceso de guardado de libro.");
+    @FXML
+    public void handleGuardarLibro(ActionEvent event) {
+        log.info("Ejecutando proceso de guardado de libro.");
 
-    if (txtIsbn.getText().trim().isEmpty() || txtTitulo.getText().trim().isEmpty() ||
-        dpFechaPublicacion.getValue() == null || txtPrecio.getText().trim().isEmpty() ||
-        txtIdCategoria.getText().trim().isEmpty() || txtNitEditorial.getText().trim().isEmpty()) {
-        mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos requeridos.", Alert.AlertType.WARNING);
-        return;
-    }
-
-    try {
-        String isbn = txtIsbn.getText().trim();
-        String titulo = txtTitulo.getText().trim();
-        Date fecha = Date.valueOf(dpFechaPublicacion.getValue());
-        double precio = Double.parseDouble(txtPrecio.getText().trim());
-        int idCategoria = Integer.parseInt(txtIdCategoria.getText().trim());
-        String nitEditorial = txtNitEditorial.getText().trim();
-
-        Libro libro = new Libro(isbn, titulo, fecha, precio, idCategoria, nitEditorial, 0);
-
-        boolean exito;
-        Libro libroExistente = libroDAO.buscarPorIsbn(isbn);
-        if (libroExistente != null) {
-            exito = libroDAO.actualizar(libro);
-        } else {
-            exito = libroDAO.agregar(libro);
+        if (txtIsbn.getText().trim().isEmpty() || txtTitulo.getText().trim().isEmpty() ||
+            dpFechaPublicacion.getValue() == null || txtPrecio.getText().trim().isEmpty() ||
+            cmbIdCategoria.getValue() == null || cmbNitEditorial.getValue() == null) {
+            mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos y seleccione Categoría y Editorial.", Alert.AlertType.WARNING);
+            return;
         }
 
-        if (exito) {
-            mostrarAlerta("Éxito", "Libro guardado correctamente en la base de datos.", Alert.AlertType.INFORMATION);
-            limpiarCampos();
-            cargarLibros();
-            verificarAlertasStock();
-        } else {
-            mostrarAlerta("Error", "No se pudo guardar el libro. Verifique que la Categoría y el NIT de la Editorial existan.", Alert.AlertType.ERROR);
+        try {
+            String isbn = txtIsbn.getText().trim();
+            String titulo = txtTitulo.getText().trim();
+            Date fecha = Date.valueOf(dpFechaPublicacion.getValue());
+            double precio = Double.parseDouble(txtPrecio.getText().trim());
+            int idCategoria = cmbIdCategoria.getValue();
+            String nitEditorial = cmbNitEditorial.getValue();
+
+            Libro libro = new Libro(isbn, titulo, fecha, precio, idCategoria, nitEditorial, 0);
+
+            boolean exito;
+            Libro libroExistente = libroDAO.buscarPorIsbn(isbn);
+            if (libroExistente != null) {
+                exito = libroDAO.actualizar(libro);
+            } else {
+                exito = libroDAO.agregar(libro);
+            }
+
+            if (exito) {
+                mostrarAlerta("Éxito", "Libro guardado correctamente en la base de datos.", Alert.AlertType.INFORMATION);
+                limpiarCampos();
+                cargarLibros();
+                verificarAlertasStock();
+            } else {
+                mostrarAlerta("Error", "No se pudo guardar el libro en la base de datos.", Alert.AlertType.ERROR);
+            }
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Error de Formato", "Asegúrese de ingresar un precio numérico válido.", Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error al guardar el libro", e);
+            mostrarAlerta("Error", "Ocurrió un error inesperado al procesar la solicitud.", Alert.AlertType.ERROR);
         }
-    } catch (NumberFormatException e) {
-        mostrarAlerta("Error de Formato", "Asegúrese de ingresar números válidos para Precio e ID Categoría.", Alert.AlertType.ERROR);
-    } catch (Exception e) {
-        log.log(Level.SEVERE, "Error al guardar el libro", e);
-        mostrarAlerta("Error de Referencia", "El NIT de la Editorial o el ID de la Categoría no existen en la base de datos.", Alert.AlertType.ERROR);
     }
-}
 
     @FXML
     public void handleRegistrarIngreso(ActionEvent event) {
@@ -253,8 +293,8 @@ public void handleGuardarLibro(ActionEvent event) {
         txtTitulo.clear();
         dpFechaPublicacion.setValue(null);
         txtPrecio.clear();
-        txtIdCategoria.clear();
-        txtNitEditorial.clear();
+        cmbIdCategoria.getSelectionModel().clearSelection();
+        cmbNitEditorial.getSelectionModel().clearSelection();
         txtCantidadMovimiento.clear();
         tblLibros.getSelectionModel().clearSelection();
     }

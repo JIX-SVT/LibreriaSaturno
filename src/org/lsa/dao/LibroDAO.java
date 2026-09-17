@@ -18,4 +18,7 @@ public interface LibroDAO {
     public boolean actualizarStock(String isbn, int cantidad);
 
     public List<Libro> obtenerLibrosStockCritico();
+    
+    public List<Integer> listarIdsCategorias();
+public List<String> listarNitsEditoriales();
 }
