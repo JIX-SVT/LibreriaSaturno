@@ -83,7 +83,7 @@ public class DashboardCajeroController implements Initializable {
     private void cargarTabla() {
         log.info("Cargando lista completa de libros desde el DAO.");
         listaLibros.clear();
-        listaLibros.addAll(libroDAO.listarTodos());
+        listaLibros.addAll(libroDAO.listar());
     }
 
     private void configurarBusqueda() {

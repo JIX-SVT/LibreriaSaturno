@@ -1,4 +1,3 @@
-
 package org.lsa.daoimpl;
 
 import java.sql.CallableStatement;
@@ -7,115 +6,121 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.lsa.dao.MovimientoInventarioDAO;
 import org.lsa.model.MovimientoInventario;
 import org.lsa.utils.ConexionSingleton;
 
-public interface MovimientoInventarioDAOImpl {
-      @Override
+public class MovimientoInventarioDAOImpl implements MovimientoInventarioDAO {
+
+    @Override
     public List<MovimientoInventario> listarTodos() {
-        List<MovimientoInventario> usuarios = new ArrayList<>();
-        String consulta = "{call sp_listarusuarios()}";
+        List<MovimientoInventario> lista = new ArrayList<>();
+        String consulta = "{call sp_listarmovimientos()}";
 
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta);
              ResultSet rs = consultaCall.executeQuery()) {
 
             while (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setIdUsuario(rs.getInt("id_usuario"));
-                usuario.setNombreUsuario(rs.getString("nombre_usuario"));
-                usuario.setNombre(rs.getString("nombre"));
-                usuario.setApellido(rs.getString("apellido"));
-                usuario.setCorreo(rs.getString("correo"));
-                usuario.setRol(rs.getString("rol"));
-                usuario.setEstado(rs.getBoolean("activo"));
-
-                usuarios.add(usuario);
+                MovimientoInventario movimiento = new MovimientoInventario(
+                    rs.getInt("id_movimiento"),
+                    rs.getString("isbn"),
+                    rs.getString("tipo_movimiento"),
+                    rs.getInt("cantidad"),
+                    rs.getTimestamp("fecha_movimiento"),
+                    String.valueOf(rs.getInt("id_usuario")),
+                    rs.getString("observacion")
+                );
+                lista.add(movimiento);
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar usuarios: " + e.getMessage());
+            System.err.println("Error al listar movimientos de inventario: " + e.getMessage());
         }
-        return usuarios;
+        return lista;
     }
 
     @Override
-    public Usuario buscarUsuario(int idUsuario) {
-        Usuario usuario = new Usuario();
-        String consultaSQL = "{call sp_buscarusuario(?)}";
+    public MovimientoInventario buscarLibro(int idMovimiento) {
+        MovimientoInventario movimiento = null;
+        String consultaSQL = "{call sp_buscarmovimientosporisbn(?)}";
+
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consultaSQL)) {
-            consultaCall.setInt(1, idUsuario);
-            try (ResultSet tablaResultado = consultaCall.executeQuery()) {
-                if (tablaResultado.next()) {
-                    usuario.setIdUsuario(tablaResultado.getInt("id_usuario"));
-                    usuario.setNombreUsuario(tablaResultado.getString("nombre_usuario"));
-                    usuario.setCorreo(tablaResultado.getString("correo"));
-                    usuario.setRol(tablaResultado.getString("rol"));
-                    usuario.setEstado(tablaResultado.getBoolean("activo"));
-                } else {
-                    return null;
+            consultaCall.setString(1, String.valueOf(idMovimiento));
+
+            try (ResultSet rs = consultaCall.executeQuery()) {
+                if (rs.next()) {
+                    movimiento = new MovimientoInventario(
+                        rs.getInt("id_movimiento"),
+                        rs.getString("isbn"),
+                        rs.getString("tipo_movimiento"),
+                        rs.getInt("cantidad"),
+                        rs.getTimestamp("fecha_movimiento"),
+                        String.valueOf(rs.getInt("id_usuario")),
+                        rs.getString("observacion")
+                    );
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al buscar Usuario: " + e.getMessage());
+            System.err.println("Error al buscar movimiento: " + e.getMessage());
         }
-        return usuario;
+        return movimiento;
     }
 
     @Override
-    public boolean insertar(Usuario usuario) {
-        String sql = "{call sp_insertarusuario(?, ?, ?, ?, ?, ?, ?)}";
-
+    public boolean insertar(MovimientoInventario movimiento) {
+        String sql = "{call sp_insertarmovimiento(?, ?, ?, ?, ?)}";
         try (Connection conn = ConexionSingleton.getInstancia().getConexion();
              CallableStatement cs = conn.prepareCall(sql)) {
 
-            cs.setString(1, usuario.getNombreUsuario());
-            cs.setString(2, usuario.getNombre());
-            cs.setString(3, usuario.getApellido());
-            cs.setString(4, usuario.getCorreo());
-            cs.setString(5, usuario.getContraseña());
-            cs.setString(6, usuario.getRol().toLowerCase());
-            cs.setBoolean(7, usuario.isEstado()); 
+            cs.setString(1, movimiento.getIsbn());
+            cs.setString(2, movimiento.getTipoMovimiento());
+            cs.setInt(3, movimiento.getCantidad());
+            cs.setInt(4, Integer.parseInt(movimiento.getIdUsuario()));
+            cs.setString(5, movimiento.getObservaciòn());
 
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al crear Usuario: " + e.getMessage());
+            System.err.println("Error al insertar movimiento: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("Error: El idUsuario debe ser un número entero válido: " + e.getMessage());
             return false;
         }
     }
-
     @Override
-    public boolean actualizar(Usuario usuario) {
-        String consulta = "{call sp_actualizarusuario(?, ?, ?, ?, ?, ?, ?)}";
+    public boolean actualizar(MovimientoInventario movimiento) {
+        String consulta = "{call sp_actualizarmovimiento(?, ?, ?, ?, ?, ?)}";
+
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-            
-            consultaCall.setInt(1, usuario.getIdUsuario());
-            consultaCall.setString(2, usuario.getNombreUsuario());
-            consultaCall.setString(3, usuario.getNombre());
-            consultaCall.setString(4, usuario.getApellido());
-            consultaCall.setString(5, usuario.getCorreo());
-            consultaCall.setString(6, usuario.getRol().toLowerCase());
-            consultaCall.setBoolean(7, usuario.isEstado());
-            
+            consultaCall.setInt(1, movimiento.getIdMovimiento());
+            consultaCall.setString(2, movimiento.getIsbn());
+            consultaCall.setString(3, movimiento.getTipoMovimiento());
+            consultaCall.setInt(4, movimiento.getCantidad());
+            consultaCall.setInt(5, Integer.parseInt(movimiento.getIdUsuario()));
+            consultaCall.setString(6, movimiento.getObservaciòn());
             return consultaCall.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al actualizar Usuario: " + e.getMessage());
+            System.err.println("Error al actualizar movimiento: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("Error: El idUsuario debe ser un número entero válido: " + e.getMessage());
             return false;
         }
     }
-
     @Override
-    public boolean eliminar(int idUsuario) {
-        String consulta = "{call sp_eliminarusuario(?)}";
+    public boolean eliminar(int idMovimiento) {
+        String consulta = "{call sp_eliminarmovimiento(?)}";
+
         try (Connection conexion = ConexionSingleton.getInstancia().getConexion();
              CallableStatement consultaCall = conexion.prepareCall(consulta)) {
-            consultaCall.setInt(1, idUsuario);
+
+            consultaCall.setInt(1, idMovimiento);
             return consultaCall.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al eliminar Usuario: " + e.getMessage());
+            System.err.println("Error al eliminar movimiento: " + e.getMessage());
             return false;
         }
     }
-
 }

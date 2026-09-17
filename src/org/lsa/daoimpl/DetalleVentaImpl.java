@@ -3,7 +3,6 @@ package org.lsa.daoimpl;
 import org.lsa.dao.DetalleVentaDAO;
 import org.lsa.model.DetalleVenta;
 import org.lsa.utils.Conexion;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,16 +12,16 @@ import java.util.List;
 
 public class DetalleVentaImpl implements DetalleVentaDAO {
 
-    public boolean insertar(DetalleVenta objeto) {
+    public boolean insertar(DetalleVenta detalleVenta) {
         String sql = "{call sp_insertardetalleventa(?, ?, ?, ?, ?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, objeto.getNoVenta());
-            cs.setString(2, objeto.getIsbn());
-            cs.setInt(3, objeto.getCantidad());
-            cs.setDouble(4, objeto.getPrecioUnitario());
-            cs.setDouble(5, objeto.getSubTotalDetalle());
+            cs.setInt(1, detalleVenta.getNoVenta());
+            cs.setString(2, detalleVenta.getIsbn());
+            cs.setInt(3, detalleVenta.getCantidad());
+            cs.setDouble(4, detalleVenta.getPrecioUnitario());
+            cs.setDouble(5, detalleVenta.getSubTotalDetalle());
             
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -51,12 +50,12 @@ public class DetalleVentaImpl implements DetalleVentaDAO {
         return lista;
     }
 
-    public DetalleVenta buscar(Integer id) {
+    public DetalleVenta buscar(int idDetalleventa) {
         String sql = "{call sp_buscardetalleventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, id);
+            cs.setInt(1, idDetalleventa);
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
                     return new DetalleVenta(
@@ -91,16 +90,18 @@ public class DetalleVentaImpl implements DetalleVentaDAO {
         }
     }
 
-    public boolean eliminar(Integer id) {
+    public boolean eliminar(int idDetalleventa) {
         String sql = "{call sp_eliminardetalleventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, id);
+            cs.setInt(1, idDetalleventa);
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error [Eliminar Detalle Venta]: " + e.getMessage());
             return false;
         }
-    }
+    } 
+
+
 }
