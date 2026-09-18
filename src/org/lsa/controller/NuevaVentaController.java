@@ -1,261 +1,225 @@
 package org.lsa.controller;
 
+import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
+import org.lsa.dao.ClienteDAO;
+import org.lsa.dao.LibroDAO;
+import org.lsa.daoimpl.ClienteDAOImpl;
+import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.exception.ValidacionException;
 import org.lsa.model.Cliente;
 import org.lsa.model.DetalleVenta;
 import org.lsa.model.Libro;
-import org.lsa.utils.Conexion;
+import org.lsa.model.Usuario;
+import org.lsa.model.Venta;
+import org.lsa.service.VentaService;
+import org.lsa.system.Main;
+import org.lsa.utils.SesionUsuario;
 
 public class NuevaVentaController implements Initializable {
 
-    @FXML private ComboBox<Cliente> cmbCliente;  
-    @FXML private ComboBox<Libro> cmbLibro; 
-    @FXML private Spinner<Integer> spnCantidad;
+    private static final Logger log = Logger.getLogger(NuevaVentaController.class.getName());
+
+    @FXML private ComboBox<Cliente> cmbCliente;
+    @FXML private ComboBox<Libro> cmbLibro;
+    @FXML private Spinner<Integer> spCantidad;
+    @FXML private Button btnAgregar;
+    @FXML private Button btnRegistrar;
+    @FXML private Button btnQuitar;
+    @FXML private Button btnVaciar;
+    @FXML private TableView<DetalleVenta> tablaLineas;
+    @FXML private TableColumn<DetalleVenta, String> colIsbn;
+    @FXML private TableColumn<DetalleVenta, String> colTitulo;
+    @FXML private TableColumn<DetalleVenta, Double> colPrecio;
+    @FXML private TableColumn<DetalleVenta, Integer> colCantidad;
+    @FXML private TableColumn<DetalleVenta, Double> colSubtotal;
     @FXML private Label lblTotal;
+    @FXML private Label lblMensaje;
 
-    @FXML private TableView<DetalleVenta> tblUsuarios;
-    @FXML private TableColumn<DetalleVenta, String> colId;
-    @FXML private TableColumn<DetalleVenta, String> colUsuario;
-    @FXML private TableColumn<DetalleVenta, Double> colNombre;
-    @FXML private TableColumn<DetalleVenta, Integer> colApellido;
-    @FXML private TableColumn<DetalleVenta, Double> colCorreo;
-
-    private ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
-    private ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
-    private ObservableList<DetalleVenta> listaDetalles = FXCollections.observableArrayList();
-
-    private double totalVenta = 0.0;
+    private final ClienteDAO clienteDAO = new ClienteDAOImpl();
+    private final LibroDAO libroDAO = new LibroDAOImpl();
+    private final VentaService ventaService = new VentaService();
+    private final ObservableList<DetalleVenta> lineasVenta = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        cargarCombos();
+        tablaLineas.setItems(lineasVenta);
         configurarTabla();
         configurarSpinner();
-        cargarClientes();
-        cargarLibros();
+        calcularTotal();
+    }
+
+    private void cargarCombos() {
+        try {
+            cmbCliente.setItems(FXCollections.observableArrayList(clienteDAO.listarTodos()));
+            cmbLibro.setItems(FXCollections.observableArrayList(libroDAO.listar()));
+        } catch (Exception e) {
+            mostrarError("Error al cargar combos: " + e.getMessage());
+        }
     }
 
     private void configurarTabla() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        colUsuario.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("precioUnitario"));
-        colApellido.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
-        colCorreo.setCellValueFactory(new PropertyValueFactory<>("subTotalDetalle"));
-        tblUsuarios.setItems(listaDetalles);
+        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precioUnitario"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        colSubtotal.setCellValueFactory(new PropertyValueFactory<>("subTotalDetalle"));
     }
-
     private void configurarSpinner() {
-        SpinnerValueFactory<Integer> valueFactory = 
-            new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1);
-        spnCantidad.setValueFactory(valueFactory);
+        spCantidad.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, 1));
     }
 
-    private void cargarClientes() {
-        String sql = "SELECT cui, nombre_cliente, apellido_cliente, correo_electronico FROM clientes";
-        try (Connection conn = Conexion.getInstancia().conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            listaClientes.clear();
-            while (rs.next()) {
-                listaClientes.add(new Cliente(
-                    rs.getLong("cui"),
-                    rs.getString("nombre_cliente"),
-                    rs.getString("apellido_cliente"),
-                    rs.getString("correo_electronico")
-                ));
-            }
-            cmbCliente.setItems(listaClientes);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudieron cargar los clientes.");
+    private double calcularTotal() {
+        double total = 0;
+        for (DetalleVenta linea : lineasVenta) {
+            total += linea.getSubTotalDetalle();
         }
-    }      
-
-    private void cargarLibros() {
-        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, stock FROM libros";
-        try (Connection conn = Conexion.getInstancia().conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            listaLibros.clear();
-            while (rs.next()) {
-                listaLibros.add(new Libro(
-                    rs.getString("isbn"),
-                    rs.getString("titulo"),
-                    rs.getDate("fecha_publicacion"),
-                    rs.getDouble("precio"),
-                    rs.getInt("id_categoria"),
-                    rs.getString("nit_editorial"),
-                    rs.getInt("stock")
-                ));
-            }
-            cmbLibro.setItems(listaLibros);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudieron cargar los libros.");
-        }
+        lblTotal.setText(String.format("Total: Q%.2f", total));
+        return total;
     }
 
     @FXML
-    public void handleAgregarTabla(ActionEvent event) {
-        Libro libroSeleccionado = cmbLibro.getValue();
-        Integer cantidad = spnCantidad.getValue();
-
-        if (libroSeleccionado == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar un libro.");
+    private void handleAgregarLinea() {
+        Libro libro = cmbLibro.getValue();
+        if (libro == null) {
+            mostrarAdvertencia("Seleccione un libro para agregar a la venta.");
             return;
         }
+        int cantidadNueva = spCantidad.getValue();
+        int cantidadAcumulada = 0;
 
-        if (cantidad == null || cantidad <= 0) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Advertencia", "Ingrese una cantidad válida.");
-            return;
-        }
-
-        if (cantidad > libroSeleccionado.getStock()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Stock Insuficiente", 
-                "El libro seleccionado solo cuenta con " + libroSeleccionado.getStock() + " unidades en inventario.");
-            return;
-        }
-
-        boolean existe = false;
-        for (DetalleVenta d : listaDetalles) {
-            if (d.getIsbn().equals(libroSeleccionado.getIsbn())) {
-                int nuevaCantidad = d.getCantidad() + cantidad;
-                
-                if (nuevaCantidad > libroSeleccionado.getStock()) {
-                    mostrarAlerta(Alert.AlertType.WARNING, "Stock Insuficiente", 
-                        "La cantidad acumulada (" + nuevaCantidad + ") supera el stock disponible (" + libroSeleccionado.getStock() + ").");
-                    return;
-                }
-                
-                d.setCantidad(nuevaCantidad);
-                existe = true;
+        DetalleVenta itemExistente = null;
+        for (DetalleVenta item : lineasVenta) {
+            if (item.getIsbn().equals(libro.getIsbn())) {
+                itemExistente = item;
+                cantidadAcumulada = item.getCantidad();
                 break;
             }
         }
-
-        if (!existe) {
-            listaDetalles.add(new DetalleVenta(
-                libroSeleccionado.getIsbn(),
-                libroSeleccionado.getTitulo(),
-                libroSeleccionado.getPrecio(),
-                cantidad
-            ));
+        if (libro.getStock() < (cantidadAcumulada + cantidadNueva)) {
+            mostrarAdvertencia("Stock insuficiente. Disponible: " + libro.getStock() + ".");
+            return;
+        }
+        if (itemExistente != null) {
+            itemExistente.setCantidad(cantidadAcumulada + cantidadNueva);
+            tablaLineas.refresh();
+        } else {
+            DetalleVenta nuevoItem = new DetalleVenta(
+                libro.getIsbn(),
+                libro.getTitulo(),
+                libro.getPrecio(),
+                cantidadNueva
+            );
+            lineasVenta.add(nuevoItem);
         }
 
-        tblUsuarios.refresh();
         calcularTotal();
-    }
-
-    private void calcularTotal() {
-        totalVenta = 0.0;
-        for (DetalleVenta detalle : listaDetalles) {
-            totalVenta += detalle.getSubTotalDetalle();
-        }
-        lblTotal.setText(String.format("Total: Q%.2f", totalVenta));
+        lblMensaje.setText("");
+        cmbLibro.setValue(null);
+        spCantidad.getValueFactory().setValue(1);
     }
 
     @FXML
-    public void handleRegistrarventa(ActionEvent event) {
-        Cliente cliente = cmbCliente.getValue();
-        if (cliente == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar un cliente.");
+    private void handleQuitarLinea() {
+        DetalleVenta seleccion = tablaLineas.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            mostrarAdvertencia("Seleccione una línea de la tabla para quitar.");
             return;
         }
-        if (listaDetalles.isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Advertencia", "La lista de venta está vacía.");
+        lineasVenta.remove(seleccion);
+        calcularTotal();
+    }
+
+    @FXML
+    private void handleVaciar() {
+        lineasVenta.clear();
+        calcularTotal();
+        lblMensaje.setText("");
+    }
+@FXML
+private void handleRegistrarVenta() {
+    try {
+        Usuario usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
+        if (usuarioActual == null) {
+            throw new ValidacionException("No hay una sesión de usuario activa. Inicie sesión nuevamente.");
+        }
+        if (cmbCliente.getValue() == null) {
+            throw new ValidacionException("Seleccione el cliente de la venta.");
+        }
+        if (lineasVenta.isEmpty()) {
+            throw new ValidacionException("Agregue al menos un libro a la venta.");
+        }
+        int idUsuario = usuarioActual.getIdUsuario();
+        long cuiCliente = cmbCliente.getValue().getCui();
+        double totalCalculado = calcularTotal();
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
+        nuevaVenta.setDescuento(0.00);
+        nuevaVenta.setTotalVenta(totalCalculado);
+        nuevaVenta.setCuiCliente(cuiCliente);
+        nuevaVenta.setId_usuario(idUsuario);
+        boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
+        if (!exito) {
+            mostrarError("No se pudo registrar la venta. Verifique el stock.");
             return;
         }
-
-        String sqlVenta = "INSERT INTO Venta (id_cliente, total, fecha) VALUES (?, ?, NOW())";
-        String sqlDetalle = "INSERT INTO DetalleVenta (id_venta, isbn, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE libros SET stock = stock - ? WHERE isbn = ?";
-
-        Connection conn = null;
+        lblMensaje.setText("Venta registrada exitosamente.");
+        limpiarVenta();
+        cargarCombos();
+    } catch (ValidacionException e) {
+        mostrarAdvertencia(e.getMessage());
+        lblMensaje.setText(e.getMessage());
+    } catch (Exception e) {
+        mostrarError("Error al registrar la venta: " + e.getMessage());
+    }
+}
+    private void limpiarVenta() {
+        lineasVenta.clear();
+        cmbCliente.setValue(null);
+        cmbLibro.setValue(null);
+        spCantidad.getValueFactory().setValue(1);
+        calcularTotal();
+    }
+    @FXML
+    public void handleVolver(ActionEvent event) {
         try {
-            conn = Conexion.getInstancia().conectar();
-            conn.setAutoCommit(false);
-
-            PreparedStatement stmtVenta = conn.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
-            stmtVenta.setLong(1, cliente.getCui());
-            stmtVenta.setDouble(2, totalVenta);
-            stmtVenta.executeUpdate();
-
-            ResultSet rsKeys = stmtVenta.getGeneratedKeys();
-            int idVenta = 0;
-            if (rsKeys.next()) {
-                idVenta = rsKeys.getInt(1);
-            }
-
-            PreparedStatement stmtDetalle = conn.prepareStatement(sqlDetalle);
-            PreparedStatement stmtStock = conn.prepareStatement(sqlUpdateStock);
-
-            for (DetalleVenta d : listaDetalles) {
-                stmtDetalle.setInt(1, idVenta);
-                stmtDetalle.setString(2, d.getIsbn());
-                stmtDetalle.setInt(3, d.getCantidad());
-                stmtDetalle.setDouble(4, d.getPrecioUnitario());
-                stmtDetalle.addBatch();
-
-                stmtStock.setInt(1, d.getCantidad());
-                stmtStock.setString(2, d.getIsbn());
-                stmtStock.addBatch();
-            }
-
-            stmtDetalle.executeBatch();
-            stmtStock.executeBatch();
-
-            conn.commit();
-
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Venta registrada correctamente.");
-            limpiarFormulario();
-            cargarLibros();
-
-        } catch (SQLException e) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Falló el registro de la venta.");
+            Main.cambiarVista(
+                    "/org/lsa/view/DashboardCajeroView.fxml");
+        } catch (Exception e) {
+            mostrarError(
+                    "Error al volver al menú: "
+                    + e.getMessage()
+            );
         }
     }
-
-    private void limpiarFormulario() {
-        listaDetalles.clear();
-        cmbCliente.getSelectionModel().clearSelection();
-        cmbLibro.getSelectionModel().clearSelection();
-        spnCantidad.getValueFactory().setValue(1);
-        calcularTotal();
+    private void mostrarError(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
-
-    @FXML
-    public void handleVolverMenu(ActionEvent event) {
-    }
-
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
+    private void mostrarAdvertencia(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();

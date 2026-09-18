@@ -33,36 +33,61 @@ public class DetalleVenta {
         this.subTotalDetalle = precioUnitario * cantidad;
     }
 
-    // Getters y Setters
-    public int getIdDetalleventa() { return idDetalleventa; }
-    public void setIdDetalleventa(int idDetalleventa) { this.idDetalleventa = idDetalleventa; }
-
-    public int getNoVenta() { return noVenta; }
-    public void setNoVenta(int noVenta) { this.noVenta = noVenta; }
-
-    public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
-
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-
-    public int getCantidad() { return cantidad; }
-    public void setCantidad(int cantidad) { 
-        this.cantidad = cantidad; 
-        this.subTotalDetalle = this.precioUnitario * cantidad;
+    public int getIdDetalleventa() {
+        return idDetalleventa;
     }
 
-    public double getPrecioUnitario() { return precioUnitario; }
-    public void setPrecioUnitario(double precioUnitario) { 
-        this.precioUnitario = precioUnitario; 
-        this.subTotalDetalle = precioUnitario * this.cantidad;
+    public void setIdDetalleventa(int idDetalleventa) {
+        this.idDetalleventa = idDetalleventa;
     }
 
-    public double getSubTotalDetalle() { return subTotalDetalle; }
-    public void setSubTotalDetalle(double subTotalDetalle) { this.subTotalDetalle = subTotalDetalle; }
-
-    @Override
-    public String toString() {
-        return titulo + " x" + cantidad + " (Q" + subTotalDetalle + ")";
+    public int getNoVenta() {
+        return noVenta;
     }
+
+    public void setNoVenta(int noVenta) {
+        this.noVenta = noVenta;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public double getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public double getSubTotalDetalle() {
+        return subTotalDetalle;
+    }
+
+    public void setSubTotalDetalle(double subTotalDetalle) {
+        this.subTotalDetalle = subTotalDetalle;
+    }
+
+  
 }

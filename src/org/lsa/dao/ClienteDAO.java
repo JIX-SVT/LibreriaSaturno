@@ -1,12 +1,15 @@
-package org.lsa.dao;
 
-import java.util.List;
-import org.lsa.model.Cliente;
+    package org.lsa.dao;
 
-public interface ClienteDAO {
-    List<Cliente> listar() throws Exception;
-    Cliente buscarPorId(Long cui) throws Exception;
-    boolean crear(Cliente cliente) throws Exception;
-    boolean actualizar(Cliente cliente) throws Exception;
-    boolean eliminar(Long cui) throws Exception;
-}
+    import java.util.List;
+    import org.lsa.model.Cliente;
+
+
+    public interface ClienteDAO {  
+          List<Cliente> listarTodos();
+        Cliente buscarLibro (long cui);
+        boolean insertar(Cliente cliente);
+        boolean actualizar(Cliente cliente);
+        boolean eliminar(long cui);   
+
+    }
