@@ -80,17 +80,6 @@
                         </VBox>
                      </graphic>
                   </Button>
-                  <Button onAction="#handleDetalleVentas" prefHeight="150.0" prefWidth="200.0">
-                     <graphic>
-                        <VBox alignment="CENTER" spacing="8.0">
-                           <children>
-                              <Label style="-fx-font-size: 32px;" text="📋" />
-                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Detalle de Ventas" />
-                              <Label text="Líneas de cada&#10;venta registrada" textAlignment="CENTER" />
-                           </children>
-                        </VBox>
-                     </graphic>
-                  </Button>
                   <Button onAction="#handleListaVentas" prefHeight="150.0" prefWidth="200.0">
                      <graphic>
                         <VBox alignment="CENTER" spacing="8.0">
