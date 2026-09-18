@@ -6,113 +6,112 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.lsa.dao.ClienteDAO;
-import org.lsa.model.Cliente;
 import org.lsa.utils.Conexion;
+import org.lsa.model.Cliente;
 
 public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
-    public List<Cliente> listarTodos() {
-        List<Cliente> clientes = new ArrayList<>();
+    public List<Cliente> listar() throws Exception {
+        List<Cliente> lista = new ArrayList<>();
         String sql = "{call sp_listarclientes()}";
-
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql);
-             ResultSet rs = cs.executeQuery()) {
-
+        
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consulta = conexion.prepareCall(sql);
+             ResultSet rs = consulta.executeQuery()) {
+            
             while (rs.next()) {
-                Cliente cliente = new Cliente(
-                    rs.getLong("cui"),
-                    rs.getString("nombre_cliente"),
-                    rs.getString("apellido_cliente"),
-                    rs.getString("correo_electronico")
-                );
-                clientes.add(cliente);
+                Cliente c = new Cliente();
+                c.setCui(rs.getLong("cui"));
+                c.setNombreCliente(rs.getString("nombre_cliente"));
+                c.setApellidoCliente(rs.getString("apellido_cliente"));
+                c.setCorreoElectronico(rs.getString("correo_electronico"));
+                lista.add(c);
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar clientes: " + e.getMessage());
+            System.err.println("Error sp_listarclientes: " + e.getMessage());
+            throw e;
         }
-        return clientes;
+        return lista;
     }
 
     @Override
-    public Cliente buscarLibro(long cui) {
-        Cliente cliente = null;
+    public Cliente buscarPorId(Long cui) throws Exception {
+        Cliente c = null;
         String sql = "{call sp_buscarcliente(?)}";
-
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-
-            cs.setLong(1, cui);
-
-            try (ResultSet rs = cs.executeQuery()) {
+        
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consulta = conexion.prepareCall(sql)) {
+            
+            consulta.setLong(1, cui);
+            try (ResultSet rs = consulta.executeQuery()) {
                 if (rs.next()) {
-                    cliente = new Cliente(
-                        rs.getLong("cui"),
-                        rs.getString("nombre_cliente"),
-                        rs.getString("apellido_cliente"),
-                        rs.getString("correo_electronico")
-                    );
+                    c = new Cliente();
+                    c.setCui(rs.getLong("cui"));
+                    c.setNombreCliente(rs.getString("nombre_cliente"));
+                    c.setApellidoCliente(rs.getString("apellido_cliente"));
+                    c.setCorreoElectronico(rs.getString("correo_electronico"));
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al buscar cliente por CUI: " + e.getMessage());
+            System.err.println("Error sp_buscarcliente: " + e.getMessage());
+            throw e;
         }
-        return cliente;
+        return c;
     }
 
     @Override
-    public boolean insertar(Cliente cliente) {
-        String sql = "{call sp_insertarcliente(?, ?, ?, ?)}";
-
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-
-            cs.setLong(1, cliente.getCui());
-            cs.setString(2, cliente.getNombreCliente());
-            cs.setString(3, cliente.getApellidoCliente());
-            cs.setString(4, cliente.getCorreoElectronico());
-
-            return cs.executeUpdate() > 0;
+    public boolean crear(Cliente cliente) throws Exception {
+        String sql = "{call sp_insertarcliente(?,?,?,?)}";
+        
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consulta = conexion.prepareCall(sql)) {
+            
+            consulta.setLong(1, cliente.getCui());
+            consulta.setString(2, cliente.getNombreCliente());
+            consulta.setString(3, cliente.getApellidoCliente());
+            consulta.setString(4, cliente.getCorreoElectronico());
+            
+            return consulta.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al insertar cliente: " + e.getMessage());
-            return false;
+            System.err.println("Error sp_insertarcliente: " + e.getMessage());
+            throw e;
         }
     }
 
     @Override
-    public boolean actualizar(Cliente cliente) {
-        String sql = "{call sp_actualizarcliente(?, ?, ?, ?)}";
-
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-
-            cs.setLong(1, cliente.getCui());
-            cs.setString(2, cliente.getNombreCliente());
-            cs.setString(3, cliente.getApellidoCliente());
-            cs.setString(4, cliente.getCorreoElectronico());
-
-            return cs.executeUpdate() > 0;
+    public boolean actualizar(Cliente cliente) throws Exception {
+        String sql = "{call sp_actualizarcliente(?,?,?,?)}";
+        
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consulta = conexion.prepareCall(sql)) {
+            
+            consulta.setLong(1, cliente.getCui());
+            consulta.setString(2, cliente.getNombreCliente());
+            consulta.setString(3, cliente.getApellidoCliente());
+            consulta.setString(4, cliente.getCorreoElectronico());
+            
+            return consulta.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al actualizar cliente: " + e.getMessage());
-            return false;
+            System.err.println("Error sp_actualizarcliente: " + e.getMessage());
+            throw e;
         }
     }
 
     @Override
-    public boolean eliminar(long cui) {
+    public boolean eliminar(Long cui) throws Exception {
         String sql = "{call sp_eliminarcliente(?)}";
-
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql)) {
-
-            cs.setLong(1, cui);
-
-            return cs.executeUpdate() > 0;
+        
+        try (Connection conexion = Conexion.getInstancia().conectar();
+             CallableStatement consulta = conexion.prepareCall(sql)) {
+            
+            consulta.setLong(1, cui);
+            return consulta.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error al eliminar cliente: " + e.getMessage());
-            return false;
+            System.err.println("Error sp_eliminarcliente: " + e.getMessage());
+            throw e;
         }
     }
 }

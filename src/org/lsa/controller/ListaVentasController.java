@@ -128,7 +128,7 @@ public class ListaVentasController implements Initializable {
 
     private void cargarClientes() {
         try {
-            cmbCliente.setItems(FXCollections.observableArrayList(clienteDAO.listarTodos()));
+            cmbCliente.setItems(FXCollections.observableArrayList(clienteDAO.listar()));
         } catch (Exception e) {
             mostrarError("Error al cargar clientes: " + e.getMessage());
         }

@@ -49,7 +49,11 @@ public class LoginController {
             mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Correo o contraseña incorrectos, o usuario inactivo.");
             return;
         }
+
+        // --- REGISTRO DE SESIÓN EN AMBAS CLASES DE CONTROL ---
         ControlAcceso.setUsuarioLogueado(usuarioLogueado);
+        SesionUsuario.getInstancia().iniciarSesion(usuarioLogueado);
+
         String fxmlPath;
         String tituloVentana;
         String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().toLowerCase() : "";
