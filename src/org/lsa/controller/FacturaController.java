@@ -12,11 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.ac.dao.FacturaDAO;
-import org.ac.dao.impl.FacturaDAOImpl;
-import org.ac.exception.DaoException;
-import org.ac.model.LineaFactura;
-import org.ac.system.Principal;
+import org.lsa.dao.FacturaDAO;
+import org.lsa.daoimpl.FacturaDAOImpl;
+import org.lsa.exception.DaoException;
+import org.lsa.model.Factura;
+import org.lsa.system.Main;
+
 
 public class FacturaController implements Initializable {
 
@@ -29,7 +30,7 @@ public class FacturaController implements Initializable {
     }
 
     private final FacturaDAO facturaDAO = new FacturaDAOImpl();
-    private final ObservableList<LineaFactura> lineasFactura = FXCollections.observableArrayList();
+    private final ObservableList<Factura> lineasFactura = FXCollections.observableArrayList();
 
     @FXML
     private Label lblNoFactura;
@@ -46,7 +47,7 @@ public class FacturaController implements Initializable {
     @FXML
     private Label lblTotal;
     @FXML
-    private TableView<LineaFactura> tablaLineas;
+    private TableView<Factura> tablaLineas;
     @FXML
     private TableColumn colTitulo;
     @FXML
@@ -67,11 +68,11 @@ public class FacturaController implements Initializable {
     }
 
     public void configurarTabla() {
-        colTitulo.setCellValueFactory(new PropertyValueFactory<LineaFactura, String>("tituloLibro"));
-        colIsbn.setCellValueFactory(new PropertyValueFactory<LineaFactura, String>("isbnLibro"));
-        colCantidad.setCellValueFactory(new PropertyValueFactory<LineaFactura, Integer>("cantidad"));
-        colPrecioUnitario.setCellValueFactory(new PropertyValueFactory<LineaFactura, Double>("precioUnitario"));
-        colSubtotal.setCellValueFactory(new PropertyValueFactory<LineaFactura, Double>("subtotal"));
+        colTitulo.setCellValueFactory(new PropertyValueFactory<Factura, String>("tituloLibro"));
+        colIsbn.setCellValueFactory(new PropertyValueFactory<Factura, String>("isbnLibro"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<Factura, Integer>("cantidad"));
+        colPrecioUnitario.setCellValueFactory(new PropertyValueFactory<Factura, Double>("precioUnitario"));
+        colSubtotal.setCellValueFactory(new PropertyValueFactory<Factura, Double>("subtotal"));
     }
 
     private void cargarFactura() {
@@ -82,7 +83,7 @@ public class FacturaController implements Initializable {
                 return;
             }
             //La primera fila trae el encabezado repetido; se usa para llenar los labels.
-            LineaFactura encabezado = lineasFactura.get(0);
+            Factura encabezado = lineasFactura.get(0);
             lblNoFactura.setText("# " + encabezado.getNumeroFactura());
             lblFecha.setText(encabezado.getFechaEmision());
             lblCliente.setText(encabezado.getNombreCliente());
@@ -100,7 +101,7 @@ public class FacturaController implements Initializable {
     private void handleVolver() {
         try {
             //Regresa a la lista de ventas (origen de la factura), no al dashboard.
-            Principal.cambiarEscena("/org/ac/view/fxml/ListaVentasView.fxml");
+            Main.cambiarEscena("/org/ac/view/fxml/ListaVentasView.fxml");
         } catch (Exception e) {
             mostrarError("Error al volver al menú: " + e.getMessage());
         }
