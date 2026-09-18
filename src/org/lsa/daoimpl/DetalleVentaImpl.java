@@ -31,25 +31,28 @@ public class DetalleVentaImpl implements DetalleVentaDAO {
     }
 
     public List<DetalleVenta> listar() {
-        List<DetalleVenta> lista = new ArrayList<>();
-        String sql = "{call sp_listardetalleventa()}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql);
-             ResultSet rs = cs.executeQuery()) {
-            
-            while (rs.next()) {
-                lista.add(new DetalleVenta(
-                        rs.getString("isbn"),
-                    rs.getString("id_venta"),
-                        rs.getDouble("precio_unitario"),
-                    rs.getInt("cantidad")));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error [Listar Detalle Venta]: " + e.getMessage());
-        }
-        return lista;
-    }
+List<DetalleVenta> lista = new ArrayList<>();
+    String sql = "{call sp_listardetalleventa(?)}";
 
+ try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+        cs.setObject(1, null);
+        try (ResultSet rs = cs.executeQuery()) {
+            while (rs.next()) {
+                DetalleVenta dv = new DetalleVenta();
+                dv.setIdDetalleventa(rs.getInt("id_detalle"));
+                dv.setNoVenta(rs.getInt("id_venta"));
+                dv.setIsbn(rs.getString("isbn"));
+                dv.setCantidad(rs.getInt("cantidad"));
+                dv.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                dv.setSubTotalDetalle(rs.getDouble("subtotal"));
+                lista.add(dv);
+            }
+        }
+    } catch (SQLException e) {
+    }
+    return lista;
+}
     public DetalleVenta buscar(int idDetalleventa) {
         String sql = "{call sp_buscardetalleventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();

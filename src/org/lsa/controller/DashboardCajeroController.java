@@ -60,8 +60,8 @@ private void cargarDatosUsuario() {
 
     @FXML
     public void handleDetalleVentas(ActionEvent event) {
-        log.info("Navegando a Detalle de Ventas.");
-        mostrarAlerta(Alert.AlertType.INFORMATION, "Detalle de Ventas", "Módulo de detalle de ventas en desarrollo.");
+       log.info("Navegando a la pantalla de Nueva Venta.");
+        navegarA(event, "/org/lsa/view/DetalleVentaview.fxml", "Registro de Venta");
     }
 
     @FXML

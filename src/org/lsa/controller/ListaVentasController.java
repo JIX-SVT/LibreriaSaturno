@@ -40,6 +40,7 @@ import org.lsa.exception.ValidacionException;
 import org.lsa.model.Cliente;
 import org.lsa.model.Usuario;
 import org.lsa.model.Venta;
+import org.lsa.system.Main;
 import org.lsa.utils.ControlAcceso;
 
 public class ListaVentasController implements Initializable {
@@ -345,18 +346,15 @@ public class ListaVentasController implements Initializable {
     @FXML
     private void handleVolver(ActionEvent event) {
         try {
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardAdminView.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Panel de Administración");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al regresar al Dashboard", e);
-            mostrarError("No se pudo regresar al panel principal.");
+            Main.cambiarVista(
+                    "/org/lsa/view/DashboardCajeroView.fxml");
+        } catch (Exception e) {
+            mostrarError(
+                    "Error al volver al menú: "
+                    + e.getMessage()
+            );
         }
     }
-
     private void limpiarFormulario() {
         txtTotal.clear();
         dpFecha.setValue(null);

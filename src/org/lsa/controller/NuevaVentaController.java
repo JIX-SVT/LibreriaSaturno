@@ -30,6 +30,7 @@ import org.lsa.model.Libro;
 import org.lsa.model.Usuario;
 import org.lsa.model.Venta;
 import org.lsa.service.VentaService;
+import org.lsa.system.Main;
 import org.lsa.utils.SesionUsuario;
 
 public class NuevaVentaController implements Initializable {
@@ -200,15 +201,13 @@ private void handleRegistrarVenta() {
     @FXML
     public void handleVolver(ActionEvent event) {
         try {
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Panel de Cajero");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al regresar al Dashboard", e);
-            mostrarError("No se pudo regresar al panel principal.");
+            Main.cambiarVista(
+                    "/org/lsa/view/DashboardCajeroView.fxml");
+        } catch (Exception e) {
+            mostrarError(
+                    "Error al volver al menú: "
+                    + e.getMessage()
+            );
         }
     }
     private void mostrarError(String mensaje) {
