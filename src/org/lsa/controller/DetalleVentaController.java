@@ -1,89 +1,362 @@
 package org.lsa.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.StringConverter;
+
+import org.lsa.dao.DetalleVentaDAO;
+import org.lsa.dao.LibroDAO;
+import org.lsa.dao.VentaDAO;
+import org.lsa.daoimpl.DetalleVentaImpl;
+import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.daoimpl.VentaDAOImpl;
+import org.lsa.exception.DaoException;
+import org.lsa.exception.ValidacionException;
+import org.lsa.model.DetalleVenta;
+import org.lsa.model.Libro;
+import org.lsa.model.Venta;
+import org.lsa.system.Main;
 
 public class DetalleVentaController implements Initializable {
-    private static final Logger LOGGER = Logger.getLogger(DetalleVentaController.class.getName());
 
-    @FXML private TableView<VentaDTO> tblVentas;
-    @FXML private TableColumn<VentaDTO, String> colIdVenta;
-    @FXML private TableColumn<VentaDTO, String> colCliente;
-    @FXML private TableColumn<VentaDTO, String> colCajero;
-    @FXML private TableColumn<VentaDTO, Double> colTotal;
+    @FXML private ComboBox<Venta> cmbVenta;
+    @FXML private ComboBox<Libro> cmbLibro;
+    @FXML private TextField txtCantidad;
+    @FXML private TextField txtPrecio;
+    @FXML private Label lblMensaje;
+    @FXML private TableView<DetalleVenta> tablaDetalleVenta;
+    
+    @FXML private TableColumn<DetalleVenta, Integer> colIdDetalleVenta;
+    @FXML private TableColumn<DetalleVenta, Integer> colNoVenta;
+    @FXML private TableColumn<DetalleVenta, String> colIsbn;
+    @FXML private TableColumn<DetalleVenta, Integer> colCantidad;
+    @FXML private TableColumn<DetalleVenta, Double> colPrecio;
+    
+    @FXML private Button btnNuevo;
+    @FXML private Button btnEditar;
+    @FXML private Button btnPrimero;
+    @FXML private Button btnAnterior;
+    @FXML private Button btnSiguiente;
+    @FXML private Button btnUltimo;
+    @FXML private TextField txtBuscar;
 
-    @FXML private Label lblFacturaNumero;
-    @FXML private Label lblClienteDetalle;
-    @FXML private Label lblEmpleadoDetalle;
-    @FXML private Label lblTotalDetalle;
-    @FXML private Button btnImprimirLateral;
-
-    private ObservableList<VentaDTO> listaVentas = FXCollections.observableArrayList(
-        new VentaDTO("F-001/2026", "Renta Sol S.L.", "Admin", 1235.00),
-        new VentaDTO("F-002/2026", "Librería Central", "Cajero1", 450.50),
-        new VentaDTO("F-003/2026", "Juan Pérez", "Admin", 89.00)
-    );
+    private boolean Editar = false;
+    private DetalleVenta Editando;
+    
+    private final DetalleVentaDAO detalleVentaDAO = new DetalleVentaImpl();
+    private final VentaDAO ventaDAO = new VentaDAOImpl();
+    private final LibroDAO libroDAO = new LibroDAOImpl();
+    
+    private final ObservableList<DetalleVenta> listaDetalles = FXCollections.observableArrayList();
+    private final FilteredList<DetalleVenta> detallesFiltrados = new FilteredList<>(listaDetalles, p -> true);
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        colIdVenta.setCellValueFactory(new PropertyValueFactory<>("idVenta"));
-        colCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
-        colCajero.setCellValueFactory(new PropertyValueFactory<>("cajero"));
-        colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
-
-        tblVentas.setItems(listaVentas);
-
-        tblVentas.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                mostrarDetalleEnPanelLateral(newSelection);
-            }
-        });
-
-        LOGGER.info("Vista Maestro-Detalle limpia cargada correctamente.");
+    public void initialize(URL location, ResourceBundle resources) {
+        configurarTabla();
+        cargarTabla();
+        cargarCombos();
+        tablaDetalleVenta.setItems(detallesFiltrados);
+        seleccionarFila();
+        configurarBusqueda();
     }
 
-    private void mostrarDetalleEnPanelLateral(VentaDTO venta) {
-        lblFacturaNumero.setText("Factura: " + venta.getIdVenta());
-        lblClienteDetalle.setText("Cliente: " + venta.getCliente());
-        lblEmpleadoDetalle.setText("Empleado: " + venta.getCajero());
-        lblTotalDetalle.setText(String.format("Total: Q %.2f", venta.getTotal()));
+    public void configurarTabla() {
+        colIdDetalleVenta.setCellValueFactory(new PropertyValueFactory<>("idDetalleventa"));
+        colNoVenta.setCellValueFactory(new PropertyValueFactory<>("noVenta"));
+        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precioUnitario"));
+    }
+
+    private void cargarTabla() {
+        try {
+            listaDetalles.setAll(detalleVentaDAO.listar());
+        } catch (DaoException e) {
+            mostrarError(e.getMessage());
+        } catch (Exception e) {
+            mostrarError("Error al cargar la tabla de detalles: " + e.getMessage());
+        }
+    }
+
+    private void cargarCombos() {
+        try {
+            cmbVenta.setItems(FXCollections.observableArrayList(ventaDAO.listar()));
+            cmbVenta.setConverter(new StringConverter<Venta>() {
+                @Override
+                public String toString(Venta venta) {
+                    return venta == null ? "" : "Venta #" + venta.getIdVenta();
+                }
+
+                @Override
+                public Venta fromString(String string) {
+                    return null;
+                }
+            });
+
+            cmbLibro.setItems(FXCollections.observableArrayList(libroDAO.listar()));
+            cmbLibro.setConverter(new StringConverter<Libro>() {
+                @Override
+                public String toString(Libro libro) {
+                    return libro == null ? "" : libro.getIsbn() + " - " + libro.getTitulo();
+                }
+
+                @Override
+                public Libro fromString(String string) {
+                    return null;
+                }
+            });
+        } catch (DaoException e) {
+            mostrarError(e.getMessage());
+        } catch (Exception e) {
+            mostrarError("Error al cargar combos: " + e.getMessage());
+        }
+    }
+
+    private void configurarBusqueda() {
+        txtBuscar.textProperty().addListener((obs, oldValue, newValue) -> filtrarDetalles());
+    }
+
+    private void filtrarDetalles() {
+        String busqueda = txtBuscar.getText().trim().toLowerCase();
+        if (busqueda.isEmpty()) {
+            detallesFiltrados.setPredicate(p -> true);
+        } else {
+            detallesFiltrados.setPredicate(detalle ->
+                    String.valueOf(detalle.getIdDetalleventa()).contains(busqueda)
+                    || String.valueOf(detalle.getNoVenta()).contains(busqueda)
+                    || (detalle.getIsbn() != null && detalle.getIsbn().toLowerCase().contains(busqueda))
+                    || String.valueOf(detalle.getCantidad()).contains(busqueda)
+                    || String.valueOf(detalle.getPrecioUnitario()).contains(busqueda));
+        }
+    }
+
+    private void seleccionarFila() {
+        tablaDetalleVenta.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        cmbVenta.setValue(null);
+                        for (Venta venta : cmbVenta.getItems()) {
+                            if (venta.getIdVenta() == newSelection.getNoVenta()) {
+                                cmbVenta.setValue(venta);
+                                break;
+                            }
+                        }
+
+                        cmbLibro.setValue(null);
+                        for (Libro libro : cmbLibro.getItems()) {
+                            if (libro.getIsbn().equals(newSelection.getIsbn())) {
+                                cmbLibro.setValue(libro);
+                                break;
+                            }
+                        }
+
+                        txtCantidad.setText(String.valueOf(newSelection.getCantidad()));
+                        txtPrecio.setText(String.valueOf(newSelection.getPrecioUnitario()));
+                        desactivarFormulario();
+                    }
+                });
     }
 
     @FXML
-    private void handleImprimirFactura(ActionEvent event) {
-        VentaDTO seleccionada = tblVentas.getSelectionModel().getSelectedItem();
-        if (seleccionada == null) {
-            LOGGER.warning("Debe seleccionar una factura de la tabla para imprimir.");
-            return;
+    private void handleGuardar() {
+        try {
+            ValidacionException.validarNoNulo(cmbVenta.getValue(), "Seleccione una venta.");
+            ValidacionException.validarNoNulo(cmbLibro.getValue(), "Seleccione un libro.");
+            ValidacionException.validarNoVacio(txtCantidad.getText(), "cantidad");
+            ValidacionException.validarPositivo(txtCantidad.getText(), "cantidad");
+            ValidacionException.validarNoVacio(txtPrecio.getText(), "precio");
+            ValidacionException.validarDecimal(txtPrecio.getText(), "precio");
+
+            DetalleVenta detalle = new DetalleVenta(
+                    Editar ? Editando.getIdDetalleventa() : 0,
+                    cmbVenta.getValue().getIdVenta(),
+                    cmbLibro.getValue().getIsbn(),
+                    cmbLibro.getValue().getTitulo(),
+                    Integer.parseInt(txtCantidad.getText().trim()),
+                    Double.parseDouble(txtPrecio.getText().trim())
+            );
+
+            boolean guardado;
+            if (Editar) {
+                guardado = detalleVentaDAO.actualizar(detalle);
+            } else {
+                guardado = detalleVentaDAO.insertar(detalle);
+            }
+
+            if (guardado) {
+                lblMensaje.setText(Editar
+                        ? "Detalle de venta actualizado exitosamente."
+                        : "Detalle de venta registrado exitosamente.");
+                cargarTabla();
+                limpiarFormulario();
+                desactivarFormulario();
+                activarNavegacion();
+                Editar = false;
+            } else {
+                mostrarError("No se pudo guardar el detalle de venta.");
+            }
+        } catch (ValidacionException e) {
+            mostrarAdvertencia(e.getMessage()); 
+            lblMensaje.setText(e.getMessage());
+        } catch (Exception e) {
+            mostrarError("Error al guardar: " + e.getMessage());
         }
-        LOGGER.info("Imprimiendo comprobante de la factura: " + seleccionada.getIdVenta());
     }
 
-    public static class VentaDTO {
-        private String idVenta;
-        private String cliente;
-        private String cajero;
-        private double total;
+    @FXML
+    private void handleCancelar() {
+        limpiarFormulario();
+        desactivarFormulario();
+        activarNavegacion();
+        Editar = false;
+        Editando = null;
+        lblMensaje.setText("");
+    }
 
-        public VentaDTO(String idVenta, String cliente, String cajero, double total) {
-            this.idVenta = idVenta;
-            this.cliente = cliente;
-            this.cajero = cajero;
-            this.total = total;
+    @FXML
+    private void handleNuevo() {
+        Editar = false;
+        Editando = null;
+        limpiarFormulario();
+        activarFormulario();
+        desactivarNavegacion();
+        tablaDetalleVenta.getSelectionModel().clearSelection();
+        lblMensaje.setText("");
+        cmbVenta.requestFocus();
+    }
+
+    @FXML
+    private void handleEditar() {
+        DetalleVenta seleccion = tablaDetalleVenta.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            mostrarError("Seleccione un detalle de venta de la tabla para editar.");
+            return;
         }
+        Editar = true;
+        Editando = seleccion;
+        activarFormulario();
+        desactivarNavegacion();
+        lblMensaje.setText("");
+    }
 
-        public String getIdVenta() { return idVenta; }
-        public String getCliente() { return cliente; }
-        public String getCajero() { return cajero; }
-        public double getTotal() { return total; }
+    @FXML
+    private void handlePrimero() {
+        if (!tablaDetalleVenta.getItems().isEmpty()) {
+            tablaDetalleVenta.getSelectionModel().selectFirst();
+            tablaDetalleVenta.scrollTo(0);
+        }
+    }
+
+    @FXML
+    private void handleAnterior() {
+        if (!tablaDetalleVenta.getItems().isEmpty()) {
+            tablaDetalleVenta.getSelectionModel().selectPrevious();
+            if (tablaDetalleVenta.getSelectionModel().getSelectedIndex() >= 0) {
+                tablaDetalleVenta.scrollTo(tablaDetalleVenta.getSelectionModel().getSelectedIndex());
+            }
+        }
+    }
+
+    @FXML
+    private void handleSiguiente() {
+        if (!tablaDetalleVenta.getItems().isEmpty()) {
+            tablaDetalleVenta.getSelectionModel().selectNext();
+            if (tablaDetalleVenta.getSelectionModel().getSelectedIndex() >= 0) {
+                tablaDetalleVenta.scrollTo(tablaDetalleVenta.getSelectionModel().getSelectedIndex());
+            }
+        }
+    }
+
+    @FXML
+    private void handleUltimo() {
+        if (!tablaDetalleVenta.getItems().isEmpty()) {
+            tablaDetalleVenta.getSelectionModel().selectLast();
+            tablaDetalleVenta.scrollTo(tablaDetalleVenta.getItems().size() - 1);
+        }
+    }
+
+    @FXML
+    private void handleVolver() {
+        try {
+            Main.cambiarVista(
+                    "/org/lsa/view/DashboardCajeroView.fxml");
+        } catch (Exception e) {
+            mostrarError(
+                    "Error al volver al menú: "
+                    + e.getMessage()
+            );
+        }
+    }
+
+    private void limpiarFormulario() {
+        cmbVenta.setValue(null);
+        cmbLibro.setValue(null);
+        txtCantidad.clear();
+        txtPrecio.clear();
+    }
+
+    private void activarFormulario() {
+        cmbVenta.setDisable(false);
+        cmbLibro.setDisable(false);
+        txtCantidad.setDisable(false);
+        txtPrecio.setDisable(false);
+    }
+
+    private void desactivarFormulario() {
+        cmbVenta.setDisable(true);
+        cmbLibro.setDisable(true);
+        txtCantidad.setDisable(true);
+        txtPrecio.setDisable(true);
+    }
+
+    private void activarNavegacion() {
+        tablaDetalleVenta.setDisable(false);
+        btnNuevo.setDisable(false);
+        btnEditar.setDisable(false);
+        btnPrimero.setDisable(false);
+        btnAnterior.setDisable(false);
+        btnSiguiente.setDisable(false);
+        btnUltimo.setDisable(false);
+        txtBuscar.setDisable(false);
+    }
+
+    private void desactivarNavegacion() {
+        tablaDetalleVenta.setDisable(true);
+        btnNuevo.setDisable(true);
+        btnEditar.setDisable(true);
+        btnPrimero.setDisable(true);
+        btnAnterior.setDisable(true);
+        btnSiguiente.setDisable(true);
+        btnUltimo.setDisable(true);
+        txtBuscar.setDisable(true);
+    }
+
+    private void mostrarError(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
+    private void mostrarAdvertencia(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

@@ -1,57 +1,59 @@
 package org.lsa.utils;
- 
+
 import java.io.InputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
- 
 
 public class ConexionSingleton {
- 
+
     private static ConexionSingleton instancia;
     private Connection conexion;
- 
+
     private ConexionSingleton() {
-        // Constructor privado para el patrón Singleton
+        Properties properties = new Properties();
+
+        try (InputStream input = getClass().getResourceAsStream("/sql.properties")) {
+            if (input == null) {
+                System.err.println("No se pudo encontrar el archivo sql.properties en el classpath.");
+                return;
+            }
+            properties.load(input);
+
+            String url = properties.getProperty("db.url");
+            String usuario = properties.getProperty("db.user");
+            String clave = properties.getProperty("db.password");
+            String driver = properties.getProperty("db.driver", "com.mysql.cj.jdbc.Driver");
+
+            Class.forName(driver);
+            this.conexion = DriverManager.getConnection(url, usuario, clave);
+            System.out.println("Conexión inicializada con éxito desde sql.properties.");
+
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo sql.properties: " + e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("Error al conectar a la Base de Datos: " + e.getMessage());
+        }
     }
- 
-    public static synchronized ConexionSingleton getInstancia() {
-        if (instancia == null) {
+
+    public static synchronized ConexionSingleton getInstance() {
+        try {
+            if (instancia == null || instancia.getConexion() == null || instancia.getConexion().isClosed()) {
+                instancia = new ConexionSingleton();
+            }
+        } catch (SQLException e) {
             instancia = new ConexionSingleton();
         }
         return instancia;
     }
- 
-    public Connection conectar() throws SQLException {
-        if (this.conexion == null || this.conexion.isClosed()) {
-            Properties props = new Properties();
-            try (InputStream input = ConexionSingleton.class.getResourceAsStream("/db.properties")) {
-                if (input == null) {
-                    System.err.println("Error: No se encontró el archivo db.properties en la raíz del classpath.");
-                    throw new SQLException("No se encontró el archivo db.properties");
-                }
-                props.load(input);
-                String url = props.getProperty("db.url");
-                String user = props.getProperty("db.user");
-                String pass = props.getProperty("db.password");
- 
-                this.conexion = DriverManager.getConnection(url, user, pass);
-                System.out.println("Conexión inicializada con éxito.");
-            } catch (Exception e) {
-                System.err.println("Error al cargar la configuración de la base de datos: " + e.getMessage());
-                throw new SQLException(e);
-            }
-        }
-        return this.conexion;
+
+    public static synchronized ConexionSingleton getInstancia() {
+        return getInstance();
     }
- 
+
     public Connection getConexion() {
-        try {
-            return this.conectar();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }   
+        return conexion;
+    }
 }

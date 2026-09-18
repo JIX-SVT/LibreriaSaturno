@@ -2,25 +2,43 @@ package org.lsa.model;
 
 public class DetalleVenta {
 
-    private int idDetalleVenta;
+    private int idDetalleventa;
     private int noVenta;
     private String isbn;
-
-    public DetalleVenta(int idDetalleVenta, int noVenta, String isbn) {
-        this.idDetalleVenta = idDetalleVenta;
-        this.noVenta = noVenta;
-        this.isbn = isbn;
-    }
+    private String titulo;
+    private int cantidad;
+    private double precioUnitario;
+    private double subTotalDetalle;
 
     public DetalleVenta() {
     }
 
-    public int getIdDetalleVenta() {
-        return idDetalleVenta;
+    // Constructor para la vista/tabla antes de insertar en la BD
+    public DetalleVenta(String isbn, String titulo, double precioUnitario, int cantidad) {
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.precioUnitario = precioUnitario;
+        this.cantidad = cantidad;
+        this.subTotalDetalle = precioUnitario * cantidad;
     }
 
-    public void setIdDetalleVenta(int idDetalleVenta) {
-        this.idDetalleVenta = idDetalleVenta;
+    // Constructor completo para BD
+    public DetalleVenta(int idDetalleventa, int noVenta, String isbn, String titulo, int cantidad, double precioUnitario) {
+        this.idDetalleventa = idDetalleventa;
+        this.noVenta = noVenta;
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subTotalDetalle = precioUnitario * cantidad;
+    }
+
+    public int getIdDetalleventa() {
+        return idDetalleventa;
+    }
+
+    public void setIdDetalleventa(int idDetalleventa) {
+        this.idDetalleventa = idDetalleventa;
     }
 
     public int getNoVenta() {
@@ -39,9 +57,37 @@ public class DetalleVenta {
         this.isbn = isbn;
     }
 
-    @Override
-    public String toString() {
-        return "DetalleVenta{" + "idDetalleVenta=" + idDetalleVenta + ", noVenta=" + noVenta + ", isbn=" + isbn + '}';
+    public String getTitulo() {
+        return titulo;
     }
-    
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public double getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public double getSubTotalDetalle() {
+        return subTotalDetalle;
+    }
+
+    public void setSubTotalDetalle(double subTotalDetalle) {
+        this.subTotalDetalle = subTotalDetalle;
+    }
+
+  
 }

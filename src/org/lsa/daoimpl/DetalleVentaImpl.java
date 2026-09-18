@@ -1,9 +1,8 @@
 package org.lsa.daoimpl;
 
-import org.lsa.utils.Conexion;
-import org.lsa.model.DetalleVenta;
 import org.lsa.dao.DetalleVentaDAO;
-
+import org.lsa.model.DetalleVenta;
+import org.lsa.utils.Conexion;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -13,93 +12,99 @@ import java.util.List;
 
 public class DetalleVentaImpl implements DetalleVentaDAO {
 
-    @Override
-    public boolean insertar(DetalleVenta objeto) {
-        String sql = "{call sp_insertardetalleventa(?, ?)}";
+    public boolean insertar(DetalleVenta detalleVenta) {
+        String sql = "{call sp_insertardetalleventa(?, ?, ?, ?, ?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, objeto.getNoVenta());
-            cs.setString(2, objeto.getIsbn());
+            cs.setInt(1, detalleVenta.getNoVenta());
+            cs.setString(2, detalleVenta.getIsbn());
+            cs.setInt(3, detalleVenta.getCantidad());
+            cs.setDouble(4, detalleVenta.getPrecioUnitario());
+            cs.setDouble(5, detalleVenta.getSubTotalDetalle());
             
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error [Insertar Detalle]: " + e.getMessage());
+            System.err.println("Error [Insertar Detalle Venta]: " + e.getMessage());
             return false;
         }
     }
 
-    @Override
     public List<DetalleVenta> listar() {
-        List<DetalleVenta> lista = new ArrayList<>();
-        String sql = "{call sp_listardetalleventa()}";
-        try (Connection con = Conexion.getInstancia().conectar();
-             CallableStatement cs = con.prepareCall(sql);
-             ResultSet rs = cs.executeQuery()) {
-            
-            while (rs.next()) {
-                lista.add(new DetalleVenta(
-                    rs.getInt("id_detalle_venta"),
-                    rs.getInt("no_venta"),
-                    rs.getString("isbn")
-                ));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error [Listar Detalle]: " + e.getMessage());
-        }
-        return lista;
-    }
+List<DetalleVenta> lista = new ArrayList<>();
+    String sql = "{call sp_listardetalleventa(?)}";
 
-    @Override
-    public DetalleVenta buscar(Integer id) {
+ try (Connection con = Conexion.getInstancia().conectar();
+             CallableStatement cs = con.prepareCall(sql)) {
+        cs.setObject(1, null);
+        try (ResultSet rs = cs.executeQuery()) {
+            while (rs.next()) {
+                DetalleVenta dv = new DetalleVenta();
+                dv.setIdDetalleventa(rs.getInt("id_detalle"));
+                dv.setNoVenta(rs.getInt("id_venta"));
+                dv.setIsbn(rs.getString("isbn"));
+                dv.setCantidad(rs.getInt("cantidad"));
+                dv.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                dv.setSubTotalDetalle(rs.getDouble("subtotal"));
+                lista.add(dv);
+            }
+        }
+    } catch (SQLException e) {
+    }
+    return lista;
+}
+    public DetalleVenta buscar(int idDetalleventa) {
         String sql = "{call sp_buscardetalleventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, id);
+            cs.setInt(1, idDetalleventa);
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
                     return new DetalleVenta(
-                        rs.getInt("id_detalle_venta"),
-                        rs.getInt("no_venta"),
-                        rs.getString("isbn")
-                    );
+                            rs.getString("isbn"),
+                        rs.getString("id_venta"),
+                            rs.getDouble("precio_unitario"),
+                        rs.getInt("cantidad"));
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error [Buscar Detalle]: " + e.getMessage());
+            System.err.println("Error [Buscar Detalle Venta]: " + e.getMessage());
         }
         return null;
     }
 
-    @Override
     public boolean actualizar(DetalleVenta objeto) {
-        String sql = "{call sp_actualizardetalleventa(?, ?, ?)}";
+        String sql = "{call sp_actualizardetalleventa(?, ?, ?, ?, ?, ?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, objeto.getIdDetalleVenta());
+            cs.setInt(1, objeto.getIdDetalleventa());
             cs.setInt(2, objeto.getNoVenta());
             cs.setString(3, objeto.getIsbn());
+            cs.setInt(4, objeto.getCantidad());
+            cs.setDouble(5, objeto.getPrecioUnitario());
+            cs.setDouble(6, objeto.getSubTotalDetalle());
             
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error [Actualizar Detalle]: " + e.getMessage());
+            System.err.println("Error [Actualizar Detalle Venta]: " + e.getMessage());
             return false;
         }
     }
 
-    @Override
-    public boolean eliminar(Integer id) {
+    public boolean eliminar(int idDetalleventa) {
         String sql = "{call sp_eliminardetalleventa(?)}";
         try (Connection con = Conexion.getInstancia().conectar();
              CallableStatement cs = con.prepareCall(sql)) {
             
-            cs.setInt(1, id);
+            cs.setInt(1, idDetalleventa);
             return cs.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error [Eliminar Detalle]: " + e.getMessage());
+            System.err.println("Error [Eliminar Detalle Venta]: " + e.getMessage());
             return false;
         }
-    }
+    } 
+
+
 }

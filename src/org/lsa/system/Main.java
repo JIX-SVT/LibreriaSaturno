@@ -1,38 +1,69 @@
 package org.lsa.system;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class Main extends Application {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger log = Logger.getLogger(Main.class.getName());
+    private static Stage escenarioPrincipal;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage escenarioPrincipal) throws Exception {
+        log.info("Iniciando aplicación Librería Saturno...");
+        this.escenarioPrincipal = escenarioPrincipal;
+        
         try {
-            
-            Parent root = FXMLLoader.load(getClass().getResource("/org/lsa/view/DetalleVentaView.fxml"));
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
+            Parent root = loader.load();
             Scene scene = new Scene(root);
-            primaryStage.setTitle("Librería Saturno - Módulo de Gestión de Ventas y Facturación");
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(true);
-            primaryStage.show();
+            escenarioPrincipal.setTitle("Librería Saturno");
+            escenarioPrincipal.setScene(scene);
+            escenarioPrincipal.show();
+            Main.escenarioPrincipal = escenarioPrincipal;     
+            
+            cambiarEscena("/org/lsa/view/LoginView.fxml");
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Fallo crítico al inicializar la ventana principal en start()", e);
+            throw e;
+        }
+    }
 
-            LOGGER.info("Aplicación iniciada mostrando el módulo Maestro-Detalle de Ventas.");
+    public static void cambiarVista(String fxmlPath) throws Exception {
+        log.info("Cambiando vista a: " + fxmlPath);
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
+            Parent root = loader.load();
+            escenarioPrincipal.setScene(new Scene(root));
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error al cambiar vista hacia: " + fxmlPath, e);
+            throw e;
+        }
+    }
+    
+    public static void cambiarEscena(String rutaFXML) throws IOException {
+        log.info("Cargando escena desde: " + rutaFXML);
+        try {
+            Parent raiz = FXMLLoader.load(Main.class.getResource(rutaFXML));                
+            Scene escena = new Scene(raiz); 
+            escenarioPrincipal.setScene(escena);
+            escenarioPrincipal.sizeToScene();
+            escenarioPrincipal.centerOnScreen();
+            escenarioPrincipal.show();        
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al cargar la vista principal de ventas", e);
+            log.log(Level.SEVERE, "Error de I/O al cargar la escena FXML: " + rutaFXML, e);
+            throw e;
         }
     }
 
     public static void main(String[] args) {
+        log.info("Lanzando JavaFX Application...");
         launch(args);
     }
 }

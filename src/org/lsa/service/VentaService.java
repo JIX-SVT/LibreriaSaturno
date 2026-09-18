@@ -31,9 +31,9 @@ public class VentaService {
     }
 
     public boolean procesarVenta(Venta venta, List<DetalleVenta> detalles) {
-        
         for (DetalleVenta det : detalles) {
-            if (!validarStock(det.getIsbn(), 1)) {
+            int cantidadRequerida = det.getCantidad() > 0 ? det.getCantidad() : 1;
+            if (!validarStock(det.getIsbn(), cantidadRequerida)) {
                 System.err.println("Stock insuficiente para el libro ISBN: " + det.getIsbn());
                 return false;
             }
@@ -44,51 +44,52 @@ public class VentaService {
             con = Conexion.getInstancia().conectar();
             con.setAutoCommit(false); 
 
-            // A. Registrar Venta Maestra (compras)
-            String sqlVenta = "{call sp_insertarventa(?, ?, ?)}";
-            int noVentaGenerado = -1;
+            String sqlVenta = "{call sp_insertarventa(?, ?, ?, ?, ?, ?)}";
+            int idVentaGenerado = -1;
 
             try (CallableStatement csVenta = con.prepareCall(sqlVenta)) {
-                csVenta.setDouble(1, venta.getTotalVenta());
-                csVenta.setLong(2, venta.getCuiCliente());
-                csVenta.registerOutParameter(3, Types.INTEGER); 
+                double subtotalNum = Double.parseDouble(venta.getSubTotal().replace(",", "."));
                 
+                csVenta.setDouble(1, subtotalNum);
+                csVenta.setDouble(2, venta.getDescuento());
+                csVenta.setDouble(3, venta.getTotalVenta());
+                csVenta.setLong(4, venta.getCuiCliente());
+                csVenta.setInt(5, venta.getId_usuario());
+                csVenta.registerOutParameter(6, Types.INTEGER);
+
                 csVenta.executeUpdate();
-                noVentaGenerado = csVenta.getInt(3);
+                idVentaGenerado = csVenta.getInt(6);
             }
 
-            if (noVentaGenerado <= 0) {
+            if (idVentaGenerado <= 0) {
                 con.rollback();
                 return false;
             }
 
-            String sqlDetalle = "{call sp_insertardetallecompra(?, ?)}";
-            String sqlStock = "{call sp_descontarstock(?, ?)}";
+            String sqlDetalle = "{call sp_insertardetalleventa(?, ?, ?, ?, ?)}";
 
-            for (DetalleVenta det : detalles) {
-                det.setNoVenta(noVentaGenerado);
+            try (CallableStatement csDetalle = con.prepareCall(sqlDetalle)) {
+                for (DetalleVenta det : detalles) {
+                    det.setNoVenta(idVentaGenerado);
 
-                try (CallableStatement csDetalle = con.prepareCall(sqlDetalle)) {
                     csDetalle.setInt(1, det.getNoVenta());
                     csDetalle.setString(2, det.getIsbn());
+                    csDetalle.setInt(3, det.getCantidad());
+                    csDetalle.setDouble(4, det.getPrecioUnitario());
+                    csDetalle.setDouble(5, det.getSubTotalDetalle());
+                    
                     csDetalle.executeUpdate();
-                }
-
-                try (CallableStatement csStock = con.prepareCall(sqlStock)) {
-                    csStock.setString(1, det.getIsbn());
-                    csStock.setInt(2, 1);
-                    csStock.executeUpdate();
                 }
             }
 
             con.commit();
             return true;
 
-        } catch (SQLException e) {
+        } catch (SQLException | NumberFormatException e) {
             System.err.println("Error en la transacción de venta. Ejecutando Rollback... " + e.getMessage());
             if (con != null) {
                 try {
-                    con.rollback(); 
+                    con.rollback();
                 } catch (SQLException ex) {
                     System.err.println("Error al ejecutar Rollback: " + ex.getMessage());
                 }

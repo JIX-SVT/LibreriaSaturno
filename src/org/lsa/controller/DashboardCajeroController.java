@@ -2,11 +2,9 @@ package org.lsa.controller;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,126 +12,92 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.lsa.model.Usuario;
 
-import org.lsa.dao.LibroDAO;
-import org.lsa.daoimpl.LibroDAOImpl;
-import org.lsa.model.Libro;
 import org.lsa.utils.SesionUsuario;
 
 public class DashboardCajeroController implements Initializable {
 
-    @FXML private TextField txtBusqueda;
-    @FXML private TableView<Libro> tblLibros; 
-    @FXML private TableColumn<Libro, String> colIsbn;
-    @FXML private TableColumn<Libro, String> colTitulo;
-    @FXML private TableColumn<Libro, String> colAutor;
-    @FXML private TableColumn<Libro, Double> colPrecio;
-    @FXML private Label lblVentasHoy;
+    private static final Logger log = Logger.getLogger(DashboardCajeroController.class.getName());
 
-    private final LibroDAO libroDAO = new LibroDAOImpl();
-
-    private final ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
-    private final FilteredList<Libro> librosFiltrados = new FilteredList<>(listaLibros, p -> true);
+    @FXML private Label lblNombreUsuario;
+    @FXML private Label lblRolUsuario;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        configurarTabla();
-        cargarTabla();
-        tblLibros.setItems(librosFiltrados);
-        configurarBusqueda();
-        actualizarVentasHoy();
+        cargarDatosUsuario();
     }
-
-    private void configurarTabla() {
-        colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));        
-        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-        cargarDatosTabla();
-    }
-
-    private void cargarTabla() {
-        listaLibros.clear();
-        listaLibros.addAll(libroDAO.listarTodos());
-    }
-
-    private void configurarBusqueda() {
-        txtBusqueda.textProperty().addListener(
-            (obs, oldValue, newValue) -> filtrarLibros()
-        );
-    }
-
-    private void filtrarLibros() {
-        String busqueda = txtBusqueda.getText().trim().toLowerCase();
-
-        if (busqueda.isEmpty()) {
-            librosFiltrados.setPredicate(p -> true);
-        } else {
-            librosFiltrados.setPredicate(libro -> {
-                boolean coincideTitulo = libro.getTitulo() != null 
-                        && libro.getTitulo().toLowerCase().contains(busqueda);
-
-                boolean coincideAutor = libro.getAutor() != null 
-                        && libro.getAutor().toLowerCase().contains(busqueda);
-
-                String isbnStr = String.valueOf(libro.getIsbn());
-                boolean coincideIsbn = isbnStr.contains(busqueda);
-
-                return coincideTitulo || coincideAutor || coincideIsbn;
-            });
+private void cargarDatosUsuario() {
+    Usuario usuario = SesionUsuario.getInstancia().getUsuarioActual();
+    if (usuario != null) {
+        String nombre = usuario.getNombre() != null ? usuario.getNombre() : usuario.getNombreUsuario();
+        String apellido = usuario.getApellido() != null ? usuario.getApellido() : "";
+        String rol = usuario.getRol() != null ? usuario.getRol() : "Cajero";
+        if (lblNombreUsuario != null) {
+            lblNombreUsuario.setText(nombre);
+        }
+        if (lblRolUsuario != null) {
+            String inicialNombre = !nombre.isEmpty() ? nombre.substring(0, 1).toUpperCase() : "U";
+            String inicialApellido = !apellido.isEmpty() ? apellido.substring(0, 1).toUpperCase() : "";
+            lblRolUsuario.setText(inicialNombre + inicialApellido + " · " + rol);
         }
     }
-
-    private void actualizarVentasHoy() {
-    }
-
-    @FXML
-    public void handleBuscar(ActionEvent event) {
-        filtrarLibros();
-    }
-    @FXML
-public void cargarDatosTabla() {
-    List<Libro> librosObtenidos = libroDAO.listarTodos();
-    listaLibros.clear();
-    listaLibros.addAll(librosObtenidos);
-    tblLibros.setItems(listaLibros); 
 }
+    @FXML
+    public void handleNuevaVenta(ActionEvent event) {
+        log.info("Navegando a la pantalla de Nueva Venta.");
+        navegarA(event, "/org/lsa/view/NuevaVentaView.fxml", "Registro de Venta");
+    }
 
     @FXML
-    public void handleVolverMenu(ActionEvent event) {
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardMenuView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Librería Saturno - Menú Principal");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo cargar la vista del menú.", ButtonType.OK);
-            alerta.showAndWait();
-        }
+    public void handleResumenDia(ActionEvent event) {
+        log.info("Navegando al Resumen del Día.");
+        mostrarAlerta(Alert.AlertType.INFORMATION, "Resumen del Día", "Módulo de resumen en desarrollo.");
+    }
+
+    @FXML
+    public void handleDetalleVentas(ActionEvent event) {
+       log.info("Navegando a la pantalla de Nueva Venta.");
+        navegarA(event, "/org/lsa/view/DetalleVentaview.fxml", "Registro de Venta");
+    }
+
+    @FXML
+    public void handleListaVentas(ActionEvent event) {
+        log.info("Navegando a Lista de Ventas.");
+      navegarA(event, "/org/lsa/view/ListaVentasView.fxml", "Listado de Venta");
     }
 
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
+        log.info("Cerrando sesión de usuario e intentando volver al Login.");
         SesionUsuario.getInstancia().cerrarSesion();
+        navegarA(event, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
+    }
+
+
+    private void navegarA(ActionEvent event, String rutaFxml, String tituloVista) {
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(rutaFxml));
             Parent root = loader.load();
             Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Inicio de Sesión");
+            escenarioPrincipal.setTitle(tituloVista);
             escenarioPrincipal.setScene(scene);
             escenarioPrincipal.show();
         } catch (IOException e) {
-            e.printStackTrace();
-            Alert alerta = new Alert(Alert.AlertType.ERROR, "No se pudo regresar al login.", ButtonType.OK);
-            alerta.showAndWait();
+            log.log(Level.SEVERE, "Error al intentar cargar la vista: " + rutaFxml, e);
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista seleccionada.");
         }
     }
 
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 }

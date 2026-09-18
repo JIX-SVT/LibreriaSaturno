@@ -38,7 +38,7 @@
 <Button fx:id="btnDesactivar" onAction="#handleDesactivarUsuario" prefWidth="120" text="Desactivar" />
 <Button fx:id="btnLimpiar" onAction="#handleLimpiarUsuario" prefWidth="120" text="Limpiar" />
 </HBox>
-<Button fx:id="btnVolverMenu" onAction="#handleCambiarContraseña" prefWidth="120" text="Cambiar Contraseña" />
+<Button fx:id="btnVolverMenu" onAction="#handleCambiarContrasena" prefWidth="120" text="Cambiar Contraseña" />
 <Button fx:id="btnVolverMenu1" onAction="#handleVolverMenu" prefWidth="120" text="Volver al Menú" />
 </VBox>
 </left>
