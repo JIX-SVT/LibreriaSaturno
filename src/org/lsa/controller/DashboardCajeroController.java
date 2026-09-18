@@ -67,7 +67,7 @@ private void cargarDatosUsuario() {
     @FXML
     public void handleListaVentas(ActionEvent event) {
         log.info("Navegando a Lista de Ventas.");
-        mostrarAlerta(Alert.AlertType.INFORMATION, "Lista de Ventas", "Módulo de lista de ventas en desarrollo.");
+      navegarA(event, "/org/lsa/view/ListaVentasView.fxml", "Listado de Venta");
     }
 
     @FXML

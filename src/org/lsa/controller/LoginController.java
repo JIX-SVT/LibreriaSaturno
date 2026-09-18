@@ -17,6 +17,7 @@ import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
 import org.lsa.model.Usuario;
 import org.lsa.utils.ControlAcceso;
+import org.lsa.utils.SesionUsuario;
 
 public class LoginController {
 
@@ -48,9 +49,7 @@ public class LoginController {
             mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Correo o contraseña incorrectos, o usuario inactivo.");
             return;
         }
-
         ControlAcceso.setUsuarioLogueado(usuarioLogueado);
-
         String fxmlPath;
         String tituloVentana;
         String rol = usuarioLogueado.getRol() != null ? usuarioLogueado.getRol().toLowerCase() : "";

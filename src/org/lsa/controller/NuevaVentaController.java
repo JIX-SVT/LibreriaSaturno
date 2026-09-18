@@ -27,6 +27,7 @@ import org.lsa.exception.ValidacionException;
 import org.lsa.model.Cliente;
 import org.lsa.model.DetalleVenta;
 import org.lsa.model.Libro;
+import org.lsa.model.Usuario;
 import org.lsa.model.Venta;
 import org.lsa.service.VentaService;
 import org.lsa.utils.SesionUsuario;
@@ -152,41 +153,43 @@ public class NuevaVentaController implements Initializable {
         calcularTotal();
         lblMensaje.setText("");
     }
-
-    @FXML
-    private void handleRegistrarVenta() {
-        try {
-            if (cmbCliente.getValue() == null) {
-                throw new ValidacionException("Seleccione el cliente de la venta.");
-            }
-            if (lineasVenta.isEmpty()) {
-                throw new ValidacionException("Agregue al menos un libro a la venta.");
-            }
-
-            int idUsuario = SesionUsuario.getInstancia().getUsuarioActual().getIdUsuario();
-            long cuiCliente = cmbCliente.getValue().getCui();
-            double totalCalculado = calcularTotal();
-            Venta nuevaVenta = new Venta();
-            nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
-            nuevaVenta.setDescuento(0.00);
-            nuevaVenta.setTotalVenta(totalCalculado);
-            nuevaVenta.setCuiCliente(cuiCliente);
-            nuevaVenta.setId_usuario(idUsuario);
-            boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
-            if (!exito) {
-                mostrarError("No se pudo registrar la venta. Verifique el stock.");
-                return;
-            }
-            lblMensaje.setText("Venta registrada exitosamente.");
-            limpiarVenta();
-            cargarCombos();
-        } catch (ValidacionException e) {
-            mostrarAdvertencia(e.getMessage());
-            lblMensaje.setText(e.getMessage());
-        } catch (Exception e) {
-            mostrarError("Error al registrar la venta: " + e.getMessage());
+@FXML
+private void handleRegistrarVenta() {
+    try {
+        Usuario usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
+        if (usuarioActual == null) {
+            throw new ValidacionException("No hay una sesión de usuario activa. Inicie sesión nuevamente.");
         }
+        if (cmbCliente.getValue() == null) {
+            throw new ValidacionException("Seleccione el cliente de la venta.");
+        }
+        if (lineasVenta.isEmpty()) {
+            throw new ValidacionException("Agregue al menos un libro a la venta.");
+        }
+        int idUsuario = usuarioActual.getIdUsuario();
+        long cuiCliente = cmbCliente.getValue().getCui();
+        double totalCalculado = calcularTotal();
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
+        nuevaVenta.setDescuento(0.00);
+        nuevaVenta.setTotalVenta(totalCalculado);
+        nuevaVenta.setCuiCliente(cuiCliente);
+        nuevaVenta.setId_usuario(idUsuario);
+        boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
+        if (!exito) {
+            mostrarError("No se pudo registrar la venta. Verifique el stock.");
+            return;
+        }
+        lblMensaje.setText("Venta registrada exitosamente.");
+        limpiarVenta();
+        cargarCombos();
+    } catch (ValidacionException e) {
+        mostrarAdvertencia(e.getMessage());
+        lblMensaje.setText(e.getMessage());
+    } catch (Exception e) {
+        mostrarError("Error al registrar la venta: " + e.getMessage());
     }
+}
     private void limpiarVenta() {
         lineasVenta.clear();
         cmbCliente.setValue(null);
