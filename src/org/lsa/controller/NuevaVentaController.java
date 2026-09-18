@@ -60,7 +60,7 @@ public class NuevaVentaController implements Initializable {
 
     private void cargarCombos() {
         try {
-            cmbCliente.setItems(FXCollections.observableArrayList(clienteDAO.listarTodos()));
+            cmbCliente.setItems(FXCollections.observableArrayList(clienteDAO.listar()));
             cmbLibro.setItems(FXCollections.observableArrayList(libroDAO.listar()));
         } catch (Exception e) {
             mostrarError("Error al cargar combos: " + e.getMessage());
