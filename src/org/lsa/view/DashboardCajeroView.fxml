@@ -4,40 +4,118 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="654.0" prefWidth="576.0" spacing="15.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
-    <padding>
-        <Insets bottom="20" left="20" right="20" top="20" />
-    </padding>
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Panel Caja " />
-        <Region HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleCerrarSesion" text="Cerrar Sesión" />
-    </HBox>
-    <VBox spacing="10">
-        <Label style="-fx-font-weight: bold;" text="Buscador de Libros" />
-        <HBox spacing="10">
-            <TextField fx:id="txtBusqueda" promptText="Buscar por Título, Autor o ISBN..." HBox.hgrow="ALWAYS" />
-        </HBox>
-        <TableView fx:id="tblLibros" prefHeight="419.0" prefWidth="536.0">
-            <columns>
-                <TableColumn fx:id="colIsbn" prefWidth="120.0" text="ISBN" />
-                <TableColumn fx:id="colTitulo" prefWidth="110.0" text="Título" />
-                <TableColumn fx:id="colPrecio" prefWidth="148.0" text="Precio" />
-                <TableColumn fx:id="colStock" prefWidth="156.0" text="Stock" />
-            </columns>
-        </TableView>
-    </VBox>
-    <Separator />
-   <Button onAction="#handlenuevaventa" prefHeight="41.0" prefWidth="97.0" text="+ Nueva Venta" />
-    <VBox spacing="10" VBox.vgrow="ALWAYS">
-        <HBox alignment="CENTER_LEFT" spacing="10" />
-        <HBox alignment="CENTER_RIGHT" spacing="15" />
-    </VBox>
-</VBox>
+<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="65.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets left="20.0" right="20.0" />
+         </padding>
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label fx:id="lblNombreUsuario" text="mario" />
+                        <Label fx:id="lblRolUsuario" text="MA · Cajero" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#handleCerrarSesion" text="Cerrar Sesión">
+               <padding>
+                  <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
+               </padding>
+            </Button>
+         </children>
+      </HBox>
+   </top>
+   <left>
+      <VBox prefWidth="220.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="20.0" />
+         </padding>
+         <children>
+            <Label text="Navegación" />
+            <Separator />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleResumenDia" text="📊  Resumen del Día" />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleNuevaVenta" text="🗎  Nueva Venta" />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDetalleVentas" text="📋  Detalle Ventas" />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleListaVentas" text="📓  Lista de Ventas" />
+          
+            <Region VBox.vgrow="ALWAYS" />
+            <Separator />
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <VBox spacing="20.0" style="-fx-background-color: #f4f5f7;" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="20.0" />
+         </padding>
+         <children>
+            <VBox spacing="3.0">
+               <children>
+                  <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="Panel de Cajero" />
+                  <Label style="-fx-font-size: 13px; -fx-text-fill: #6b7280;" text="Proceso de ventas y consulta de inventario" />
+               </children>
+            </VBox>
+            <Separator style="-fx-background-color: #e5e7eb;" />
+            <FlowPane hgap="20.0" vgap="20.0">
+               <children>
+                  <Button onAction="#handleNuevaVenta" prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox alignment="CENTER" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="➕" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Agregar Venta" />
+                              <Label style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;" text="Registrar una nueva&#10;venta o factura" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button onAction="#handleDetalleVentas" prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox alignment="CENTER" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📋" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Detalle de Ventas" />
+                              <Label text="Líneas de cada&#10;venta registrada" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button onAction="#handleListaVentas" prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox alignment="CENTER" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📓" />
+                              <Label text="Lista de Ventas" />
+                              <Label text="Consultar ventas&#10;registradas" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button onAction="#handleResumenDia" prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox alignment="CENTER" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📊 " />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="📊  Resumen del Día" />
+                              <Label style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;" text="Consulta que ventas se hicieron" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+               </children>
+            </FlowPane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
