@@ -95,7 +95,7 @@ public class ClienteController implements Initializable {
 
     private void cargarTabla() {
         try {
-            listaClientes.setAll(clienteDAO.listar());
+            listaClientes.setAll(clienteDAO.listarTodos());
         } catch (Exception e) {
             mostrarError("Error al cargar la lista de clientes: " + e.getMessage());
         }
@@ -170,7 +170,7 @@ public class ClienteController implements Initializable {
             if (modoEdicion) {
                 guardado = clienteDAO.actualizar(cliente);
             } else {
-                guardado = clienteDAO.crear(cliente);
+                guardado = clienteDAO.insertar(cliente);
             }
 
             if (guardado) {
