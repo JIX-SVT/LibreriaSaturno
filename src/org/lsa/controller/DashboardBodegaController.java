@@ -25,6 +25,8 @@ import javafx.stage.Stage;
 
 import org.lsa.dao.LibroDAO;
 import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.model.Categoria;
+import org.lsa.model.Editorial;
 import org.lsa.model.Libro;
 import org.lsa.utils.SesionUsuario;
 
@@ -43,8 +45,11 @@ public class DashboardBodegaController implements Initializable {
 
     @FXML private TextField txtBusqueda;
     @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtCantidadMovimiento;
-    @FXML private ComboBox<Integer> cmbIdCategoria;
-    @FXML private ComboBox<String> cmbNitEditorial;
+    
+    // Cambiado a tipos Categoria y Editorial
+    @FXML private ComboBox<Categoria> cmbCategoria;
+    @FXML private ComboBox<Editorial> cmbEditorial;
+    
     @FXML private DatePicker dpFechaPublicacion;
     @FXML private Label lblAlertaBajoStock;
 
@@ -69,8 +74,20 @@ public class DashboardBodegaController implements Initializable {
                 }
                 
                 txtPrecio.setText(String.valueOf(newSelection.getPrecio()));
-                cmbIdCategoria.setValue(newSelection.getIdCategoria());
-                cmbNitEditorial.setValue(newSelection.getNitEditorial());
+                
+                for (Categoria cat : cmbCategoria.getItems()) {
+                    if (cat.getIdCategoria() == newSelection.getIdCategoria()) {
+                        cmbCategoria.setValue(cat);
+                        break;
+                    }
+                }
+
+                for (Editorial ed : cmbEditorial.getItems()) {
+                    if (ed.getNit() != null && ed.getNit().equalsIgnoreCase(newSelection.getNitEditorial())) {
+                        cmbEditorial.setValue(ed);
+                        break;
+                    }
+                }
             }
         });
     }
@@ -87,13 +104,13 @@ public class DashboardBodegaController implements Initializable {
         }
     }
 
-private void cargarOpcionesCombos() {
-    List<Integer> categoriasBD = libroDAO.listarIdsCategorias();
-    cmbIdCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
+    private void cargarOpcionesCombos() {
+        List<Categoria> categoriasBD = libroDAO.listarCategorias();
+        cmbCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
 
-    List<String> editorialesBD = libroDAO.listarNitsEditoriales();
-    cmbNitEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
-}
+        List<Editorial> editorialesBD = libroDAO.listarEditoriales();
+        cmbEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
+    }
 
     private void cargarLibros() {
         listaLibros.clear();
@@ -158,7 +175,7 @@ private void cargarOpcionesCombos() {
 
         if (txtIsbn.getText().trim().isEmpty() || txtTitulo.getText().trim().isEmpty() ||
             dpFechaPublicacion.getValue() == null || txtPrecio.getText().trim().isEmpty() ||
-            cmbIdCategoria.getValue() == null || cmbNitEditorial.getValue() == null) {
+            cmbCategoria.getValue() == null || cmbEditorial.getValue() == null) {
             mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos y seleccione Categoría y Editorial.", Alert.AlertType.WARNING);
             return;
         }
@@ -168,8 +185,9 @@ private void cargarOpcionesCombos() {
             String titulo = txtTitulo.getText().trim();
             Date fecha = Date.valueOf(dpFechaPublicacion.getValue());
             double precio = Double.parseDouble(txtPrecio.getText().trim());
-            int idCategoria = cmbIdCategoria.getValue();
-            String nitEditorial = cmbNitEditorial.getValue();
+            
+            int idCategoria = cmbCategoria.getValue().getIdCategoria();
+            String nitEditorial = cmbEditorial.getValue().getNit();
 
             Libro libro = new Libro(isbn, titulo, fecha, precio, idCategoria, nitEditorial, 0);
 
@@ -290,8 +308,8 @@ private void cargarOpcionesCombos() {
         txtTitulo.clear();
         dpFechaPublicacion.setValue(null);
         txtPrecio.clear();
-        cmbIdCategoria.getSelectionModel().clearSelection();
-        cmbNitEditorial.getSelectionModel().clearSelection();
+        cmbCategoria.getSelectionModel().clearSelection();
+        cmbEditorial.getSelectionModel().clearSelection();
         txtCantidadMovimiento.clear();
         tblLibros.getSelectionModel().clearSelection();
     }

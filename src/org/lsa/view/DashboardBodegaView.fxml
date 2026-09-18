@@ -29,7 +29,6 @@
     </HBox>
     <Label fx:id="lblAlertaBajoStock" style="-fx-font-size: 14px;" text="Estado del Inventario" />
     
-    <!-- Campo de Búsqueda -->
     <TextField fx:id="txtBusqueda" promptText="Buscar Libro por ISBN o Título..." />
     
     <SplitPane dividerPositions="0.6" style="-fx-background-color: #ffffff; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
@@ -40,8 +39,8 @@
                     <TableColumn fx:id="colTitulo" prefWidth="180" style="-fx-font-family: 'Century Gothic';" text="Título" />
                     <TableColumn fx:id="colFechaPublicacion" prefWidth="110" style="-fx-font-family: 'Century Gothic';" text="Fecha Pub." />
                     <TableColumn fx:id="colPrecio" prefWidth="80" style="-fx-font-family: 'Century Gothic';" text="Precio" />
-                    <TableColumn fx:id="colIdCategoria" prefWidth="90" style="-fx-font-family: 'Century Gothic';" text="ID Categoría" />
-                    <TableColumn fx:id="colNitEditorial" prefWidth="110" style="-fx-font-family: 'Century Gothic';" text="NIT Editorial" />
+                    <TableColumn fx:id="colIdCategoria" prefWidth="90" style="-fx-font-family: 'Century Gothic';" text="Categoría" />
+                    <TableColumn fx:id="colNitEditorial" prefWidth="110" style="-fx-font-family: 'Century Gothic';" text="Editorial" />
                     <TableColumn fx:id="colStock" prefWidth="75" style="-fx-font-family: 'Century Gothic';" text="Stock" />
                 </columns>
             </TableView>
@@ -64,11 +63,11 @@
                 <Label style="-fx-text-fill: black;" text="Precio:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <TextField fx:id="txtPrecio" style="-fx-font-family: 'Century Gothic'; -fx-border-color: #a6a6a6; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                 
-                <Label style="-fx-text-fill: black;" text="ID Categoría:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <ComboBox fx:id="cmbIdCategoria" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label style="-fx-text-fill: black;" text="Categoría:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <ComboBox fx:id="cmbCategoria" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                 
-                <Label style="-fx-text-fill: black;" text="NIT Editorial:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                <ComboBox fx:id="cmbNitEditorial" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Label style="-fx-text-fill: black;" text="Editorial:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <ComboBox fx:id="cmbEditorial" prefHeight="25.0" prefWidth="200.0" style="-fx-font-family: 'Century Gothic';" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                 
                 <columnConstraints>
                     <ColumnConstraints />

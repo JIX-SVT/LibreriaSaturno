@@ -13,6 +13,10 @@ public class Cliente {
         this.correoElectronico = correoElectronico;
     }
 
+    // Costruttore vuoto corretto (senza eccezione UnsupportedOperationException)
+    public Cliente() {
+    }
+
     public long getCui() {
         return cui;
     }

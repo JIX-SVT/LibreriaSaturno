@@ -49,6 +49,7 @@ public class MenuBodegaController implements Initializable {
 
     private Usuario usuarioActual;
 
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         LOGGER.info("Inicializando MenuBodegaController...");
@@ -80,7 +81,7 @@ public class MenuBodegaController implements Initializable {
 
     @FXML
     public void irAInventario(ActionEvent evento) {
-        navegar(evento, "/org/lsa/view/DashboardBodegaView.fxml", "Librería Saturno - Panel Bodega");
+        navegar(evento, "/org/lsa/view/InventarioView.fxml", "Librería Saturno - Panel Bodega");
     }
 
     @FXML
@@ -110,7 +111,7 @@ public class MenuBodegaController implements Initializable {
 
     @FXML
     public void verInventario(MouseEvent evento) {
-        navegarMouseEvent(evento, "/org/lsa/view/DashboardBodegaView.fxml", "Librería Saturno - Panel Bodega");
+        navegarMouseEvent(evento, "/org/lsa/view/InventarioView.fxml", "Librería Saturno - Panel Bodega");
     }
 
     @FXML

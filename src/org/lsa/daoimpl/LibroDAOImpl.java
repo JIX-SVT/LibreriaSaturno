@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lsa.dao.LibroDAO;
+import org.lsa.model.Categoria;
+import org.lsa.model.Editorial;
 import org.lsa.model.Libro;
 import org.lsa.utils.Conexion;
 
@@ -20,7 +22,8 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public List<Libro> listar() {
         List<Libro> lista = new ArrayList<>();
-        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, stock FROM libros";
+        String sql = "SELECT l.isbn, l.titulo, l.fecha_publicacion, l.precio, l.id_categoria, l.nit_editorial, l.stock " +
+                     "FROM libros l";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -37,7 +40,8 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public Libro buscarPorIsbn(String isbn) {
-        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, stock FROM libros WHERE isbn = ?";
+        String sql = "SELECT l.isbn, l.titulo, l.fecha_publicacion, l.precio, l.id_categoria, l.nit_editorial, l.stock " +
+                     "FROM libros l WHERE l.isbn = ?";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -78,7 +82,7 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public boolean actualizar(Libro libro) {
-        String sql = "UPDATE libros SET titulo = ?, fecha_publicacion = ?, precio = ?, id_categoria = ?, nit_editorial = ? WHERE isbn = ?";
+        String sql = "UPDATE libros SET titulo = ?, fecha_publicacion = ?, precio = ?, id_categoria = ?, nit_editorial = ?, stock = ? WHERE isbn = ?";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -88,7 +92,8 @@ public class LibroDAOImpl implements LibroDAO {
             stmt.setDouble(3, libro.getPrecio());
             stmt.setInt(4, libro.getIdCategoria());
             stmt.setString(5, libro.getNitEditorial());
-            stmt.setString(6, libro.getIsbn());
+            stmt.setInt(6, libro.getStock());
+            stmt.setString(7, libro.getIsbn());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -113,6 +118,14 @@ public class LibroDAOImpl implements LibroDAO {
     }
 
     @Override
+    public boolean cambiarEstado(String isbn, boolean estado) {
+        // La tabla 'libros' no tiene columna 'estado'. 
+        // Si no usas borrado lógico, este método puede retornar true o manejar un log.
+        LOGGER.log(Level.WARNING, "La tabla 'libros' no maneja el campo 'estado'. Operación omitida para ISBN: {0}", isbn);
+        return false;
+    }
+
+    @Override
     public boolean actualizarStock(String isbn, int cantidad) {
         String sql = "UPDATE libros SET stock = stock + ? WHERE isbn = ?";
         
@@ -131,7 +144,8 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public List<Libro> obtenerLibrosStockCritico() {
         List<Libro> lista = new ArrayList<>();
-        String sql = "SELECT isbn, titulo, fecha_publicacion, precio, id_categoria, nit_editorial, stock FROM libros WHERE stock <= 10";
+        String sql = "SELECT l.isbn, l.titulo, l.fecha_publicacion, l.precio, l.id_categoria, l.nit_editorial, l.stock " +
+                     "FROM libros l WHERE l.stock <= 10";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -178,6 +192,42 @@ public class LibroDAOImpl implements LibroDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al listar NITs de editoriales", e);
+        }
+        return lista;
+    }
+
+    @Override
+    public List<Categoria> listarCategorias() {
+        List<Categoria> lista = new ArrayList<>();
+        String sql = "SELECT id_categoria, nombre_categoria FROM categorias ORDER BY nombre_categoria ASC";
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Categoria(rs.getInt("id_categoria"), rs.getString("nombre_categoria")));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al listar categorías", e);
+        }
+        return lista;
+    }
+
+    @Override
+    public List<Editorial> listarEditoriales() {
+        List<Editorial> lista = new ArrayList<>();
+        String sql = "SELECT nit_editorial, nombre_editorial FROM editoriales ORDER BY nombre_editorial ASC";
+        
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Editorial(rs.getString("nit_editorial"), rs.getString("nombre_editorial")));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al listar editoriales", e);
         }
         return lista;
     }
