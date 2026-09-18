@@ -13,11 +13,14 @@ public class Cliente {
         this.correoElectronico = correoElectronico;
     }
 
+    // Costruttore vuoto corretto (senza eccezione UnsupportedOperationException)
+    public Cliente() {
+    }
+
     public long getCui() {
         return cui;
     }
 
-    // CORREGIDO: Cambiado de 'int cui' a 'long cui'
     public void setCui(long cui) {
         this.cui = cui;
     }
@@ -46,7 +49,6 @@ public class Cliente {
         this.correoElectronico = correoElectronico;
     }
 
-    // CORREGIDO: Formato limpio para que se despliegue correctamente en el ComboBox
     @Override
     public String toString() {
         return nombreCliente + " " + apellidoCliente;
