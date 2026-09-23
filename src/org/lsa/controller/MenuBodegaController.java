@@ -38,14 +38,12 @@ public class MenuBodegaController implements Initializable {
     @FXML private Button btnAutor;
     @FXML private Button btnCategoria;
     @FXML private Button btnEditorial;
-    @FXML private Button btnClientes;
 
     @FXML private VBox cardVerInventario;
     @FXML private VBox cardNuevoLibro;
     @FXML private VBox cardNuevoAutor;
     @FXML private VBox cardNuevaCategoria;
     @FXML private VBox cardNuevaEditorial;
-    @FXML private VBox cardNuevoCliente;
 
     private Usuario usuarioActual;
 
@@ -104,10 +102,7 @@ public class MenuBodegaController implements Initializable {
         navegar(evento, "/org/lsa/view/EditorialView.fxml", "Librería Saturno - Editoriales");
     }
 
-    @FXML
-    public void irAClientes(ActionEvent evento) {
-        navegar(evento, "/org/lsa/view/ClienteView.fxml", "Librería Saturno - Clientes");
-    }
+    
 
     @FXML
     public void verInventario(MouseEvent evento) {
@@ -134,10 +129,6 @@ public class MenuBodegaController implements Initializable {
         navegarMouseEvent(evento, "/org/lsa/view/EditorialView.fxml", "Librería Saturno - Editoriales");
     }
 
-    @FXML
-    public void nuevoCliente(MouseEvent evento) {
-        navegarMouseEvent(evento, "/org/lsa/view/ClienteView.fxml", "Librería Saturno - Clientes");
-    }
 
     private void navegar(ActionEvent evento, String ruta, String titulo) {
         try {

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lsa.dao.LibroDAO;
+import org.lsa.model.Autor;
 import org.lsa.model.Categoria;
 import org.lsa.model.Editorial;
 import org.lsa.model.Libro;
@@ -41,7 +42,8 @@ public class LibroDAOImpl implements LibroDAO {
     @Override
     public Libro buscarPorIsbn(String isbn) {
         String sql = "SELECT l.isbn, l.titulo, l.fecha_publicacion, l.precio, l.id_categoria, l.nit_editorial, l.stock " +
-                     "FROM libros l WHERE l.isbn = ?";
+                     "FROM libros l " +
+                     "WHERE l.isbn = ?";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -119,8 +121,6 @@ public class LibroDAOImpl implements LibroDAO {
 
     @Override
     public boolean cambiarEstado(String isbn, boolean estado) {
-        // La tabla 'libros' no tiene columna 'estado'. 
-        // Si no usas borrado lógico, este método puede retornar true o manejar un log.
         LOGGER.log(Level.WARNING, "La tabla 'libros' no maneja el campo 'estado'. Operación omitida para ISBN: {0}", isbn);
         return false;
     }
@@ -145,7 +145,8 @@ public class LibroDAOImpl implements LibroDAO {
     public List<Libro> obtenerLibrosStockCritico() {
         List<Libro> lista = new ArrayList<>();
         String sql = "SELECT l.isbn, l.titulo, l.fecha_publicacion, l.precio, l.id_categoria, l.nit_editorial, l.stock " +
-                     "FROM libros l WHERE l.stock <= 10";
+                     "FROM libros l " +
+                     "WHERE l.stock <= 10";
         
         try (Connection conn = Conexion.getInstancia().conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -228,6 +229,29 @@ public class LibroDAOImpl implements LibroDAO {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al listar editoriales", e);
+        }
+        return lista;
+    }
+
+    @Override
+    public List<Autor> listarAutores() {
+        List<Autor> lista = new ArrayList<>();
+        String sql = "SELECT id_autor, nombre_autor, apellido_autor, nacionalidad FROM autores ORDER BY nombre_autor ASC";
+
+        try (Connection conn = Conexion.getInstancia().conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Autor autor = new Autor();
+                autor.setIdAutor(rs.getInt("id_autor"));
+                autor.setNombreAutor(rs.getString("nombre_autor"));
+                autor.setApellidoAutor(rs.getString("apellido_autor"));
+                autor.setNacionalidad(rs.getString("nacionalidad"));
+                lista.add(autor);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al listar autores", e);
         }
         return lista;
     }

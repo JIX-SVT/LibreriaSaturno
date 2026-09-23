@@ -1,6 +1,7 @@
 package org.lsa.dao;
 
 import java.util.List;
+import org.lsa.model.Autor;
 import org.lsa.model.Categoria;
 import org.lsa.model.Editorial;
 import org.lsa.model.Libro;
@@ -29,5 +30,7 @@ public interface LibroDAO {
     
     List<Categoria> listarCategorias();
 List<Editorial> listarEditoriales();
+
+    public List<Autor> listarAutores();
 
 }
