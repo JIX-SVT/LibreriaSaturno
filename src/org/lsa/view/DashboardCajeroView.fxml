@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="65.0" BorderPane.alignment="CENTER">
          <padding>
@@ -48,6 +48,7 @@
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleNuevaVenta" text="🗎  Nueva Venta" />
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDetalleVentas" text="📋  Detalle Ventas" />
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleListaVentas" text="📓  Lista de Ventas" />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleClientes" text="📊  Clientes" />
           
             <Region VBox.vgrow="ALWAYS" />
             <Separator />

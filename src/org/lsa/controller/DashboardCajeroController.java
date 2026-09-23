@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.lsa.model.Usuario;
@@ -49,7 +50,7 @@ private void cargarDatosUsuario() {
     @FXML
     public void handleNuevaVenta(ActionEvent event) {
         log.info("Navegando a la pantalla de Nueva Venta.");
-        navegarA(event, "/org/lsa/view/NuevaVentaView.fxml", "Registro de Venta");
+        navegar(event, "/org/lsa/view/NuevaVentaView.fxml", "Registro de Venta");
     }
 
     @FXML
@@ -61,24 +62,31 @@ private void cargarDatosUsuario() {
     @FXML
     public void handleDetalleVentas(ActionEvent event) {
        log.info("Navegando a la pantalla de Nueva Venta.");
-        navegarA(event, "/org/lsa/view/DetalleVentaview.fxml", "Registro de Venta");
+        navegar(event, "/org/lsa/view/DetalleVentaview.fxml", "Registro de Venta");
     }
 
     @FXML
     public void handleListaVentas(ActionEvent event) {
         log.info("Navegando a Lista de Ventas.");
-      navegarA(event, "/org/lsa/view/ListaVentasView.fxml", "Listado de Venta");
+      navegar(event, "/org/lsa/view/ListaVentasView.fxml", "Listado de Venta");
     }
 
     @FXML
     public void handleCerrarSesion(ActionEvent event) {
         log.info("Cerrando sesión de usuario e intentando volver al Login.");
         SesionUsuario.getInstancia().cerrarSesion();
-        navegarA(event, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
+        navegar(event, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
     }
 
+    
+    @FXML    
+    public void handleClientes (ActionEvent evento) {       
+        navegar(evento, "/org/lsa/view/ClienteView.fxml", "Librería Saturno - Clientes");    }     
 
-    private void navegarA(ActionEvent event, String rutaFxml, String tituloVista) {
+ 
+ 
+
+    private void navegar(ActionEvent event, String rutaFxml, String tituloVista) {
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(rutaFxml));
