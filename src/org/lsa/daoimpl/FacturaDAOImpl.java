@@ -42,4 +42,34 @@ public class FacturaDAOImpl implements FacturaDAO {
         }
         return lista;
     }
+
+    @Override
+    public ArrayList<Factura> obtenerVentasDelDia() {
+        ArrayList<Factura> lista = new ArrayList<>();
+        String sql = "{call sp_resumen_dia()}"; 
+        try (Connection conexion = Conexion.getInstancia().conectar();
+                CallableStatement consulta = conexion.prepareCall(sql);
+                ResultSet rs = consulta.executeQuery()) {
+            
+            while (rs.next()) {
+                Factura linea = new Factura();
+                linea.setNumeroFactura(rs.getInt("numero_factura"));
+                linea.setFechaEmision(rs.getString("fecha_emision"));
+                linea.setCuiCliente(rs.getLong("cui_cliente"));
+                linea.setNombreCliente(rs.getString("nombre_cliente"));
+                linea.setCorreoCliente(rs.getString("correo_cliente"));
+                linea.setIsbnLibro(rs.getString("isbn_libro"));
+                linea.setTituloLibro(rs.getString("titulo_libro"));
+                linea.setCantidad(rs.getInt("cantidad"));
+                linea.setPrecioUnitario(rs.getDouble("precio_unitario"));
+                linea.setSubtotal(rs.getDouble("subtotal"));
+                linea.setUsuarioAtendio(rs.getString("usuario_atendio"));
+                linea.setGranTotal(rs.getDouble("gran_total"));
+                lista.add(linea);
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Error al obtener el resumen del día: " + e.getMessage(), e);
+        }
+        return lista;
+    }
 }

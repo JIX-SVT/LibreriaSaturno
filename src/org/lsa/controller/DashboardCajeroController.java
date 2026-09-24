@@ -55,8 +55,8 @@ private void cargarDatosUsuario() {
 
     @FXML
     public void handleResumenDia(ActionEvent event) {
-        log.info("Navegando al Resumen del Día.");
-        mostrarAlerta(Alert.AlertType.INFORMATION, "Resumen del Día", "Módulo de resumen en desarrollo.");
+         log.info("Navegando a la pantalla de Nueva Venta.");
+        navegar(event, "/org/lsa/view/ResumenDelDiaView.fxml", "Registro de Venta");
     }
 
     @FXML

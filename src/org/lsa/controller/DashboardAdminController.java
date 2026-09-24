@@ -146,7 +146,7 @@ public class DashboardAdminController implements Initializable {
 
     @FXML
     public void reportes(MouseEvent evento) {
-        navegarCard(evento, "/org/lsa/view/FacturaView.fxml", "Reportes y Facturas");
+        navegarCard(evento, "/org/lsa/view/ResumenDelDiaView.fxml", "Reportes y Facturas");
     }
 
     @FXML

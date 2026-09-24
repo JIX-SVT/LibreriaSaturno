@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
 import org.lsa.dao.UsuarioDAO;
 import org.lsa.daoimpl.UsuarioDAOImpl;
+import org.lsa.system.Main;
 
 public class CambioContrasenaController {
 
@@ -83,7 +84,22 @@ public class CambioContrasenaController {
             showAlert(AlertType.ERROR, "Error", "No se pudo actualizar la contraseña en la base de datos.");
         }
     }
-
+ @FXML
+    private void handleVolver() {
+        try {
+            //Regresa a la lista de ventas (origen de la factura), no al dashboard.
+            Main.cambiarEscena("/org/lsa/view/DashboardAdminView.fxml");
+        } catch (Exception e) {
+            mostrarError("Error al volver al menú: " + e.getMessage());
+        }
+    }
+      private void mostrarError(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
     private void showAlert(AlertType alertType, String title, String message) {
         log.info("Mostrando ventana de alerta [Tipo: " + alertType + "]: " + title);
         Alert alert = new Alert(alertType);

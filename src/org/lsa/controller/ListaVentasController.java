@@ -346,18 +346,21 @@ public class ListaVentasController implements Initializable {
             );
         }
     }
-        @FXML
+    @FXML
     private void handleFactura(ActionEvent event) {
-        try {
-            Main.cambiarVista(
-                        "/org/lsa/view/FacturaView.fxml");
-        } catch (Exception e) {
-            mostrarError(
-                    "Error al volver al menú: "
-                    + e.getMessage()
-            );
+        Venta seleccion = tablaVentas.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            mostrarAdvertencia("Seleccione una venta de la tabla para ver su factura.");
+            return;
         }
-    }
+
+        try {
+            FacturaController.setNoVentaSeleccionada(seleccion.getIdVenta());
+            Main.cambiarVista("/org/lsa/view/FacturaView.fxml");
+        } catch (Exception e) {
+            mostrarError("Error al abrir la factura: " + e.getMessage());
+        }
+}
     private void limpiarFormulario() {
         txtTotal.clear();
         dpFecha.setValue(null);
