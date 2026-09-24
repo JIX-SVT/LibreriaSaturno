@@ -18,7 +18,6 @@ import org.lsa.exception.DaoException;
 import org.lsa.model.Factura;
 import org.lsa.system.Main;
 
-
 public class FacturaController implements Initializable {
 
     //Mecanismo del proyecto: no hay paso de datos entre vistas, se usa un campo
@@ -27,6 +26,10 @@ public class FacturaController implements Initializable {
 
     public static void setNoVentaSeleccionada(int noVenta) {
         noVentaSeleccionada = noVenta;
+    }
+
+    public static int getNoVentaSeleccionada() {
+        return noVentaSeleccionada;
     }
 
     private final FacturaDAO facturaDAO = new FacturaDAOImpl();
@@ -60,7 +63,7 @@ public class FacturaController implements Initializable {
     private TableColumn colSubtotal;
     @FXML
     private Button btnImprimir;
-
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarTabla();
@@ -101,7 +104,7 @@ public class FacturaController implements Initializable {
     private void handleVolver() {
         try {
             //Regresa a la lista de ventas (origen de la factura), no al dashboard.
-            Main.cambiarEscena("/org/ac/view/fxml/ListaVentasView.fxml");
+            Main.cambiarEscena("/org/lsa/view/ListaVentasView.fxml");
         } catch (Exception e) {
             mostrarError("Error al volver al menú: " + e.getMessage());
         }
@@ -109,11 +112,11 @@ public class FacturaController implements Initializable {
 
     @FXML
     private void handleImprimir() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Imprimir");
-        alert.setHeaderText(null);
-        alert.setContentText("La impresión de la factura está en desarrollo.");
-        alert.showAndWait();
+       try {
+            Main.cambiarEscena("/org/lsa/view/FacturaImpresaView.fxml");
+        } catch (Exception e) {
+            mostrarError("Error al volver al menú: " + e.getMessage());
+        }
     }
 
     private void mostrarError(String mensaje) {
