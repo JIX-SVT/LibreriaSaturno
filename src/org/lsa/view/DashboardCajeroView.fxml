@@ -9,20 +9,22 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
-<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="65.0" BorderPane.alignment="CENTER">
          <padding>
             <Insets left="20.0" right="20.0" />
          </padding>
          <children>
+            <Circle fx:id="avatarCircle" radius="18.0" styleClass="avatar" />
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                <children>
                   <VBox alignment="CENTER_LEFT">
                      <children>
-                        <Label fx:id="lblNombreUsuario" text="mario" />
-                        <Label fx:id="lblRolUsuario" text="MA · Cajero" />
+                        <Label fx:id="lblNombreUsuario" prefWidth="97.0" text="Cajero" />
+                        <Label fx:id="lblRolUsuario" prefHeight="17.0" prefWidth="94.0" text="Cajero" />
                      </children>
                   </VBox>
                </children>
@@ -48,7 +50,7 @@
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleNuevaVenta" text="🗎  Nueva Venta" />
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDetalleVentas" text="📋  Detalle Ventas" />
             <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleListaVentas" text="📓  Lista de Ventas" />
-            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleClientes" text="📊  Clientes" />
+            <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleClientes" text="👤 Clientes" />
           
             <Region VBox.vgrow="ALWAYS" />
             <Separator />
@@ -76,7 +78,7 @@
                            <children>
                               <Label style="-fx-font-size: 32px;" text="➕" />
                               <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Agregar Venta" />
-                              <Label style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;" text="Registrar una nueva&#10;venta o factura" textAlignment="CENTER" />
+                              <Label text="Registrar una nueva&#10;venta o factura" textAlignment="CENTER" />
                            </children>
                         </VBox>
                      </graphic>
@@ -109,7 +111,18 @@
                            <children>
                               <Label style="-fx-font-size: 32px;" text="📊 " />
                               <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="📊  Resumen del Día" />
-                              <Label style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;" text="Consulta que ventas se hicieron" textAlignment="CENTER" />
+                              <Label text="Consulta que ventas se hicieron" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button onAction="#handleDetalleVentas" prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox alignment="CENTER" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="👤" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Clientes" />
+                              <Label text="Crea un nuevo cliente" textAlignment="CENTER" />
                            </children>
                         </VBox>
                      </graphic>

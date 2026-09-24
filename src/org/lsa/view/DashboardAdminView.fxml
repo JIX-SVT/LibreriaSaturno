@@ -1,163 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" styleClass="root" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardAdminController">
-    <stylesheets>
-        <URL value="@/org/lsa/view/style/dashboardadminview.css" />
-    </stylesheets>
-
-    <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="56.0" styleClass="header" BorderPane.alignment="CENTER">
-            <children>
-                <HBox alignment="CENTER_LEFT" spacing="12.0">
-                    <Circle fx:id="avatarCircle" radius="18.0" styleClass="avatar" />
-                    <VBox spacing="2.0">
-                        <Label fx:id="lblBienvenida" styleClass="header-title" text="Bienvenido" />
-                        <Label fx:id="lblRol" styleClass="header-subtitle" text="Administrador" />
-                    </VBox>
-                </HBox>
-                <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
-                    <Button fx:id="btnCerrarSesion" onAction="#cerrarSesion" prefHeight="32.0" prefWidth="130.0" styleClass="btn-logout" text="Cerrar Sesión" />
-                </HBox>
-            </children>
-            <padding>
-                <Insets left="24.0" right="24.0" />
-            </padding>
-        </HBox>
-    </top>
-
-    <left>
-        <VBox prefWidth="220.0" styleClass="sidebar" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets top="16.0" />
-            </padding>
-            <children>
-                <Label styleClass="sidebar-title" text="Navegación" />
-                <Separator styleClass="sidebar-separator" />
-                <VBox spacing="2.0" VBox.vgrow="ALWAYS">
-                    <children>
-                        <Button fx:id="btnUsuario" mnemonicParsing="false" onAction="#irAUsuario" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   👤   Usuarios" />
-                        <Button fx:id="btnLibro" mnemonicParsing="false" onAction="#irALibro" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   📖   Libros" />
-                        <Button fx:id="btnAutor" mnemonicParsing="false" onAction="#irAAutor" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   ✍️   Autores" />
-                        <Button fx:id="btnCategoria" mnemonicParsing="false" onAction="#irACategoria" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   🏷️   Categorías" />
-                        <Button fx:id="btnEditorial" mnemonicParsing="false" onAction="#irAEditorial" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   🏢   Editoriales" />
-                        <Button fx:id="btnVentas" mnemonicParsing="false" onAction="#irAVentas" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   🧾   Ventas" />
-                        <Button fx:id="btnAutorLibro" mnemonicParsing="false" onAction="#irAAutorLibro" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   🔗   Autores-Libro" />
-                        <Button fx:id="btnDetalleVenta" mnemonicParsing="false" onAction="#irADetalleVenta" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   📋   Detalle Ventas" />
-                        <Button fx:id="btnClientes" layoutX="10.0" layoutY="230.0" mnemonicParsing="false" onAction="#irAClientes" prefHeight="42.0" prefWidth="200.0" styleClass="sidebar-button" text="   🧾   Clientes" />
-                    </children>
-                </VBox>
-                <Separator styleClass="sidebar-separator" />
-                <Label styleClass="sidebar-version" text="v1.0.0" />
-            </children>
-        </VBox>
-    </left>
-
-    <center>
-        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane">
-            <content>
-                <AnchorPane prefHeight="544.0" prefWidth="680.0" styleClass="center-content">
-                    <children>
-                        <Label layoutX="32.0" layoutY="24.0" styleClass="section-title" text="Panel de Control">
-                            <font>
-                                <Font size="22.0" />
-                            </font>
-                        </Label>
-                        <Label layoutX="32.0" layoutY="50.0" styleClass="section-subtitle" text="Accesos rápidos a las funciones principales del sistema" />
-                        <Separator layoutX="32.0" layoutY="70.0" prefWidth="600.0" styleClass="section-separator" />
-                        <TilePane alignment="TOP_CENTER" hgap="24.0" layoutX="32.0" layoutY="90.0" prefColumns="3" prefHeight="420.0" prefWidth="616.0" vgap="24.0">
-                            <children>
-                                <VBox fx:id="cardNuevoLibro" onMouseClicked="#nuevoLibro" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-primary" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="📖" />
-                                        <Label styleClass="card-title" text="Nuevo Libro" />
-                                        <Label styleClass="card-desc" text="Registrar un nuevo" />
-                                        <Label styleClass="card-desc" text="libro en el sistema" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                                <VBox fx:id="cardAgregarVenta" onMouseClicked="#agregarVenta" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-success" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="➕" />
-                                        <Label styleClass="card-title" text="Agregar Venta" />
-                                        <Label styleClass="card-desc" text="Registrar una nueva" />
-                                        <Label styleClass="card-desc" text="venta o factura" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                                <VBox fx:id="cardVerInventario" onMouseClicked="#verInventario" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-info" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="📦" />
-                                        <Label styleClass="card-title" text="Ver Inventario" />
-                                        <Label styleClass="card-desc" text="Consultar el stock" />
-                                        <Label styleClass="card-desc" text="disponible actual" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                                <VBox fx:id="cardGestionarUsuarios" onMouseClicked="#gestionarUsuarios" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-warning" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="👥" />
-                                        <Label styleClass="card-title" text="Gestionar" />
-                                        <Label styleClass="card-title" text="Usuarios" />
-                                        <Label styleClass="card-desc" text="Administrar cuentas" />
-                                        <Label styleClass="card-desc" text="y permisos" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                                <VBox fx:id="cardReportes" onMouseClicked="#reportes" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-danger" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="📊" />
-                                        <Label styleClass="card-title" text="Reportes" />
-                                        <Label styleClass="card-desc" text="Ver reportes y" />
-                                        <Label styleClass="card-desc" text="estadísticas" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                                <VBox fx:id="cardConfiguracion" onMouseClicked="#configuracion" prefHeight="160.0" prefWidth="186.0" styleClass="card">
-                                    <children>
-                                        <VBox styleClass="card-accent-secondary" VBox.vgrow="ALWAYS" />
-                                        <Label styleClass="card-icon" text="⚙️" />
-                                        <Label styleClass="card-title" text="Configuración" />
-                                        <Label styleClass="card-desc" text="Ajustes del" />
-                                        <Label styleClass="card-desc" text="sistema" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="16.0" left="16.0" right="16.0" top="0.0" />
-                                    </padding>
-                                </VBox>
-                            </children>
-                        </TilePane>
-                    </children>
-                </AnchorPane>
-            </content>
-        </ScrollPane>
-    </center>
+<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardAdminController">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="65.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets left="20.0" right="20.0" />
+         </padding>
+         <children>
+            <Circle fx:id="avatarCircle" radius="18.0" styleClass="avatar" />
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label fx:id="lblBienvenida" prefWidth="97.0" text="Bienvenido" />
+                        <Label fx:id="lblRol" prefHeight="17.0" prefWidth="94.0" text="Administrador" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" text="Cerrar Sesión">
+               <padding>
+                  <Insets bottom="8.0" left="16.0" right="16.0" top="8.0" />
+               </padding>
+            </Button>
+         </children>
+      </HBox>
+   </top>
+   <left>
+      <VBox prefWidth="220.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="20.0" />
+         </padding>
+         <children>
+            <Label text="Navegación" />
+            <Separator />
+            <Button fx:id="btnUsuario" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAUsuario" text="👤  Usuarios" />
+            <Button fx:id="btnLibro" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irALibro" text="📖  Libros" />
+            <Button fx:id="btnAutor" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAAutor" text="✍️  Autores" />
+            <Button fx:id="btnCategoria" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irACategoria" text="🏷️  Categorías" />
+            <Button fx:id="btnEditorial" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAEditorial" text="🏢  Editoriales" />
+            <Button fx:id="btnVentas" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAVentas" text="🧾  Ventas" />
+            <Button fx:id="btnAutorLibro" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAAutorLibro" text="🔗  Autores-Libro" />
+            <Button fx:id="btnDetalleVenta" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irADetalleVenta" text="📋  Detalle Ventas" />
+            <Button fx:id="btnClientes" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAClientes" text="👤  Clientes" />
+            <Region VBox.vgrow="ALWAYS" />
+            <Separator />
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <VBox spacing="20.0" style="-fx-background-color: #f4f5f7;" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="20.0" />
+         </padding>
+         <children>
+            <VBox spacing="3.0">
+               <children>
+                  <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="Panel de Control" />
+                  <Label style="-fx-font-size: 13px; -fx-text-fill: #6b7280;" text="Accesos rápidos a las funciones principales del sistema" />
+               </children>
+            </VBox>
+            <Separator style="-fx-background-color: #e5e7eb;" />
+            <FlowPane hgap="20.0" vgap="20.0">
+               <children>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardNuevoLibro" alignment="CENTER" onMouseClicked="#nuevoLibro" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📖" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Nuevo Libro" />
+                              <Label text="Registrar un nuevo&#10;libro en el sistema" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardAgregarVenta" alignment="CENTER" onMouseClicked="#agregarVenta" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="➕" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Agregar Venta" />
+                              <Label text="Registrar una nueva&#10;venta o factura" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardVerInventario" alignment="CENTER" onMouseClicked="#verInventario" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📦" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Ver Inventario" />
+                              <Label text="Consultar el stock&#10;disponible actual" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardGestionarUsuarios" alignment="CENTER" onMouseClicked="#gestionarUsuarios" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="👥" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Gestionar Usuarios" />
+                              <Label text="Administrar cuentas&#10;y permisos" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardReportes" alignment="CENTER" onMouseClicked="#reportes" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="📊" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Reportes" />
+                              <Label text="Ver reportes y&#10;estadísticas" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+                  <Button prefHeight="150.0" prefWidth="200.0">
+                     <graphic>
+                        <VBox fx:id="cardConfiguracion" alignment="CENTER" onMouseClicked="#configuracion" spacing="8.0">
+                           <children>
+                              <Label style="-fx-font-size: 32px;" text="⚙️" />
+                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;" text="Configuración" />
+                              <Label text="Ajustes generales&#10;del sistema" textAlignment="CENTER" />
+                           </children>
+                        </VBox>
+                     </graphic>
+                  </Button>
+               </children>
+            </FlowPane>
+         </children>
+      </VBox>
+   </center>
 </BorderPane>
