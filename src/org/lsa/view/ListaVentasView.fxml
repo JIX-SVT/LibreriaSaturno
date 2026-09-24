@@ -61,6 +61,7 @@
                 <Button fx:id="btnAnterior" onAction="#handleAnterior" text="Anterior" />
                 <Button fx:id="btnSiguiente" onAction="#handleSiguiente" text="Siguiente" />
                 <Button fx:id="btnUltimo" onAction="#handleUltimo" text="Último" />
+            <Button fx:id="btnObtenerReporte" onAction="#handleObtenerReporte" text="Obtener Reporte" />
             </HBox>
         </VBox>
     </center>

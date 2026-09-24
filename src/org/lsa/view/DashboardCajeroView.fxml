@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 
-<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
+<BorderPane prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #f4f5f7;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.DashboardCajeroController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="65.0" BorderPane.alignment="CENTER">
          <padding>
@@ -116,7 +116,7 @@
                         </VBox>
                      </graphic>
                   </Button>
-                  <Button onAction="#handleDetalleVentas" prefHeight="150.0" prefWidth="200.0">
+                  <Button onAction="#handleClientes" prefHeight="150.0" prefWidth="200.0">
                      <graphic>
                         <VBox alignment="CENTER" spacing="8.0">
                            <children>

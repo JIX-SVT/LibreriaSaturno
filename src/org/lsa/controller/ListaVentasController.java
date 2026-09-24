@@ -1,5 +1,16 @@
 package org.lsa.controller;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -20,6 +31,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.lsa.dao.ClienteDAO;
 import org.lsa.dao.UsuarioDAO;
@@ -56,11 +68,12 @@ public class ListaVentasController implements Initializable {
     @FXML private TableColumn<Venta, Long> colCuiCliente;
     @FXML private TableColumn<Venta, Integer> colUsuario;
 
-    // Botones de Navegación
+    // Botones de Navegación y Reportes
     @FXML private Button btnPrimero;
     @FXML private Button btnAnterior;
     @FXML private Button btnSiguiente;
     @FXML private Button btnUltimo;
+    @FXML private Button btnObtenerReporte;
 
     // Variables de Estado y Persistencia
     private boolean modoEdicion = false;
@@ -337,15 +350,12 @@ public class ListaVentasController implements Initializable {
     @FXML
     private void handleVolver(ActionEvent event) {
         try {
-            Main.cambiarVista(
-                    "/org/lsa/view/DashboardCajeroView.fxml");
+            Main.cambiarVista("/org/lsa/view/DashboardCajeroView.fxml");
         } catch (Exception e) {
-            mostrarError(
-                    "Error al volver al menú: "
-                    + e.getMessage()
-            );
+            mostrarError("Error al volver al menú: " + e.getMessage());
         }
     }
+
     @FXML
     private void handleFactura(ActionEvent event) {
         Venta seleccion = tablaVentas.getSelectionModel().getSelectedItem();
@@ -360,7 +370,76 @@ public class ListaVentasController implements Initializable {
         } catch (Exception e) {
             mostrarError("Error al abrir la factura: " + e.getMessage());
         }
-}
+    }
+
+    @FXML
+    private void handleObtenerReporte(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Reporte de Ventas");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo PDF (*.pdf)", "*.pdf"));
+        fileChooser.setInitialFileName("Reporte_De_Ventas.pdf");
+
+        File file = fileChooser.showSaveDialog(tablaVentas.getScene().getWindow());
+        if (file != null) {
+            Document documento = new Document();
+            try {
+                PdfWriter.getInstance(documento, new FileOutputStream(file));
+                documento.open();
+
+                // Fuentes
+                Font fontTitulo = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
+                Font fontEncabezado = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+                Font fontContenido = new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, BaseColor.BLACK);
+
+                // Título del reporte
+                Paragraph titulo = new Paragraph("Librería Saturno - Reporte General de Ventas", fontTitulo);
+                titulo.setAlignment(Paragraph.ALIGN_CENTER);
+                titulo.setSpacingAfter(20);
+                documento.add(titulo);
+
+                // Tabla PDF con 5 columnas
+                PdfPTable tablaPdf = new PdfPTable(5);
+                tablaPdf.setWidthPercentage(100);
+                tablaPdf.setWidths(new float[]{15f, 30f, 20f, 20f, 15f});
+
+                // Encabezados
+                String[] headers = {"No. Venta", "Fecha", "Total", "CUI Cliente", "Usuario"};
+                for (String header : headers) {
+                    PdfPCell celda = new PdfPCell(new Phrase(header, fontEncabezado));
+                    celda.setBackgroundColor(new BaseColor(41, 128, 185)); // Azul corporativo
+                    celda.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    celda.setPadding(6);
+                    tablaPdf.addCell(celda);
+                }
+
+                // Llenar datos (respeta los filtros aplicados en la interfaz)
+                double totalGeneral = 0.0;
+                for (Venta v : ventasFiltradas) {
+                    tablaPdf.addCell(new PdfPCell(new Phrase(String.valueOf(v.getIdVenta()), fontContenido)));
+                    tablaPdf.addCell(new PdfPCell(new Phrase(v.getFechaVenta() != null ? v.getFechaVenta().toString() : "", fontContenido)));
+                    tablaPdf.addCell(new PdfPCell(new Phrase(String.format("Q %.2f", v.getTotalVenta()), fontContenido)));
+                    tablaPdf.addCell(new PdfPCell(new Phrase(String.valueOf(v.getCuiCliente()), fontContenido)));
+                    tablaPdf.addCell(new PdfPCell(new Phrase(String.valueOf(v.getId_usuario()), fontContenido)));
+
+                    totalGeneral += v.getTotalVenta();
+                }
+
+                documento.add(tablaPdf);
+
+                // Agregar Total General al pie del reporte
+                Paragraph totalParrafo = new Paragraph("\nTotal General Acumulado: Q " + String.format("%.2f", totalGeneral), fontTitulo);
+                totalParrafo.setAlignment(Paragraph.ALIGN_RIGHT);
+                documento.add(totalParrafo);
+
+                documento.close();
+                mostrarAdvertencia("Reporte PDF generado exitosamente.");
+
+            } catch (DocumentException | java.io.IOException e) {
+                mostrarError("Error al generar el PDF: " + e.getMessage());
+            }
+        }
+    }
+
     private void limpiarFormulario() {
         txtTotal.clear();
         dpFecha.setValue(null);
@@ -390,6 +469,7 @@ public class ListaVentasController implements Initializable {
         btnAnterior.setDisable(false);
         btnSiguiente.setDisable(false);
         btnUltimo.setDisable(false);
+        btnObtenerReporte.setDisable(false);
         txtBuscar.setDisable(false);
     }
 
@@ -401,6 +481,7 @@ public class ListaVentasController implements Initializable {
         btnAnterior.setDisable(true);
         btnSiguiente.setDisable(true);
         btnUltimo.setDisable(true);
+        btnObtenerReporte.setDisable(true);
         txtBuscar.setDisable(true);
     }
 

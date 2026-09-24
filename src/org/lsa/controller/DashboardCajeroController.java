@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.lsa.model.Usuario;
-
 import org.lsa.utils.SesionUsuario;
 
 public class DashboardCajeroController implements Initializable {
