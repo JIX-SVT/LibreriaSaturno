@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.FacturaImpresaController">
+<AnchorPane prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.FacturaImpresaController">
    <children>
       
       <Label layoutX="140.0" layoutY="20.0" text="Vista Previa de Factura">
@@ -17,7 +17,8 @@
 
       <TextArea fx:id="txtAreaFactura" editable="false" layoutX="40.0" layoutY="65.0" prefHeight="440.0" prefWidth="420.0" style="-fx-font-family: 'Courier New'; -fx-font-size: 13px;" />
 
-      <Button layoutX="40.0" layoutY="525.0" mnemonicParsing="false" onAction="#handleVolver" prefHeight="35.0" prefWidth="100.0" text="Regresar" />
+      <Button layoutX="40.0" layoutY="525.0" mnemonicParsing="false" onAction="#handleVolver" prefHeight="35.0" prefWidth="115.0" text="Regresar" />
+      <Button fx:id="btnfacturapdf" layoutX="179.0" layoutY="525.0" mnemonicParsing="false" onAction="#handleExportarpdf" prefHeight="35.0" prefWidth="163.0" text="Exportar como PDF" />
       
    </children>
 </AnchorPane>

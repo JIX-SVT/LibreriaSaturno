@@ -1,12 +1,21 @@
 package org.lsa.controller;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.stage.FileChooser;
 import org.lsa.dao.FacturaDAO;
 import org.lsa.daoimpl.FacturaDAOImpl;
 import org.lsa.exception.DaoException;
@@ -17,6 +26,9 @@ public class FacturaImpresaController implements Initializable {
 
     @FXML
     private TextArea txtAreaFactura; 
+    
+    @FXML
+    private Button btnfacturapdf;
 
     private final FacturaDAO facturaDAO = new FacturaDAOImpl();
 
@@ -69,13 +81,49 @@ public class FacturaImpresaController implements Initializable {
             sb.append("----------------------------------------\n");
             sb.append("TOTAL A PAGAR: Q ").append(String.format("%.2f", encabezado.getGranTotal())).append("\n");
             sb.append("========================================\n");
-            sb.append("        ¡GRACIAS POR SU COMPRA!         \n");
+            sb.append("         ¡GRACIAS POR SU COMPRA!        \n");
             sb.append("========================================\n");
 
             txtAreaFactura.setText(sb.toString());
 
         } catch (DaoException e) {
             mostrarError(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleExportarpdf() {
+        String contenidoFactura = txtAreaFactura.getText();
+        if (contenidoFactura == null || contenidoFactura.isEmpty()) {
+            mostrarError("No hay contenido en la factura para exportar.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Factura como PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
+        
+        int idVenta = FacturaController.getNoVentaSeleccionada();
+        fileChooser.setInitialFileName("Factura_" + idVenta + ".pdf");
+
+        File file = fileChooser.showSaveDialog(btnfacturapdf.getScene().getWindow());
+
+        if (file != null) {
+            Document document = new Document();
+            try {
+                PdfWriter.getInstance(document, new FileOutputStream(file));
+                document.open();
+                
+                com.itextpdf.text.Font font = FontFactory.getFont(FontFactory.COURIER, 10);
+                document.add(new Paragraph(contenidoFactura, font));
+                
+                document.close();
+
+                mostrarMensajeExito("Factura exportada exitosamente en:\n" + file.getAbsolutePath());
+
+            } catch (DocumentException | java.io.FileNotFoundException e) {
+                mostrarError("Error al generar el PDF: " + e.getMessage());
+            }
         }
     }
 
@@ -91,6 +139,14 @@ public class FacturaImpresaController implements Initializable {
     private void mostrarError(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
+    private void mostrarMensajeExito(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Éxito");
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();

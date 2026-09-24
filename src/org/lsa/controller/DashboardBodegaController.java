@@ -77,7 +77,6 @@ public class DashboardBodegaController implements Initializable {
                 
                 txtPrecio.setText(String.valueOf(newSelection.getPrecio()));
 
-                // Seleccionar Autor
                 if (cmbAutor != null) {
                     cmbAutor.getSelectionModel().clearSelection();
                     for (Autor aut : cmbAutor.getItems()) {
@@ -89,7 +88,6 @@ public class DashboardBodegaController implements Initializable {
                     }
                 }
 
-                // Seleccionar Categoría
                 if (cmbCategoria != null) {
                     for (Categoria cat : cmbCategoria.getItems()) {
                         if (cat.getIdCategoria() == newSelection.getIdCategoria()) {
@@ -99,7 +97,6 @@ public class DashboardBodegaController implements Initializable {
                     }
                 }
 
-                // Seleccionar Editorial
                 if (cmbEditorial != null) {
                     for (Editorial ed : cmbEditorial.getItems()) {
                         if (ed.getNit() != null && ed.getNit().equalsIgnoreCase(newSelection.getNitEditorial())) {
@@ -118,7 +115,6 @@ public class DashboardBodegaController implements Initializable {
         colFechaPublicacion.setCellValueFactory(new PropertyValueFactory<>("fechaPublicacion"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
         
-        // Muestra la representación en texto del autor si está presente
         if (colAutor != null) {
             colAutor.setCellValueFactory(cellData -> {
                 String nombreAutor = cellData.getValue().getAutor();

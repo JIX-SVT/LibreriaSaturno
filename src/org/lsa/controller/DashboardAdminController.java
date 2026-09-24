@@ -45,7 +45,6 @@ public class DashboardAdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Obtenemos el usuario de la sesión actual mediante tu método exacto
         if (SesionUsuario.getInstancia() != null) {
             usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
         }
