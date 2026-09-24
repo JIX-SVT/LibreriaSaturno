@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -25,6 +26,7 @@ import javafx.stage.Stage;
 
 import org.lsa.dao.LibroDAO;
 import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.model.Autor;
 import org.lsa.model.Categoria;
 import org.lsa.model.Editorial;
 import org.lsa.model.Libro;
@@ -38,7 +40,7 @@ public class DashboardBodegaController implements Initializable {
     private final ObservableList<Libro> listaLibros = FXCollections.observableArrayList();
 
     @FXML private TableView<Libro> tblLibros; 
-    @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colNitEditorial;
+    @FXML private TableColumn<Libro, String> colIsbn, colTitulo, colNitEditorial, colAutor;
     @FXML private TableColumn<Libro, Date> colFechaPublicacion;
     @FXML private TableColumn<Libro, Double> colPrecio;
     @FXML private TableColumn<Libro, Integer> colIdCategoria, colStock;
@@ -46,7 +48,7 @@ public class DashboardBodegaController implements Initializable {
     @FXML private TextField txtBusqueda;
     @FXML private TextField txtIsbn, txtTitulo, txtPrecio, txtCantidadMovimiento;
     
-    // Cambiado a tipos Categoria y Editorial
+    @FXML private ComboBox<Autor> cmbAutor;
     @FXML private ComboBox<Categoria> cmbCategoria;
     @FXML private ComboBox<Editorial> cmbEditorial;
     
@@ -74,18 +76,36 @@ public class DashboardBodegaController implements Initializable {
                 }
                 
                 txtPrecio.setText(String.valueOf(newSelection.getPrecio()));
-                
-                for (Categoria cat : cmbCategoria.getItems()) {
-                    if (cat.getIdCategoria() == newSelection.getIdCategoria()) {
-                        cmbCategoria.setValue(cat);
-                        break;
+
+                // Seleccionar Autor
+                if (cmbAutor != null) {
+                    cmbAutor.getSelectionModel().clearSelection();
+                    for (Autor aut : cmbAutor.getItems()) {
+                        if ((newSelection.getIdAutor() != 0 && aut.getIdAutor() == newSelection.getIdAutor()) ||
+                            (newSelection.getAutor() != null && aut.toString().toLowerCase().contains(newSelection.getAutor().toLowerCase()))) {
+                            cmbAutor.setValue(aut);
+                            break;
+                        }
                     }
                 }
 
-                for (Editorial ed : cmbEditorial.getItems()) {
-                    if (ed.getNit() != null && ed.getNit().equalsIgnoreCase(newSelection.getNitEditorial())) {
-                        cmbEditorial.setValue(ed);
-                        break;
+                // Seleccionar Categoría
+                if (cmbCategoria != null) {
+                    for (Categoria cat : cmbCategoria.getItems()) {
+                        if (cat.getIdCategoria() == newSelection.getIdCategoria()) {
+                            cmbCategoria.setValue(cat);
+                            break;
+                        }
+                    }
+                }
+
+                // Seleccionar Editorial
+                if (cmbEditorial != null) {
+                    for (Editorial ed : cmbEditorial.getItems()) {
+                        if (ed.getNit() != null && ed.getNit().equalsIgnoreCase(newSelection.getNitEditorial())) {
+                            cmbEditorial.setValue(ed);
+                            break;
+                        }
                     }
                 }
             }
@@ -97,19 +117,41 @@ public class DashboardBodegaController implements Initializable {
         colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colFechaPublicacion.setCellValueFactory(new PropertyValueFactory<>("fechaPublicacion"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        
+        // Muestra la representación en texto del autor si está presente
+        if (colAutor != null) {
+            colAutor.setCellValueFactory(cellData -> {
+                String nombreAutor = cellData.getValue().getAutor();
+                if (nombreAutor != null && !nombreAutor.trim().isEmpty()) {
+                    return new SimpleStringProperty(nombreAutor);
+                }
+                return new SimpleStringProperty(String.valueOf(cellData.getValue().getIdAutor()));
+            });
+        }
+        
         colIdCategoria.setCellValueFactory(new PropertyValueFactory<>("idCategoria"));
         colNitEditorial.setCellValueFactory(new PropertyValueFactory<>("nitEditorial"));
+        
         if (colStock != null) {
             colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
         }
     }
 
     private void cargarOpcionesCombos() {
+        List<Autor> autoresBD = libroDAO.listarAutores();
+        if (cmbAutor != null && autoresBD != null) {
+            cmbAutor.setItems(FXCollections.observableArrayList(autoresBD));
+        }
+
         List<Categoria> categoriasBD = libroDAO.listarCategorias();
-        cmbCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
+        if (cmbCategoria != null && categoriasBD != null) {
+            cmbCategoria.setItems(FXCollections.observableArrayList(categoriasBD));
+        }
 
         List<Editorial> editorialesBD = libroDAO.listarEditoriales();
-        cmbEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
+        if (cmbEditorial != null && editorialesBD != null) {
+            cmbEditorial.setItems(FXCollections.observableArrayList(editorialesBD));
+        }
     }
 
     private void cargarLibros() {
@@ -175,8 +217,8 @@ public class DashboardBodegaController implements Initializable {
 
         if (txtIsbn.getText().trim().isEmpty() || txtTitulo.getText().trim().isEmpty() ||
             dpFechaPublicacion.getValue() == null || txtPrecio.getText().trim().isEmpty() ||
-            cmbCategoria.getValue() == null || cmbEditorial.getValue() == null) {
-            mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos y seleccione Categoría y Editorial.", Alert.AlertType.WARNING);
+            cmbAutor.getValue() == null || cmbCategoria.getValue() == null || cmbEditorial.getValue() == null) {
+            mostrarAlerta("Campos Incompletos", "Por favor complete todos los campos requeridos (ISBN, Título, Fecha, Precio, Autor, Categoría y Editorial).", Alert.AlertType.WARNING);
             return;
         }
 
@@ -186,10 +228,12 @@ public class DashboardBodegaController implements Initializable {
             Date fecha = Date.valueOf(dpFechaPublicacion.getValue());
             double precio = Double.parseDouble(txtPrecio.getText().trim());
             
+            int idAutor = cmbAutor.getValue().getIdAutor();
+            String nombreAutor = cmbAutor.getValue().toString();
             int idCategoria = cmbCategoria.getValue().getIdCategoria();
             String nitEditorial = cmbEditorial.getValue().getNit();
 
-            Libro libro = new Libro(isbn, titulo, fecha, precio, idCategoria, nitEditorial, 0);
+            Libro libro = new Libro(isbn, titulo, fecha, precio, idAutor, nombreAutor, idCategoria, nitEditorial, 0);
 
             boolean exito;
             Libro libroExistente = libroDAO.buscarPorIsbn(isbn);
@@ -308,8 +352,15 @@ public class DashboardBodegaController implements Initializable {
         txtTitulo.clear();
         dpFechaPublicacion.setValue(null);
         txtPrecio.clear();
-        cmbCategoria.getSelectionModel().clearSelection();
-        cmbEditorial.getSelectionModel().clearSelection();
+        if (cmbAutor != null) {
+            cmbAutor.getSelectionModel().clearSelection();
+        }
+        if (cmbCategoria != null) {
+            cmbCategoria.getSelectionModel().clearSelection();
+        }
+        if (cmbEditorial != null) {
+            cmbEditorial.getSelectionModel().clearSelection();
+        }
         txtCantidadMovimiento.clear();
         tblLibros.getSelectionModel().clearSelection();
     }

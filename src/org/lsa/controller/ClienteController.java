@@ -1,3 +1,4 @@
+
 package org.lsa.controller;
 
 import java.io.IOException;
@@ -265,7 +266,7 @@ public class ClienteController implements Initializable {
         LOGGER.info("Navegando de regreso al menú principal.");
         try {
             Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/MenuBodegaView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             escenarioPrincipal.setTitle("Librería Saturno - Menú");

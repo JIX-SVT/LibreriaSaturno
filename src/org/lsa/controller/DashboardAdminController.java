@@ -1,174 +1,187 @@
 package org.lsa.controller;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.lsa.model.Usuario;
+import org.lsa.utils.Navegador;
 import org.lsa.utils.SesionUsuario;
 
 public class DashboardAdminController implements Initializable {
 
-    private static final Logger log = Logger.getLogger(DashboardAdminController.class.getName());
+    @FXML private Label lblBienvenida;
+    @FXML private Label lblRol;
+    @FXML private Button btnCerrarSesion;
+    @FXML private Circle avatarCircle;
 
-    @FXML private Label lblVentasTotales;
-    @FXML private Label lblTotalLibros;
-    @FXML private Label lblUsuariosActivos;
+    @FXML private Button btnUsuario;
+    @FXML private Button btnLibro;
+    @FXML private Button btnAutor;
+    @FXML private Button btnCategoria;
+    @FXML private Button btnEditorial;
+    @FXML private Button btnVentas;
+    @FXML private Button btnAutorLibro;
+    @FXML private Button btnDetalleVenta;
+
+    @FXML private VBox cardNuevoLibro;
+    @FXML private VBox cardAgregarVenta;
+    @FXML private VBox cardVerInventario;
+    @FXML private VBox cardGestionarUsuarios;
+    @FXML private VBox cardReportes;
+    @FXML private VBox cardConfiguracion;
+
+    private Usuario usuarioActual;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        log.info("Inicializando DashboardAdminController...");
-        cargarKpis();
+        // Obtenemos el usuario de la sesión actual mediante tu método exacto
+        if (SesionUsuario.getInstancia() != null) {
+            usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
+        }
+
+        actualizarInformacionUsuario(usuarioActual);
     }
 
-    private void cargarKpis() {
-        log.info("Cargando indicadores clave de rendimiento (KPIs)...");
-        lblVentasTotales.setText("Q0.00");
-        lblTotalLibros.setText("0"); 
-        lblUsuariosActivos.setText("1");
-    }
-
-    @FXML
-    public void handleReportesVentas(ActionEvent event) {
-        log.info("Navegando hacia la vista de Reportes de Ventas (DashboardCajeroView.fxml).");
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Reportes de Ventas");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la vista de reportes de ventas: /org/lsa/view/DashboardCajeroView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de ventas.");
+    private void actualizarInformacionUsuario(Usuario usuario) {
+        if (usuario != null && usuario.getNombreUsuario() != null) {
+            lblBienvenida.setText(usuario.getNombreUsuario());
+            String iniciales = usuario.getNombreUsuario()
+                    .substring(0, Math.min(2, usuario.getNombreUsuario().length()))
+                    .toUpperCase();
+            String rolTexto = usuario.getRol() != null ? usuario.getRol() : "Usuario";
+            lblRol.setText(iniciales + " · " + capitalize(rolTexto));
+        } else {
+            lblBienvenida.setText("Invitado");
+            lblRol.setText("?? · Sin sesión");
         }
     }
 
-    @FXML
-    public void handleReportesInventario(ActionEvent event) {
-        log.info("Navegando hacia la vista de Reportes de Inventario (DashboardBodegaView.fxml).");
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardBodegaView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Reportes de Inventario");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la vista de reportes de inventario: /org/lsa/view/DashboardBodegaView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de inventario.");
-        }
+    private String capitalize(String texto) {
+        if (texto == null || texto.isEmpty()) return "";
+        return texto.substring(0, 1).toUpperCase() + texto.substring(1).toLowerCase();
     }
 
     @FXML
-    public void handleGestionarLibros(ActionEvent event) {
-        log.info("Navegando hacia la vista de Gestión de Libros (DashboardCajeroView.fxml).");
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardCajeroView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Reportes de Inventario");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la vista de gestión de libros: /org/lsa/view/DashboardCajeroView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de reportes de inventario.");
-        }
-    }
-
-    @FXML
-    public void handleVolverMenu(ActionEvent event) {
-        log.info("Regresando al menú principal (DashboardMenuView.fxml).");
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/DashboardMenuView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Menú Principal - Librería Saturno");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la vista del menú principal: /org/lsa/view/DashboardMenuView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista del menú principal.");
-        }
-    }
-
-    @FXML
-    public void handleCerrarSesion(ActionEvent event) {
-        log.info("Cerrando sesión de administrador e intentando navegar a LoginView.fxml.");
+    public void cerrarSesion(ActionEvent evento) {
         SesionUsuario.getInstancia().cerrarSesion();
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/LoginView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Inicio de Sesión");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al intentar volver al inicio de sesión: /org/lsa/view/LoginView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo regresar a la pantalla de inicio de sesión.");
-        }
+        Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+        Navegador.cargarVista(stage, "/org/lsa/view/LoginView.fxml", "Inicio de Sesión");
     }
 
     @FXML
-    public void handleGestionarUsuarios(ActionEvent event) {
-        log.info("Navegando hacia la vista de Gestión de Usuarios (ListaUsuariosView.fxml).");
-        try {
-            Stage escenarioPrincipal = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/ListaUsuariosView.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            escenarioPrincipal.setTitle("Gestionar Usuarios");
-            escenarioPrincipal.setScene(scene);
-            escenarioPrincipal.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la vista de gestión de usuarios: /org/lsa/view/ListaUsuariosView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de gestión de usuarios.");
-        }
+    public void irAUsuario(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/ListaUsuariosView.fxml", "Gestión de Usuarios");
     }
 
     @FXML
-    private void handleCambiarContraseña() {
-        log.info("Abriendo ventana emergente para Cambio de Contraseña (CambioContrasenaView.fxml).");
+    public void irALibro(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/InventarioView.fxml", "Gestión de Libros");
+    }
+
+    @FXML
+    public void irAAutor(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/AutorView.fxml", "Gestión de Autores");
+    }
+
+    @FXML
+    public void irACategoria(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/CategoriaView.fxml", "Gestión de Categorías");
+    }
+
+    @FXML
+    public void irAEditorial(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/EditorialView.fxml", "Gestión de Editoriales");
+    }
+
+    @FXML
+    public void irAVentas(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/ListaVentasView.fxml", "Lista de Ventas");
+    }
+
+    @FXML
+    public void irAAutorLibro(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/AutorView.fxml", "Autores y Libros");
+    }
+
+    @FXML
+    public void irADetalleVenta(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/DetalleVentaview.fxml", "Detalle de Venta");
+    }
+
+    @FXML
+    public void irAClientes(ActionEvent evento) {
+        navegar(evento, "/org/lsa/view/ClienteView.fxml", "Gestión de Clientes");
+    }
+
+    @FXML
+    public void nuevoLibro(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/InventarioView.fxml", "Nuevo Libro");
+    }
+
+    @FXML
+    public void agregarVenta(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/NuevaVentaView.fxml", "Nueva Venta");
+    }
+
+    @FXML
+    public void verInventario(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/InventarioView.fxml", "Inventario");
+    }
+
+    @FXML
+    public void gestionarUsuarios(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/ListaUsuariosView.fxml", "Gestión de Usuarios");
+    }
+
+    @FXML
+    public void reportes(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/FacturaView.fxml", "Reportes y Facturas");
+    }
+
+    @FXML
+    public void configuracion(MouseEvent evento) {
+        navegarCard(evento, "/org/lsa/view/CambioContrasenaView.fxml", "Configuración");
+    }
+
+    private void navegar(ActionEvent evento, String fxmlPath, String titulo) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/lsa/view/CambioContrasenaView.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al cargar la ventana modal de cambio de contraseña: /org/lsa/view/CambioContrasenaView.fxml", e);
-            e.printStackTrace();
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de interfaz", "No se pudo cargar la vista de cambio de contraseña.");
+            Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+            Navegador.cargarVista(stage, fxmlPath, titulo);
+        } catch (Exception e) {
+            mostrarAlertaEnConstruccion();
         }
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        log.info("Mostrando ventana emergente de alerta. Tipo: " + tipo + " | Título: " + titulo);
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    private void navegarCard(MouseEvent evento, String fxmlPath, String titulo) {
+        try {
+            Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+            Navegador.cargarVista(stage, fxmlPath, titulo);
+        } catch (Exception e) {
+            mostrarAlertaEnConstruccion();
+        }
+    }
+
+    private void mostrarAlertaEnConstruccion() {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION,
+                "Esta sección estará disponible próximamente.", ButtonType.OK);
+        alerta.setTitle("En construcción");
+        alerta.setHeaderText(null);
+        alerta.showAndWait();
+    }
+
+    public void iniciarUsuario(Usuario usuario) {
+        this.usuarioActual = usuario;
+        actualizarInformacionUsuario(usuario);
     }
 }
