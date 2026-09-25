@@ -1,4 +1,5 @@
 package org.lsa.controller;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -6,14 +7,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import org.lsa.dao.ClienteDAO;
 import org.lsa.dao.LibroDAO;
+import org.lsa.dao.VentaDAO;
 import org.lsa.daoimpl.ClienteDAOImpl;
 import org.lsa.daoimpl.LibroDAOImpl;
+import org.lsa.daoimpl.VentaDAOImpl;
 import org.lsa.exception.ValidacionException;
 import org.lsa.model.Cliente;
 import org.lsa.model.DetalleVenta;
@@ -74,6 +82,7 @@ public class NuevaVentaController implements Initializable {
         colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
         colSubtotal.setCellValueFactory(new PropertyValueFactory<>("subTotalDetalle"));
     }
+
     private void configurarSpinner() {
         spCantidad.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 999, 1));
     }
@@ -145,43 +154,75 @@ public class NuevaVentaController implements Initializable {
         calcularTotal();
         lblMensaje.setText("");
     }
-@FXML
-private void handleRegistrarVenta() {
-    try {
-        Usuario usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
-        if (usuarioActual == null) {
-            throw new ValidacionException("No hay una sesión de usuario activa. Inicie sesión nuevamente.");
+
+    @FXML  
+    private void handleRegistrarVenta() {
+        try {
+            Usuario usuarioActual = SesionUsuario.getInstancia().getUsuarioActual();
+            if (usuarioActual == null) {
+                throw new ValidacionException("No hay una sesión de usuario activa. Inicie sesión nuevamente.");
+            }
+            Cliente clienteSeleccionado = cmbCliente.getValue();
+            if (clienteSeleccionado == null) {
+                throw new ValidacionException("Seleccione el cliente de la venta.");
+            }
+            if (lineasVenta.isEmpty()) {
+                throw new ValidacionException("Agregue al menos un libro a la venta.");
+            }
+            
+            int idUsuario = usuarioActual.getIdUsuario();
+            long cuiCliente = clienteSeleccionado.getCui();
+            double totalCalculado = calcularTotal();
+            
+            Venta nuevaVenta = new Venta();
+            nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
+            nuevaVenta.setDescuento(0.00);
+            nuevaVenta.setTotalVenta(totalCalculado);
+            nuevaVenta.setCuiCliente(cuiCliente);
+            nuevaVenta.setId_usuario(idUsuario);
+            
+            boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
+            if (!exito) {
+                mostrarError("No se pudo registrar la venta. Verifique el stock.");
+                return;
+            }
+
+            VentaDAO ventaDAO = new VentaDAOImpl();
+            int idUltimaVenta = ventaDAO.listar().stream()
+                    .mapToInt(Venta::getIdVenta)
+                    .max()
+                    .orElse(0);
+
+            FacturaCompraController.setNoVentaSeleccionada(idUltimaVenta);
+
+            java.net.URL fxmlUrl = getClass().getResource("/org/lsa/view/FacturaCompraView.fxml");
+            if (fxmlUrl == null) {
+                throw new Exception("No se pudo encontrar el archivo FacturaCompraView.fxml. Revisa la ruta.");
+            }
+            
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            Stage stageEmergente = new Stage();
+            stageEmergente.setTitle("Factura de Compra - Librería Saturno");
+            stageEmergente.initModality(Modality.APPLICATION_MODAL);
+            stageEmergente.setScene(new Scene(root));
+            stageEmergente.setResizable(false);
+            stageEmergente.show();
+
+            limpiarVenta();
+            cargarCombos();
+            lblMensaje.setText("Venta registrada exitosamente.");
+
+        } catch (ValidacionException e) {
+            mostrarAdvertencia(e.getMessage());
+            lblMensaje.setText(e.getMessage());
+        } catch (Exception e) {
+            mostrarError("Error al registrar la venta: " + e.getMessage());
+            e.printStackTrace();
         }
-        if (cmbCliente.getValue() == null) {
-            throw new ValidacionException("Seleccione el cliente de la venta.");
-        }
-        if (lineasVenta.isEmpty()) {
-            throw new ValidacionException("Agregue al menos un libro a la venta.");
-        }
-        int idUsuario = usuarioActual.getIdUsuario();
-        long cuiCliente = cmbCliente.getValue().getCui();
-        double totalCalculado = calcularTotal();
-        Venta nuevaVenta = new Venta();
-        nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
-        nuevaVenta.setDescuento(0.00);
-        nuevaVenta.setTotalVenta(totalCalculado);
-        nuevaVenta.setCuiCliente(cuiCliente);
-        nuevaVenta.setId_usuario(idUsuario);
-        boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
-        if (!exito) {
-            mostrarError("No se pudo registrar la venta. Verifique el stock.");
-            return;
-        }
-        lblMensaje.setText("Venta registrada exitosamente.");
-        limpiarVenta();
-        cargarCombos();
-    } catch (ValidacionException e) {
-        mostrarAdvertencia(e.getMessage());
-        lblMensaje.setText(e.getMessage());
-    } catch (Exception e) {
-        mostrarError("Error al registrar la venta: " + e.getMessage());
     }
-}
+      
     private void limpiarVenta() {
         lineasVenta.clear();
         cmbCliente.setValue(null);
@@ -189,18 +230,16 @@ private void handleRegistrarVenta() {
         spCantidad.getValueFactory().setValue(1);
         calcularTotal();
     }
+
     @FXML
     public void handleVolver(ActionEvent event) {
         try {
-            Main.cambiarVista(
-                    "/org/lsa/view/DashboardCajeroView.fxml");
+            Main.cambiarVista("/org/lsa/view/DashboardCajeroView.fxml");
         } catch (Exception e) {
-            mostrarError(
-                    "Error al volver al menú: "
-                    + e.getMessage()
-            );
+            mostrarError("Error al volver al menú: " + e.getMessage());
         }
     }
+
     private void mostrarError(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -208,6 +247,7 @@ private void handleRegistrarVenta() {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
     private void mostrarAdvertencia(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia");

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="380.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lsa.controller.FacturaCompraController">
+   <children>
+
+      <Label layoutX="30.0" layoutY="25.0" text="Factura">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      
+
+      <Label layoutX="30.0" layoutY="70.0" text="Factura No.:" />
+      <Label fx:id="lblNoFactura" layoutX="120.0" layoutY="70.0" text="# 0" />
+      
+      <Label layoutX="30.0" layoutY="100.0" text="Fecha:" />
+      <Label fx:id="lblFecha" layoutX="120.0" layoutY="100.0" text="--" />
+      
+      <Label layoutX="30.0" layoutY="130.0" text="Cliente:" />
+      <Label fx:id="lblCliente" layoutX="120.0" layoutY="130.0" text="--" />
+      
+      <Label layoutX="30.0" layoutY="160.0" text="CUI:" />
+      <Label fx:id="lblCui" layoutX="120.0" layoutY="160.0" text="--" />
+      
+      <Label layoutX="30.0" layoutY="190.0" text="Correo:" />
+      <Label fx:id="lblCorreo" layoutX="120.0" layoutY="190.0" text="--" />
+      
+      <Label layoutX="30.0" layoutY="220.0" text="Atendido por:" />
+      <Label fx:id="lblUsuario" layoutX="120.0" layoutY="220.0" text="--" />
+      
+
+      <Label layoutX="30.0" layoutY="260.0" text="Total:">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblTotal" layoutX="120.0" layoutY="258.0" text="Q 0.00">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+
+      <Button fx:id="btnImprimir" layoutX="30.0" layoutY="310.0" mnemonicParsing="false" onAction="#handleImprimirFactura" prefWidth="120.0" text="Imprimir" />
+      <Button fx:id="btnOk" layoutX="170.0" layoutY="310.0" mnemonicParsing="false" onAction="#handleOk" prefWidth="110.0" text="OK" />
+   </children>
+</AnchorPane>
