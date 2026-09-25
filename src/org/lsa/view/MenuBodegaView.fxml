@@ -24,7 +24,7 @@
                   <VBox alignment="CENTER_LEFT">
                      <children>
                         <Label fx:id="lblBienvenida" prefWidth="97.0" text="Bienvenido" />
-                        <Label fx:id="lblRol" prefHeight="17.0" prefWidth="94.0" text="Empleado" />
+                        <Label fx:id="lblRol" prefHeight="17.0" prefWidth="94.0" text="Bodega" />
                      </children>
                   </VBox>
                </children>
@@ -64,7 +64,7 @@
          <children>
             <VBox spacing="3.0">
                <children>
-                  <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="Panel de Empleado" />
+                  <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" text="Panel de Bodega" />
                   <Label style="-fx-font-size: 13px; -fx-text-fill: #6b7280;" text="Inventario y gestión de catálogo" />
                </children>
             </VBox>
