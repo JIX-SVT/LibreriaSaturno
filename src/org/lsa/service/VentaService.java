@@ -47,9 +47,8 @@ public class VentaService {
             String sqlVenta = "{call sp_insertarventa(?, ?, ?, ?, ?, ?)}";
             int idVentaGenerado = -1;
 
-            try (CallableStatement csVenta = con.prepareCall(sqlVenta)) {
+try (CallableStatement csVenta = con.prepareCall(sqlVenta)) {
                 double subtotalNum = Double.parseDouble(venta.getSubTotal().replace(",", "."));
-                
                 csVenta.setDouble(1, subtotalNum);
                 csVenta.setDouble(2, venta.getDescuento());
                 csVenta.setDouble(3, venta.getTotalVenta());
@@ -60,24 +59,20 @@ public class VentaService {
                 csVenta.executeUpdate();
                 idVentaGenerado = csVenta.getInt(6);
             }
-
             if (idVentaGenerado <= 0) {
                 con.rollback();
                 return false;
             }
-
+            venta.setIdVenta(idVentaGenerado); 
             String sqlDetalle = "{call sp_insertardetalleventa(?, ?, ?, ?, ?)}";
-
             try (CallableStatement csDetalle = con.prepareCall(sqlDetalle)) {
                 for (DetalleVenta det : detalles) {
                     det.setNoVenta(idVentaGenerado);
-
-                    csDetalle.setInt(1, det.getNoVenta());
+                        csDetalle.setInt(1, det.getNoVenta());
                     csDetalle.setString(2, det.getIsbn());
                     csDetalle.setInt(3, det.getCantidad());
                     csDetalle.setDouble(4, det.getPrecioUnitario());
                     csDetalle.setDouble(5, det.getSubTotalDetalle());
-                    
                     csDetalle.executeUpdate();
                 }
             }

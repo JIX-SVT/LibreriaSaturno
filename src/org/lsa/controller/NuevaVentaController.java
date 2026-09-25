@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import static org.lsa.controller.FacturaController.setNoVentaSeleccionada;
 
 import org.lsa.dao.ClienteDAO;
 import org.lsa.dao.LibroDAO;
@@ -158,9 +159,11 @@ private void handleRegistrarVenta() {
         if (lineasVenta.isEmpty()) {
             throw new ValidacionException("Agregue al menos un libro a la venta.");
         }
+
         int idUsuario = usuarioActual.getIdUsuario();
         long cuiCliente = cmbCliente.getValue().getCui();
         double totalCalculado = calcularTotal();
+
         Venta nuevaVenta = new Venta();
         nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
         nuevaVenta.setDescuento(0.00);
@@ -168,18 +171,22 @@ private void handleRegistrarVenta() {
         nuevaVenta.setCuiCliente(cuiCliente);
         nuevaVenta.setId_usuario(idUsuario);
         boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
+
         if (!exito) {
             mostrarError("No se pudo registrar la venta. Verifique el stock.");
             return;
         }
-        lblMensaje.setText("Venta registrada exitosamente.");
+        int idVentaGenerada = nuevaVenta.getIdVenta();
+        FacturaController.setNoVentaSeleccionada(idVentaGenerada);
         limpiarVenta();
         cargarCombos();
+        Main.cambiarVista("/org/lsa/view/FacturaImpresaView.fxml");
+
     } catch (ValidacionException e) {
         mostrarAdvertencia(e.getMessage());
         lblMensaje.setText(e.getMessage());
     } catch (Exception e) {
-        mostrarError("Error al registrar la venta: " + e.getMessage());
+        mostrarError("Error al registrar la venta y redirigir: " + e.getMessage());
     }
 }
     private void limpiarVenta() {
