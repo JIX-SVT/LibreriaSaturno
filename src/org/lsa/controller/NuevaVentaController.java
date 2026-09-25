@@ -170,59 +170,39 @@ public class NuevaVentaController implements Initializable {
                 throw new ValidacionException("Agregue al menos un libro a la venta.");
             }
             
-            int idUsuario = usuarioActual.getIdUsuario();
-            long cuiCliente = clienteSeleccionado.getCui();
-            double totalCalculado = calcularTotal();
-            
-            Venta nuevaVenta = new Venta();
-            nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
-            nuevaVenta.setDescuento(0.00);
-            nuevaVenta.setTotalVenta(totalCalculado);
-            nuevaVenta.setCuiCliente(cuiCliente);
-            nuevaVenta.setId_usuario(idUsuario);
-            
-            boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
-            if (!exito) {
-                mostrarError("No se pudo registrar la venta. Verifique el stock.");
-                return;
-            }
-
-            VentaDAO ventaDAO = new VentaDAOImpl();
-            int idUltimaVenta = ventaDAO.listar().stream()
-                    .mapToInt(Venta::getIdVenta)
-                    .max()
-                    .orElse(0);
-
-            FacturaCompraController.setNoVentaSeleccionada(idUltimaVenta);
-
-            java.net.URL fxmlUrl = getClass().getResource("/org/lsa/view/FacturaCompraView.fxml");
-            if (fxmlUrl == null) {
-                throw new Exception("No se pudo encontrar el archivo FacturaCompraView.fxml. Revisa la ruta.");
-            }
-            
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-
-            Stage stageEmergente = new Stage();
-            stageEmergente.setTitle("Factura de Compra - Librería Saturno");
-            stageEmergente.initModality(Modality.APPLICATION_MODAL);
-            stageEmergente.setScene(new Scene(root));
-            stageEmergente.setResizable(false);
-            stageEmergente.show();
-
-            limpiarVenta();
-            cargarCombos();
-            lblMensaje.setText("Venta registrada exitosamente.");
-
-        } catch (ValidacionException e) {
-            mostrarAdvertencia(e.getMessage());
-            lblMensaje.setText(e.getMessage());
-        } catch (Exception e) {
-            mostrarError("Error al registrar la venta: " + e.getMessage());
-            e.printStackTrace();
+       if (lineasVenta.isEmpty()) {
+            throw new ValidacionException("Agregue al menos un libro a la venta.");
         }
+
+        int idUsuario = usuarioActual.getIdUsuario();
+        long cuiCliente = cmbCliente.getValue().getCui();
+        double totalCalculado = calcularTotal();
+
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setSubTotal(String.valueOf(totalCalculado));
+        nuevaVenta.setDescuento(0.00);
+        nuevaVenta.setTotalVenta(totalCalculado);
+        nuevaVenta.setCuiCliente(cuiCliente);
+        nuevaVenta.setId_usuario(idUsuario);
+        boolean exito = ventaService.procesarVenta(nuevaVenta, lineasVenta);
+
+        if (!exito) {
+            mostrarError("No se pudo registrar la venta. Verifique el stock.");
+            return;
+        }
+        int idVentaGenerada = nuevaVenta.getIdVenta();
+        FacturaController.setNoVentaSeleccionada(idVentaGenerada);
+        limpiarVenta();
+        cargarCombos();
+        Main.cambiarVista("/org/lsa/view/FacturaImpresaView.fxml");
+
+    } catch (ValidacionException e) {
+        mostrarAdvertencia(e.getMessage());
+        lblMensaje.setText(e.getMessage());
+    } catch (Exception e) {
+        mostrarError("Error al registrar la venta y redirigir: " + e.getMessage());
     }
-      
+}
     private void limpiarVenta() {
         lineasVenta.clear();
         cmbCliente.setValue(null);
