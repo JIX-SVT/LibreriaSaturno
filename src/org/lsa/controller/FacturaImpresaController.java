@@ -20,6 +20,7 @@ import org.lsa.dao.FacturaDAO;
 import org.lsa.daoimpl.FacturaDAOImpl;
 import org.lsa.exception.DaoException;
 import org.lsa.model.Factura;
+import org.lsa.service.VentaService;
 import org.lsa.system.Main;
 
 public class FacturaImpresaController implements Initializable {
@@ -126,7 +127,7 @@ public class FacturaImpresaController implements Initializable {
             }
         }
     }
-
+   
     @FXML
     private void handleVolver() {
         try {
